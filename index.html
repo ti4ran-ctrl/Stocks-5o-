@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>מעקב מניות ותוצאות סריקה</title>
+  <title>מעקב מניות וניהול תיק אוטומטי</title>
   <style>
     :root {
       --bg: #f4f6f8;
@@ -45,7 +45,6 @@
       border-radius: 16px;
       padding: 14px 16px;
       margin-bottom: 14px;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
     .top h1 { margin: 0; font-size: 1.22rem; font-weight: 800; }
     .meta { font-size: 0.84rem; color: var(--muted); }
@@ -77,7 +76,6 @@
       border-radius: 16px;
       padding: 16px;
       margin-bottom: 14px;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
     .row {
       display: flex;
@@ -119,7 +117,6 @@
       border-radius: 16px;
       padding: 15px;
       background: #ffffff;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -130,15 +127,8 @@
       align-items: flex-start;
       gap: 8px;
     }
-    .ticker-title {
-      font-size: 1.08rem;
-      font-weight: 800;
-    }
-    .price-now {
-      font-size: 1.08rem;
-      font-weight: 800;
-      text-align: left;
-    }
+    .ticker-title { font-size: 1.08rem; font-weight: 800; }
+    .price-now { font-size: 1.08rem; font-weight: 800; text-align: left; }
     .badge {
       background: var(--accent-soft);
       color: var(--accent);
@@ -156,7 +146,6 @@
     .bar-labels {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       font-size: 0.8rem;
       font-weight: 700;
       margin-bottom: 6px;
@@ -171,12 +160,10 @@
     .progress-fill {
       height: 100%;
       border-radius: 999px;
-      transition: width 0.25s ease;
     }
     .fill-ok { background: linear-gradient(90deg, #16a34a, #0f766e); }
     .fill-warn { background: linear-gradient(90deg, #f59e0b, #d97706); }
     .fill-bad { background: linear-gradient(90deg, #ef4444, #b91c1c); }
-
     .io-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -194,20 +181,9 @@
       border-radius: 11px;
       padding: 9px 10px;
     }
-    .box-label {
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: var(--muted);
-    }
-    .box-val {
-      font-size: 1.05rem;
-      font-weight: 800;
-      margin: 2px 0;
-    }
-    .box-pct {
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
+    .box-label { font-size: 0.76rem; font-weight: 700; color: var(--muted); }
+    .box-val { font-size: 1.05rem; font-weight: 800; margin: 2px 0; }
+    .box-pct { font-size: 0.78rem; font-weight: 700; }
     .sub-levels {
       display: flex;
       justify-content: space-between;
@@ -215,8 +191,20 @@
       gap: 6px;
       font-size: 0.8rem;
       color: var(--muted);
-      padding-top: 2px;
     }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .kpi-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .kpi-val { font-size: 1.12rem; font-weight: 800; margin-top: 2px; }
     .pos { color: var(--ok); font-weight: 700; }
     .warn { color: var(--warn); font-weight: 700; }
     .neg { color: var(--bad); font-weight: 700; }
@@ -236,7 +224,7 @@
   <div class="wrap">
     <div class="top">
       <div>
-        <h1>מערכת סריקה ומעקב מניות</h1>
+        <h1>מערכת סריקה וניהול תיק אוטומטי</h1>
         <div class="meta" id="syncStatus">טוען נתוני סנכרון מ-Yahoo Finance...</div>
       </div>
       <button class="btn secondary" onclick="loadSyncedData()">רענן סנכרון</button>
@@ -244,16 +232,16 @@
 
     <div class="tabs">
       <button class="tab active" data-tab="scan" onclick="switchTab('scan')">סריקה ותוצאות</button>
+      <button class="tab" data-tab="bot-demo" onclick="switchTab('bot-demo')">תיק אוטומטי ורווחים</button>
       <button class="tab" data-tab="watchlist" onclick="switchTab('watchlist')">רשימת מעקב</button>
       <button class="tab" data-tab="my-demo" onclick="switchTab('my-demo')">תיק דמו ידני</button>
-      <button class="tab" data-tab="bot-demo" onclick="switchTab('bot-demo')">תיק דמו אוטומטי</button>
     </div>
 
     <section id="tab-scan" class="card">
       <div class="row">
         <div>
           <label for="filterTicker">חיפוש סימול מניה</label>
-          <input id="filterTicker" placeholder="למשל NVDA, PLTR..." oninput="renderScanResults()" />
+          <input id="filterTicker" placeholder="הקלד כל סימול..." oninput="renderScanResults()" />
         </div>
         <div>
           <label for="filterVerdict">סינון סטטוס</label>
@@ -272,10 +260,14 @@
       <div class="grid" id="scanGrid"></div>
     </section>
 
+    <section id="tab-bot-demo" class="card hidden">
+      <div id="botDemoContent"></div>
+    </section>
+
     <section id="tab-watchlist" class="card hidden">
       <div class="row">
         <div>
-          <label for="watchInput">הוסף מניה למעקב</label>
+          <label for="watchInput">הוסף מניה למעקב וקנייה/מכירה אוטומטית</label>
           <input id="watchInput" placeholder="למשל AAPL" />
         </div>
         <button class="btn" onclick="addToWatchlist()">הוסף למעקב</button>
@@ -309,21 +301,11 @@
       <div id="myDemoSummary" class="meta" style="margin-top:14px;"></div>
       <div id="myDemoTrades" style="margin-top:8px;"></div>
     </section>
-
-    <section id="tab-bot-demo" class="card hidden">
-      <div class="row" style="margin-bottom:12px;">
-        <div>
-          <label for="botCapitalInput">גודל תיק לבדיקת ביצועי הסוכנים ($)</label>
-          <input id="botCapitalInput" type="number" min="100" step="100" value="10000" onchange="renderBotDemo()" />
-        </div>
-      </div>
-      <div id="botDemoContent"></div>
-    </section>
   </div>
 
   <script>
     let scanData = { updatedAt: "", results: [] };
-    let botPortfolio = { open_positions: [], closed_positions: [] };
+    let botPortfolio = { initial_capital: 10000, cash: 10000, open_positions: [], closed_positions: [], summary: {} };
 
     let watchlist = JSON.parse(localStorage.getItem("user_watchlist") || '["NVDA","PLTR","COIN"]');
     let myCapital = Number(localStorage.getItem("my_demo_capital") || 10000);
@@ -333,7 +315,7 @@
 
     function switchTab(tabName) {
       document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tabName));
-      ["scan", "watchlist", "my-demo", "bot-demo"].forEach(id => {
+      ["scan", "bot-demo", "watchlist", "my-demo"].forEach(id => {
         document.getElementById("tab-" + id).classList.toggle("hidden", id !== tabName);
       });
     }
@@ -391,8 +373,6 @@
 
       grid.innerHTML = items.map(r => {
         const currPrice = Number(r.price || 0);
-        const breakout = Number(r.breakoutLevel || currPrice);
-        const support = Number(r.supportLevel || r.stopLoss || 0);
         const entry = Number(r.entry || currPrice);
         const stopLoss = Number(r.stopLoss || 0);
         const calcTarget = Number((entry * (1 + targetPct / 100)).toFixed(2));
@@ -406,7 +386,6 @@
         const entryPctLabel = Math.abs(deltaEntryPct) < 0.05
           ? "0.0% מהמחיר הנוכחי"
           : (deltaEntryPct < 0 ? `${deltaEntryPct.toFixed(1)}% מתחת לעכשיו` : `+${deltaEntryPct.toFixed(1)}% מעל לעכשיו`);
-        const entryPctClass = deltaEntryPct <= 0.1 ? "pos" : "warn";
 
         const exitDiffPct = (((recExit - currPrice) / Math.max(currPrice, 0.01)) * 100);
         const exitPctLabel = `${exitDiffPct >= 0 ? "+" : ""}${exitDiffPct.toFixed(1)}% מול עכשיו (יעד +${targetPct}%)`;
@@ -430,8 +409,8 @@
 
             <div class="bar-block">
               <div class="bar-labels">
-                <span>ציון סוכנים: ${scorePct.toFixed(0)}%</span>
-                <span>מיקום בטווח יעד: ${posInRangePct.toFixed(0)}%</span>
+                <span>ציון: ${scorePct.toFixed(0)}%</span>
+                <span>מיקום ביעד: ${posInRangePct.toFixed(0)}%</span>
               </div>
               <div class="progress-track">
                 <div class="progress-fill ${fillClass}" style="width:${scorePct.toFixed(0)}%"></div>
@@ -446,12 +425,12 @@
               <div class="entry-box">
                 <div class="box-label">שער כניסה</div>
                 <div class="box-val">$${entry.toFixed(2)}</div>
-                <div class="box-pct ${entryPctClass}">${entryPctLabel}</div>
+                <div class="box-pct pos">${entryPctLabel}</div>
                 <div class="meta">${r.entryType || ""}</div>
               </div>
 
               <div class="exit-box">
-                <div class="box-label">שער יציאה (${r.exitAction || "יעד"})</div>
+                <div class="box-label">יציאה דינמית (${r.exitAction || "יעד"})</div>
                 <div class="box-val">$${recExit.toFixed(2)}</div>
                 <div class="box-pct warn">${exitPctLabel}</div>
                 <div class="meta">יחס 1:${r.rrRatio || "-"}</div>
@@ -459,8 +438,8 @@
             </div>
 
             <div class="sub-levels">
-              <span>פריצה: <b>$${breakout.toFixed(2)}</b></span>
-              <span>תמיכה: <b>$${support.toFixed(2)}</b></span>
+              <span>פריצה: <b>$${Number(r.breakoutLevel || currPrice).toFixed(2)}</b></span>
+              <span>תמיכה: <b>$${Number(r.supportLevel || stopLoss).toFixed(2)}</b></span>
               <button class="btn secondary" style="padding:5px 10px;font-size:0.78rem;" onclick="quickWatch('${r.ticker}')">+ למעקב</button>
             </div>
           </div>
@@ -499,7 +478,7 @@
       const container = document.getElementById("watchlistContainer");
       const helper = document.getElementById("watchlistSecretHelper");
       helper.textContent = watchlist.length
-        ? `לשליחת עדכוני מעקב לטלגרם בסריקות, הגדר ב-GitHub Secret בשם WATCHLIST_TICKERS: ${watchlist.join(",")}`
+        ? `לסריקה וקנייה/מכירה אוטומטית של המניות שלך ב-GitHub Actions, הגדר Secret בשם WATCHLIST_TICKERS: ${watchlist.join(",")}`
         : "";
 
       if (!watchlist.length) {
@@ -509,7 +488,7 @@
       container.innerHTML = watchlist.map(t => {
         const found = (scanData.results || []).find(r => r.ticker === t);
         const p = found ? Number(found.price) : null;
-        const exitInfo = found ? ` | כניסה: <b>$${Number(found.entry).toFixed(2)}</b> | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b> (${found.exitAction})` : "";
+        const exitInfo = found ? ` | כניסה: <b>$${Number(found.entry).toFixed(2)}</b> | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b>` : "";
         return `
           <div class="list-row">
             <div><b>${t}</b> ${p ? `— $${p.toFixed(2)}${exitInfo}` : "(אין נתון עדכני בסריקה האחרונה)"}</div>
@@ -573,7 +552,7 @@
         totalPnl += pnl;
 
         const exitHint = found && tr.sellPrice === null
-          ? ` | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b> (${found.exitAction})`
+          ? ` | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b>`
           : "";
 
         const statusText = tr.sellPrice !== null
@@ -595,45 +574,93 @@
       }).join("");
 
       const totalReturnPct = (totalPnl / myCapital) * 100;
-      summaryEl.innerHTML = `הון התחלתי: <b>$${myCapital.toLocaleString()}</b> | בשימוש: <b>$${allocated.toLocaleString()}</b> | רווח/הפסד מצטבר: <span class="${totalPnl >= 0 ? "pos" : "neg"}">${totalPnl >= 0 ? "+" : ""}$${totalPnl.toFixed(2)} (${totalReturnPct >= 0 ? "+" : ""}${totalReturnPct.toFixed(2)}%)</span>`;
+      summaryEl.innerHTML = `הון התחלתי: <b>$${myCapital.toLocaleString()}</b> | בשימוש: <b>$${allocated.toLocaleString()}</b> | רווח/הפסד: <span class="${totalPnl >= 0 ? "pos" : "neg"}">${totalPnl >= 0 ? "+" : ""}$${totalPnl.toFixed(2)} (${totalReturnPct >= 0 ? "+" : ""}${totalReturnPct.toFixed(2)}%)</span>`;
       tradesEl.innerHTML = html || `<div class="meta">עדיין לא הוזנו עסקאות לתיק הידני.</div>`;
     }
 
     function renderBotDemo() {
-      const cap = Math.max(100, Number(document.getElementById("botCapitalInput").value || 10000));
       const openList = botPortfolio.open_positions || [];
       const closedList = botPortfolio.closed_positions || [];
+      const sum = botPortfolio.summary || {};
 
-      const closedPnlPct = closedList.reduce((acc, c) => acc + Number(c.pnl_pct || 0), 0);
+      const initCap = Number(sum.initial_capital ?? botPortfolio.initial_capital ?? 10000);
+      const cash = Number(sum.cash ?? botPortfolio.cash ?? initCap);
+
+      let calcOpenVal = 0;
+      let calcOpenPnl = 0;
+      const enrichedOpen = openList.map(p => {
+        const liveItem = (scanData.results || []).find(r => r.ticker === p.ticker);
+        const curr = liveItem ? Number(liveItem.price) : Number(p.current_price || p.entry);
+        const entry = Number(p.entry || curr);
+        const shares = Number(p.shares || (Number(p.allocated || 1500) / Math.max(entry, 0.01)));
+        const pnlDollar = (curr - entry) * shares;
+        const pnlPct = ((curr - entry) / Math.max(entry, 0.01)) * 100;
+        const dynExit = liveItem ? Number(liveItem.recommendedExit || p.exit_price_target || p.target_price) : Number(p.exit_price_target || p.target_price);
+        calcOpenVal += curr * shares;
+        calcOpenPnl += pnlDollar;
+        return { ...p, curr, entry, shares, pnlDollar, pnlPct, dynExit };
+      });
+
+      const realizedPnl = closedList.reduce((acc, c) => acc + Number(c.pnl_dollar || 0), 0);
+      const totalEquity = Number(sum.total_equity ?? (cash + calcOpenVal));
+      const totalPnlDollar = Number(sum.total_pnl_dollar ?? (totalEquity - initCap));
+      const totalPnlPct = Number(sum.total_pnl_pct ?? ((totalPnlDollar / Math.max(initCap, 1)) * 100));
       const wins = closedList.filter(c => c.result === "WIN").length;
       const winRate = closedList.length ? ((wins / closedList.length) * 100).toFixed(1) : "0.0";
-      const estProfitDollars = (cap * closedPnlPct) / 100;
 
       let html = `
-        <div class="meta" style="margin-bottom:10px;">
-          עסקאות פתוחות: <b>${openList.length}</b> | עסקאות סגורות: <b>${closedList.length}</b> | אחוז הצלחה: <b>${winRate}%</b><br/>
-          תשואה מצטברת בעסקאות סגורות: <span class="${closedPnlPct >= 0 ? "pos" : "neg"}">${closedPnlPct >= 0 ? "+" : ""}${closedPnlPct.toFixed(2)}% (${estProfitDollars >= 0 ? "+" : ""}$${estProfitDollars.toFixed(2)})</span>
+        <div class="kpi-grid">
+          <div class="kpi-box">
+            <div class="box-label">רווח / הפסד כללי לתיק</div>
+            <div class="kpi-val ${totalPnlDollar >= 0 ? "pos" : "neg"}">${totalPnlDollar >= 0 ? "+" : ""}$${totalPnlDollar.toFixed(2)} (${totalPnlPct >= 0 ? "+" : ""}${totalPnlPct.toFixed(2)}%)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="box-label">שווי תיק כולל</div>
+            <div class="kpi-val">$${totalEquity.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+          </div>
+          <div class="kpi-box">
+            <div class="box-label">מזומן פנוי / ממומש</div>
+            <div class="kpi-val">$${cash.toLocaleString(undefined, { maximumFractionDigits: 0 })} <span class="meta">(${realizedPnl >= 0 ? "+" : ""}$${realizedPnl.toFixed(0)}$)</span></div>
+          </div>
+          <div class="kpi-box">
+            <div class="box-label">פתוחות / סגורות / הצלחה</div>
+            <div class="kpi-val">${enrichedOpen.length} / ${closedList.length} <span class="meta">(${winRate}%)</span></div>
+          </div>
         </div>
       `;
 
-      if (openList.length) {
-        html += `<h3 style="margin:10px 0 6px;font-size:1rem;">עסקאות פתוחות</h3>`;
-        html += openList.map(p => `
+      html += `<h3 style="margin:8px 0 6px;font-size:1rem;">פוזיציות פתוחות (רווח לכל מניה ויציאה דינמית)</h3>`;
+      if (!enrichedOpen.length) {
+        html += `<div class="meta">אין פוזיציות פתוחות כרגע.</div>`;
+      } else {
+        html += enrichedOpen.map(p => `
           <div class="list-row">
-            <div><b>${p.ticker}</b> — כניסה $${Number(p.entry).toFixed(2)} | יעד $${Number(p.target_price).toFixed(2)} | סטופ $${Number(p.stop_loss).toFixed(2)}</div>
-            <span class="badge">פתוח</span>
+            <div>
+              <b>${p.ticker}</b> <span class="badge">${p.source || "אוטומטי"}</span><br/>
+              <span class="meta">כניסה: $${p.entry.toFixed(2)} | עכשיו: $${p.curr.toFixed(2)} | יציאה דינמית: <b>$${p.dynExit.toFixed(2)}</b> | סטופ: $${Number(p.stop_loss || 0).toFixed(2)}</span>
+            </div>
+            <div style="text-align:left;">
+              <div class="${p.pnlDollar >= 0 ? "pos" : "neg"}">${p.pnlDollar >= 0 ? "+" : ""}$${p.pnlDollar.toFixed(2)} (${p.pnlPct >= 0 ? "+" : ""}${p.pnlPct.toFixed(1)}%)</div>
+            </div>
           </div>
         `).join("");
       }
 
       if (closedList.length) {
-        html += `<h3 style="margin:14px 0 6px;font-size:1rem;">עסקאות סגורות</h3>`;
-        html += closedList.slice().reverse().slice(0, 10).map(c => `
-          <div class="list-row">
-            <div><b>${c.ticker}</b> — כניסה $${Number(c.entry).toFixed(2)} ← יציאה $${Number(c.exit_price).toFixed(2)} (${c.result})</div>
-            <span class="${Number(c.pnl_pct) >= 0 ? "pos" : "neg"}">${Number(c.pnl_pct) >= 0 ? "+" : ""}${Number(c.pnl_pct).toFixed(2)}%</span>
-          </div>
-        `).join("");
+        html += `<h3 style="margin:14px 0 6px;font-size:1rem;">עסקאות סגורות (רווח ממומש לכל מניה)</h3>`;
+        html += closedList.slice().reverse().slice(0, 12).map(c => {
+          const pnlD = Number(c.pnl_dollar || 0);
+          const pnlP = Number(c.pnl_pct || 0);
+          return `
+            <div class="list-row">
+              <div>
+                <b>${c.ticker}</b> — כניסה $${Number(c.entry).toFixed(2)} ← יציאה $${Number(c.exit_price).toFixed(2)}<br/>
+                <span class="meta">${c.exit_reason || c.result} • ${c.closed_at || ""}</span>
+              </div>
+              <div style="text-align:left;" class="${pnlD >= 0 ? "pos" : "neg"}">${pnlD >= 0 ? "+" : ""}$${pnlD.toFixed(2)} (${pnlP >= 0 ? "+" : ""}${pnlP.toFixed(1)}%)</div>
+            </div>
+          `;
+        }).join("");
       }
 
       document.getElementById("botDemoContent").innerHTML = html;
