@@ -47,6 +47,19 @@
     },
     {
       "ticker": "LI",
+      "entry": 11.63,
+      "entry_type": "כניסה בנסיגה לתמיכה (Pullback)",
+      "breakout_level": 12.86,
+      "stop_loss": 10.93,
+      "target_price": 12.33,
+      "target_pct": 6.0,
+      "score": 0.847,
+      "opened_at": "26/11 19:45 UTC"
+    }
+  ],
+  "closed_positions": [
+    {
+      "ticker": "LI",
       "entry": 12.87,
       "entry_type": "כניסה בפריצת התנגדות",
       "breakout_level": 12.87,
@@ -54,8 +67,12 @@
       "target_price": 14.16,
       "target_pct": 10.0,
       "score": 0.861,
-      "opened_at": "26/11 19:37 UTC"
+      "opened_at": "26/11 19:37 UTC",
+      "exit_price": 11.88,
+      "pnl_pct": -7.69,
+      "result": "LOSS",
+      "exit_reason": "פגעה בסטופ לוס",
+      "closed_at": "26/11 19:45 UTC"
     }
-  ],
-  "closed_positions": []
+  ]
 }

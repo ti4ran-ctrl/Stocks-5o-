@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-11-26 19:37 UTC",
+  "updatedAt": "2026-11-26 19:45 UTC",
   "source": "Yahoo Finance (yfinance)",
   "mode": "auto",
-  "targetPct": 10.0,
+  "targetPct": 6.0,
   "scannedCount": 23,
   "scannedTickers": [
     "NVDA",
@@ -34,28 +34,39 @@
       "ticker": "LI",
       "price": 11.88,
       "changePct": 11.03,
-      "bullCount": 38,
-      "bearCount": 12,
-      "scorePct": 86.1,
-      "weightedScore": 0.861,
-      "breakoutLevel": 12.87,
-      "supportLevel": 11.18,
-      "entry": 12.87,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 8.33,
-      "stopLoss": 12.25,
-      "stopPct": 4.8,
-      "targetPrice": 14.16,
-      "targetPct": 10.0,
-      "trailExit": 12.25,
-      "recommendedExit": 11.88,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.08,
+      "bullCount": 37,
+      "bearCount": 13,
+      "scorePct": 84.7,
+      "weightedScore": 0.847,
+      "breakoutLevel": 12.86,
+      "supportLevel": 11.52,
+      "entry": 11.63,
+      "entryType": "כניסה בנסיגה לתמיכה (Pullback)",
+      "entryNote": "מגמה עולה — כניסה סביב תמיכה/ממוצע קצר במקום רדיפה אחרי שיא",
+      "deltaToEntryPct": -2.1,
+      "stopLoss": 10.93,
+      "stopPct": 6.0,
+      "targetPrice": 12.33,
+      "targetPct": 6.0,
+      "trailExit": 11.34,
+      "recommendedExit": 12.33,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $12.33, סטופ $10.93 או טריילינג $11.34",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 49.6,
+        "macdHist": -0.065,
+        "volRatio": 3.09,
+        "atrPct": 4.16,
+        "ema9": 11.28,
+        "ema21": 11.42,
+        "sma20": 11.52,
+        "sma50": 11.46
+      },
       "sentiment": {
         "code": "BULLISH",
         "label": "שורי חזק",
-        "description": "שורי חזק (38 בעד / 12 נגד | RSI 49.6 - מאוזן)",
+        "description": "שורי חזק (37 בעד / 13 נגד | RSI 49.6 - מאוזן)",
         "categories": {
           "פריצות": "1/3",
           "מומנטום": "4/5",
@@ -63,7 +74,7 @@
           "מגמה": "8/10",
           "מתנדים": "4/10",
           "נפח": "10/10",
-          "סיכון": "10/10"
+          "סיכון": "9/10"
         }
       },
       "reason": "מומנטום מחיר חיובי • מגמה עולה מעל ממוצעים • איתות חיובי ב-RSI/MACD",
@@ -366,8 +377,8 @@
           "id": 43,
           "category": "סיכון",
           "name": "סוכן יחס סיכוי-סיכון ליעד",
-          "signal": "BULLISH",
-          "score": 0.77
+          "signal": "BEARISH",
+          "score": 0.38
         },
         {
           "id": 44,
@@ -428,20 +439,31 @@
       "bearCount": 14,
       "scorePct": 83.2,
       "weightedScore": 0.832,
-      "breakoutLevel": 361.91,
-      "supportLevel": 338.08,
-      "entry": 361.91,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 1.78,
-      "stopLoss": 351.88,
-      "stopPct": 2.8,
-      "targetPrice": 398.1,
-      "targetPct": 10.0,
-      "trailExit": 351.88,
-      "recommendedExit": 398.1,
-      "exitAction": "המשך החזקה ליעד",
-      "exitReason": "יציאה ביעד $398.10 או בסטופ $351.88 (טריילינג $351.88)",
-      "rrRatio": 3.61,
+      "breakoutLevel": 361.55,
+      "supportLevel": 348.75,
+      "entry": 351.57,
+      "entryType": "כניסה בנסיגה לתמיכה (Pullback)",
+      "entryNote": "מגמה עולה — כניסה סביב תמיכה/ממוצע קצר במקום רדיפה אחרי שיא",
+      "deltaToEntryPct": -1.13,
+      "stopLoss": 330.48,
+      "stopPct": 6.0,
+      "targetPrice": 372.66,
+      "targetPct": 6.0,
+      "trailExit": 351.24,
+      "recommendedExit": 372.66,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $372.66, סטופ $330.48 או טריילינג $351.24",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 61.9,
+        "macdHist": -0.122,
+        "volRatio": 1.05,
+        "atrPct": 2.26,
+        "ema9": 351.24,
+        "ema21": 348.75,
+        "sma20": 348.54,
+        "sma50": 342.84
+      },
       "sentiment": {
         "code": "BULLISH",
         "label": "שורי חזק",
@@ -818,20 +840,31 @@
       "bearCount": 15,
       "scorePct": 81.8,
       "weightedScore": 0.818,
-      "breakoutLevel": 12.74,
-      "supportLevel": 11.6,
-      "entry": 12.74,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 4.68,
-      "stopLoss": 12.32,
-      "stopPct": 3.3,
-      "targetPrice": 14.01,
-      "targetPct": 10.0,
-      "trailExit": 12.32,
-      "recommendedExit": 12.17,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 3.02,
+      "breakoutLevel": 12.73,
+      "supportLevel": 11.96,
+      "entry": 12.0,
+      "entryType": "כניסה בנסיגה לתמיכה (Pullback)",
+      "entryNote": "מגמה עולה — כניסה סביב תמיכה/ממוצע קצר במקום רדיפה אחרי שיא",
+      "deltaToEntryPct": -1.4,
+      "stopLoss": 11.28,
+      "stopPct": 6.0,
+      "targetPrice": 12.72,
+      "targetPct": 6.0,
+      "trailExit": 11.8,
+      "recommendedExit": 12.72,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $12.72, סטופ $11.28 או טריילינג $11.80",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 45.6,
+        "macdHist": 0.028,
+        "volRatio": 1.06,
+        "atrPct": 2.78,
+        "ema9": 11.75,
+        "ema21": 11.85,
+        "sma20": 11.96,
+        "sma50": 12.08
+      },
       "sentiment": {
         "code": "BULLISH",
         "label": "שורי חזק",
@@ -1204,28 +1237,39 @@
       "ticker": "PLTR",
       "price": 163.59,
       "changePct": 1.5,
-      "bullCount": 32,
-      "bearCount": 18,
-      "scorePct": 77.7,
-      "weightedScore": 0.777,
-      "breakoutLevel": 199.34,
-      "supportLevel": 161.32,
-      "entry": 199.34,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 21.85,
-      "stopLoss": 189.37,
-      "stopPct": 5.0,
-      "targetPrice": 219.27,
-      "targetPct": 10.0,
-      "trailExit": 189.37,
-      "recommendedExit": 163.59,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.0,
+      "bullCount": 31,
+      "bearCount": 19,
+      "scorePct": 76.1,
+      "weightedScore": 0.761,
+      "breakoutLevel": 199.14,
+      "supportLevel": 167.23,
+      "entry": 163.59,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": 0.0,
+      "stopLoss": 152.08,
+      "stopPct": 7.0,
+      "targetPrice": 173.41,
+      "targetPct": 6.0,
+      "trailExit": 160.19,
+      "recommendedExit": 173.41,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $173.41, סטופ $152.08 או טריילינג $160.19",
+      "rrRatio": 0.85,
+      "indicatorsSnapshot": {
+        "rsi14": 56.4,
+        "macdHist": 0.093,
+        "volRatio": 0.83,
+        "atrPct": 5.63,
+        "ema9": 160.19,
+        "ema21": 167.23,
+        "sma20": 166.31,
+        "sma50": 182.54
+      },
       "sentiment": {
         "code": "BULLISH_SOFT",
         "label": "שורי מתון",
-        "description": "שורי מתון (32 בעד / 18 נגד | RSI 56.4 - מאוזן)",
+        "description": "שורי מתון (31 בעד / 19 נגד | RSI 56.4 - מאוזן)",
         "categories": {
           "פריצות": "1/3",
           "מומנטום": "3/5",
@@ -1233,7 +1277,7 @@
           "מגמה": "3/10",
           "מתנדים": "9/10",
           "נפח": "6/10",
-          "סיכון": "9/10"
+          "סיכון": "8/10"
         }
       },
       "reason": "מומנטום מחיר חיובי • מגמה עולה מעל ממוצעים • איתות חיובי ב-RSI/MACD",
@@ -1536,398 +1580,8 @@
           "id": 43,
           "category": "סיכון",
           "name": "סוכן יחס סיכוי-סיכון ליעד",
-          "signal": "BULLISH",
-          "score": 0.77
-        },
-        {
-          "id": 44,
-          "category": "סיכון",
-          "name": "סוכן יציבות סגירה יומית",
-          "signal": "BULLISH",
-          "score": 0.72
-        },
-        {
-          "id": 45,
-          "category": "סיכון",
-          "name": "סוכן מרווח ביטחון מתמיכה",
-          "signal": "BULLISH",
-          "score": 0.74
-        },
-        {
-          "id": 46,
-          "category": "סיכון",
-          "name": "סוכן הימנעות ממתיחה קיצונית מעל EMA21",
-          "signal": "BULLISH",
-          "score": 0.73
-        },
-        {
-          "id": 47,
-          "category": "סיכון",
-          "name": "סוכן עקביות טווח קצר",
-          "signal": "BULLISH",
-          "score": 0.74
-        },
-        {
-          "id": 48,
-          "category": "סיכון",
-          "name": "סוכן מומנטום פוטנציאלי ליעד",
-          "signal": "BULLISH",
-          "score": 0.76
-        },
-        {
-          "id": 49,
-          "category": "סיכון",
-          "name": "סוכן איכות מגמה כוללת",
-          "signal": "BEARISH",
-          "score": 0.36
-        },
-        {
-          "id": 50,
-          "category": "סיכון",
-          "name": "סוכן אישור סופי לתרחיש לונג",
-          "signal": "BULLISH",
-          "score": 0.77
-        }
-      ]
-    },
-    {
-      "ticker": "TSLA",
-      "price": 380.14,
-      "changePct": -1.18,
-      "bullCount": 27,
-      "bearCount": 23,
-      "scorePct": 69.4,
-      "weightedScore": 0.694,
-      "breakoutLevel": 415.47,
-      "supportLevel": 370.68,
-      "entry": 415.47,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 9.29,
-      "stopLoss": 394.7,
-      "stopPct": 5.0,
-      "targetPrice": 457.02,
-      "targetPct": 10.0,
-      "trailExit": 394.7,
-      "recommendedExit": 380.14,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.0,
-      "sentiment": {
-        "code": "BULLISH_SOFT",
-        "label": "שורי מתון",
-        "description": "שורי מתון (27 בעד / 23 נגד | RSI 61.5 - מאוזן)",
-        "categories": {
-          "פריצות": "1/3",
-          "מומנטום": "1/5",
-          "נרות יפניים": "0/2",
-          "מגמה": "6/10",
-          "מתנדים": "5/10",
-          "נפח": "5/10",
-          "סיכון": "9/10"
-        }
-      },
-      "reason": "מגמה עולה מעל ממוצעים • איתות חיובי ב-RSI/MACD • תמיכה של נפח מסחר",
-      "agents": [
-        {
-          "id": 1,
-          "category": "פריצות",
-          "name": "סוכן פריצת שיא 20 ימים",
-          "signal": "BEARISH",
-          "score": 0.35
-        },
-        {
-          "id": 2,
-          "category": "פריצות",
-          "name": "סוכן התקרבות לפריצה",
-          "signal": "BEARISH",
-          "score": 0.42
-        },
-        {
-          "id": 3,
-          "category": "פריצות",
-          "name": "סוכן הגנה מתחתית 20 ימים",
-          "signal": "BULLISH",
-          "score": 0.72
-        },
-        {
-          "id": 4,
-          "category": "מומנטום",
-          "name": "סוכן מומנטום יומי חיובי",
           "signal": "BEARISH",
           "score": 0.38
-        },
-        {
-          "id": 5,
-          "category": "מומנטום",
-          "name": "סוכן מומנטום 3 ימים",
-          "signal": "BULLISH",
-          "score": 0.75
-        },
-        {
-          "id": 6,
-          "category": "מומנטום",
-          "name": "סוכן מומנטום שבועי (5 ימים)",
-          "signal": "BEARISH",
-          "score": 0.41
-        },
-        {
-          "id": 7,
-          "category": "מומנטום",
-          "name": "סוכן מגמה 10 ימים",
-          "signal": "BEARISH",
-          "score": 0.42
-        },
-        {
-          "id": 8,
-          "category": "מומנטום",
-          "name": "סוכן מגמה חודשית (20 ימים)",
-          "signal": "BEARISH",
-          "score": 0.4
-        },
-        {
-          "id": 9,
-          "category": "נרות יפניים",
-          "name": "סוכן פער מחיר (Gap Up/Down)",
-          "signal": "BEARISH",
-          "score": 0.44
-        },
-        {
-          "id": 10,
-          "category": "נרות יפניים",
-          "name": "סוכן נר שורי דומיננטי",
-          "signal": "BEARISH",
-          "score": 0.39
-        },
-        {
-          "id": 11,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל SMA5",
-          "signal": "BULLISH",
-          "score": 0.72
-        },
-        {
-          "id": 12,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל SMA10",
-          "signal": "BEARISH",
-          "score": 0.38
-        },
-        {
-          "id": 13,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל SMA20",
-          "signal": "BEARISH",
-          "score": 0.35
-        },
-        {
-          "id": 14,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל SMA50",
-          "signal": "BULLISH",
-          "score": 0.8
-        },
-        {
-          "id": 15,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל EMA9",
-          "signal": "BULLISH",
-          "score": 0.74
-        },
-        {
-          "id": 16,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל EMA21",
-          "signal": "BULLISH",
-          "score": 0.77
-        },
-        {
-          "id": 17,
-          "category": "מגמה",
-          "name": "סוכן יישור ממוצעים (EMA9 > EMA21)",
-          "signal": "BEARISH",
-          "score": 0.35
-        },
-        {
-          "id": 18,
-          "category": "מגמה",
-          "name": "סוכן מבנה שורי (SMA20 > SMA50)",
-          "signal": "BULLISH",
-          "score": 0.81
-        },
-        {
-          "id": 19,
-          "category": "מגמה",
-          "name": "סוכן מיקום בטווח 52 שבועות",
-          "signal": "BULLISH",
-          "score": 0.71
-        },
-        {
-          "id": 20,
-          "category": "מגמה",
-          "name": "סוכן שיפוע ממוצע 20 ימים",
-          "signal": "BEARISH",
-          "score": 0.38
-        },
-        {
-          "id": 21,
-          "category": "מתנדים",
-          "name": "סוכן RSI אזור כוח (50-72)",
-          "signal": "BULLISH",
-          "score": 0.78
-        },
-        {
-          "id": 22,
-          "category": "מתנדים",
-          "name": "סוכן RSI עולה מעל אתמול",
-          "signal": "BULLISH",
-          "score": 0.73
-        },
-        {
-          "id": 23,
-          "category": "מתנדים",
-          "name": "סוכן היפוך ממכירת יתר (RSI < 35)",
-          "signal": "BEARISH",
-          "score": 0.38
-        },
-        {
-          "id": 24,
-          "category": "מתנדים",
-          "name": "סוכן הימנעות מקניית יתר קיצונית",
-          "signal": "BULLISH",
-          "score": 0.7
-        },
-        {
-          "id": 25,
-          "category": "מתנדים",
-          "name": "סוכן MACD מעל קו האות",
-          "signal": "BEARISH",
-          "score": 0.35
-        },
-        {
-          "id": 26,
-          "category": "מתנדים",
-          "name": "סוכן היסטוגרמת MACD חיובית",
-          "signal": "BEARISH",
-          "score": 0.36
-        },
-        {
-          "id": 27,
-          "category": "מתנדים",
-          "name": "סוכן האצת היסטוגרמת MACD",
-          "signal": "BULLISH",
-          "score": 0.75
-        },
-        {
-          "id": 28,
-          "category": "מתנדים",
-          "name": "סוכן קרוס שורי ב-MACD",
-          "signal": "BEARISH",
-          "score": 0.4
-        },
-        {
-          "id": 29,
-          "category": "מתנדים",
-          "name": "סוכן מומנטום ביניים (RSI > 55)",
-          "signal": "BULLISH",
-          "score": 0.74
-        },
-        {
-          "id": 30,
-          "category": "מתנדים",
-          "name": "סוכן איזון מתנדים",
-          "signal": "BEARISH",
-          "score": 0.41
-        },
-        {
-          "id": 31,
-          "category": "נפח",
-          "name": "סוכן זינוק נפח (מעל פי 1.3 מהממוצע)",
-          "signal": "BEARISH",
-          "score": 0.38
-        },
-        {
-          "id": 32,
-          "category": "נפח",
-          "name": "סוכן נפח תקין ומעלה",
-          "signal": "BEARISH",
-          "score": 0.4
-        },
-        {
-          "id": 33,
-          "category": "נפח",
-          "name": "סוכן נפח בעלייה יומית",
-          "signal": "BEARISH",
-          "score": 0.39
-        },
-        {
-          "id": 34,
-          "category": "נפח",
-          "name": "סוכן אישור פריצה בנפח",
-          "signal": "BEARISH",
-          "score": 0.36
-        },
-        {
-          "id": 35,
-          "category": "נפח",
-          "name": "סוכן צבירה שבועית בנפח",
-          "signal": "BULLISH",
-          "score": 0.74
-        },
-        {
-          "id": 36,
-          "category": "נפח",
-          "name": "סוכן נזילות גבוהה",
-          "signal": "BULLISH",
-          "score": 0.75
-        },
-        {
-          "id": 37,
-          "category": "נפח",
-          "name": "סוכן יחס נפח-מחיר חיובי",
-          "signal": "BEARISH",
-          "score": 0.42
-        },
-        {
-          "id": 38,
-          "category": "נפח",
-          "name": "סוכן הימנעות ממימוש בנפח חריג",
-          "signal": "BULLISH",
-          "score": 0.71
-        },
-        {
-          "id": 39,
-          "category": "נפח",
-          "name": "סוכן עקביות מחזור מסחר",
-          "signal": "BULLISH",
-          "score": 0.7
-        },
-        {
-          "id": 40,
-          "category": "נפח",
-          "name": "סוכן דחיפת קונים בסגירה",
-          "signal": "BULLISH",
-          "score": 0.75
-        },
-        {
-          "id": 41,
-          "category": "סיכון",
-          "name": "סוכן תנודתיות תומכת יעד",
-          "signal": "BULLISH",
-          "score": 0.78
-        },
-        {
-          "id": 42,
-          "category": "סיכון",
-          "name": "סוכן מרחק סביר מ-SMA20",
-          "signal": "BULLISH",
-          "score": 0.73
-        },
-        {
-          "id": 43,
-          "category": "סיכון",
-          "name": "סוכן יחס סיכוי-סיכון ליעד",
-          "signal": "BULLISH",
-          "score": 0.77
         },
         {
           "id": 44,
@@ -1988,20 +1642,31 @@
       "bearCount": 23,
       "scorePct": 69.4,
       "weightedScore": 0.694,
-      "breakoutLevel": 289.68,
-      "supportLevel": 266.26,
-      "entry": 289.68,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 5.75,
-      "stopLoss": 281.61,
-      "stopPct": 2.8,
-      "targetPrice": 318.65,
-      "targetPct": 10.0,
-      "trailExit": 281.61,
-      "recommendedExit": 273.94,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 3.59,
+      "breakoutLevel": 289.39,
+      "supportLevel": 274.5,
+      "entry": 273.94,
+      "entryType": "כניסה בנסיגה לתמיכה (Pullback)",
+      "entryNote": "מגמה עולה — כניסה סביב תמיכה/ממוצע קצר במקום רדיפה אחרי שיא",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 257.5,
+      "stopPct": 6.0,
+      "targetPrice": 290.38,
+      "targetPct": 6.0,
+      "trailExit": 273.47,
+      "recommendedExit": 290.38,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $290.38, סטופ $257.50 או טריילינג $273.47",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 53.0,
+        "macdHist": -0.926,
+        "volRatio": 1.09,
+        "atrPct": 2.36,
+        "ema9": 273.47,
+        "ema21": 272.37,
+        "sma20": 274.5,
+        "sma50": 266.55
+      },
       "sentiment": {
         "code": "BULLISH_SOFT",
         "label": "שורי מתון",
@@ -2378,20 +2043,31 @@
       "bearCount": 23,
       "scorePct": 69.1,
       "weightedScore": 0.691,
-      "breakoutLevel": 93.98,
-      "supportLevel": 83.28,
-      "entry": 93.98,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 11.89,
-      "stopLoss": 90.5,
-      "stopPct": 3.7,
-      "targetPrice": 103.38,
-      "targetPct": 10.0,
-      "trailExit": 90.5,
-      "recommendedExit": 83.99,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.7,
+      "breakoutLevel": 93.89,
+      "supportLevel": 85.85,
+      "entry": 83.99,
+      "entryType": "כניסה בנסיגה לתמיכה (Pullback)",
+      "entryNote": "מגמה עולה — כניסה סביב תמיכה/ממוצע קצר במקום רדיפה אחרי שיא",
+      "deltaToEntryPct": 0.0,
+      "stopLoss": 78.95,
+      "stopPct": 6.0,
+      "targetPrice": 89.03,
+      "targetPct": 6.0,
+      "trailExit": 83.11,
+      "recommendedExit": 89.03,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $89.03, סטופ $78.95 או טריילינג $83.11",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 38.9,
+        "macdHist": -0.569,
+        "volRatio": 0.8,
+        "atrPct": 3.31,
+        "ema9": 83.11,
+        "ema21": 83.85,
+        "sma20": 85.85,
+        "sma50": 82.99
+      },
       "sentiment": {
         "code": "BULLISH_SOFT",
         "label": "שורי מתון",
@@ -2768,20 +2444,31 @@
       "bearCount": 24,
       "scorePct": 67.7,
       "weightedScore": 0.677,
-      "breakoutLevel": 701.01,
-      "supportLevel": 638.9,
-      "entry": 701.01,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 9.36,
-      "stopLoss": 670.53,
-      "stopPct": 4.3,
-      "targetPrice": 771.11,
-      "targetPct": 10.0,
-      "trailExit": 670.53,
-      "recommendedExit": 641.02,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.3,
+      "breakoutLevel": 700.31,
+      "supportLevel": 658.66,
+      "entry": 641.02,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 602.56,
+      "stopPct": 6.0,
+      "targetPrice": 679.48,
+      "targetPct": 6.0,
+      "trailExit": 638.2,
+      "recommendedExit": 679.48,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $679.48, סטופ $602.56 או טריילינג $638.20",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 44.1,
+        "macdHist": -4.815,
+        "volRatio": 1.69,
+        "atrPct": 3.8,
+        "ema9": 638.2,
+        "ema21": 648.91,
+        "sma20": 658.66,
+        "sma50": 660.69
+      },
       "sentiment": {
         "code": "BULLISH_SOFT",
         "label": "שורי מתון",
@@ -3151,6 +2838,407 @@
       ]
     },
     {
+      "ticker": "TSLA",
+      "price": 380.14,
+      "changePct": -1.18,
+      "bullCount": 26,
+      "bearCount": 24,
+      "scorePct": 67.6,
+      "weightedScore": 0.676,
+      "breakoutLevel": 415.06,
+      "supportLevel": 382.15,
+      "entry": 380.14,
+      "entryType": "כניסה בנסיגה לתמיכה (Pullback)",
+      "entryNote": "מגמה עולה — כניסה סביב תמיכה/ממוצע קצר במקום רדיפה אחרי שיא",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 355.08,
+      "stopPct": 6.6,
+      "targetPrice": 402.95,
+      "targetPct": 6.0,
+      "trailExit": 378.68,
+      "recommendedExit": 402.95,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $402.95, סטופ $355.08 או טריילינג $378.68",
+      "rrRatio": 0.91,
+      "indicatorsSnapshot": {
+        "rsi14": 61.5,
+        "macdHist": -0.86,
+        "volRatio": 0.98,
+        "atrPct": 5.27,
+        "ema9": 378.68,
+        "ema21": 379.64,
+        "sma20": 382.15,
+        "sma50": 377.17
+      },
+      "sentiment": {
+        "code": "BULLISH_SOFT",
+        "label": "שורי מתון",
+        "description": "שורי מתון (26 בעד / 24 נגד | RSI 61.5 - מאוזן)",
+        "categories": {
+          "פריצות": "1/3",
+          "מומנטום": "1/5",
+          "נרות יפניים": "0/2",
+          "מגמה": "6/10",
+          "מתנדים": "5/10",
+          "נפח": "5/10",
+          "סיכון": "8/10"
+        }
+      },
+      "reason": "מגמה עולה מעל ממוצעים • איתות חיובי ב-RSI/MACD • תמיכה של נפח מסחר",
+      "agents": [
+        {
+          "id": 1,
+          "category": "פריצות",
+          "name": "סוכן פריצת שיא 20 ימים",
+          "signal": "BEARISH",
+          "score": 0.35
+        },
+        {
+          "id": 2,
+          "category": "פריצות",
+          "name": "סוכן התקרבות לפריצה",
+          "signal": "BEARISH",
+          "score": 0.42
+        },
+        {
+          "id": 3,
+          "category": "פריצות",
+          "name": "סוכן הגנה מתחתית 20 ימים",
+          "signal": "BULLISH",
+          "score": 0.72
+        },
+        {
+          "id": 4,
+          "category": "מומנטום",
+          "name": "סוכן מומנטום יומי חיובי",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 5,
+          "category": "מומנטום",
+          "name": "סוכן מומנטום 3 ימים",
+          "signal": "BULLISH",
+          "score": 0.75
+        },
+        {
+          "id": 6,
+          "category": "מומנטום",
+          "name": "סוכן מומנטום שבועי (5 ימים)",
+          "signal": "BEARISH",
+          "score": 0.41
+        },
+        {
+          "id": 7,
+          "category": "מומנטום",
+          "name": "סוכן מגמה 10 ימים",
+          "signal": "BEARISH",
+          "score": 0.42
+        },
+        {
+          "id": 8,
+          "category": "מומנטום",
+          "name": "סוכן מגמה חודשית (20 ימים)",
+          "signal": "BEARISH",
+          "score": 0.4
+        },
+        {
+          "id": 9,
+          "category": "נרות יפניים",
+          "name": "סוכן פער מחיר (Gap Up/Down)",
+          "signal": "BEARISH",
+          "score": 0.44
+        },
+        {
+          "id": 10,
+          "category": "נרות יפניים",
+          "name": "סוכן נר שורי דומיננטי",
+          "signal": "BEARISH",
+          "score": 0.39
+        },
+        {
+          "id": 11,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל SMA5",
+          "signal": "BULLISH",
+          "score": 0.72
+        },
+        {
+          "id": 12,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל SMA10",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 13,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל SMA20",
+          "signal": "BEARISH",
+          "score": 0.35
+        },
+        {
+          "id": 14,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל SMA50",
+          "signal": "BULLISH",
+          "score": 0.8
+        },
+        {
+          "id": 15,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל EMA9",
+          "signal": "BULLISH",
+          "score": 0.74
+        },
+        {
+          "id": 16,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל EMA21",
+          "signal": "BULLISH",
+          "score": 0.77
+        },
+        {
+          "id": 17,
+          "category": "מגמה",
+          "name": "סוכן יישור ממוצעים (EMA9 > EMA21)",
+          "signal": "BEARISH",
+          "score": 0.35
+        },
+        {
+          "id": 18,
+          "category": "מגמה",
+          "name": "סוכן מבנה שורי (SMA20 > SMA50)",
+          "signal": "BULLISH",
+          "score": 0.81
+        },
+        {
+          "id": 19,
+          "category": "מגמה",
+          "name": "סוכן מיקום בטווח 52 שבועות",
+          "signal": "BULLISH",
+          "score": 0.71
+        },
+        {
+          "id": 20,
+          "category": "מגמה",
+          "name": "סוכן שיפוע ממוצע 20 ימים",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 21,
+          "category": "מתנדים",
+          "name": "סוכן RSI אזור כוח (50-72)",
+          "signal": "BULLISH",
+          "score": 0.78
+        },
+        {
+          "id": 22,
+          "category": "מתנדים",
+          "name": "סוכן RSI עולה מעל אתמול",
+          "signal": "BULLISH",
+          "score": 0.73
+        },
+        {
+          "id": 23,
+          "category": "מתנדים",
+          "name": "סוכן היפוך ממכירת יתר (RSI < 35)",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 24,
+          "category": "מתנדים",
+          "name": "סוכן הימנעות מקניית יתר קיצונית",
+          "signal": "BULLISH",
+          "score": 0.7
+        },
+        {
+          "id": 25,
+          "category": "מתנדים",
+          "name": "סוכן MACD מעל קו האות",
+          "signal": "BEARISH",
+          "score": 0.35
+        },
+        {
+          "id": 26,
+          "category": "מתנדים",
+          "name": "סוכן היסטוגרמת MACD חיובית",
+          "signal": "BEARISH",
+          "score": 0.36
+        },
+        {
+          "id": 27,
+          "category": "מתנדים",
+          "name": "סוכן האצת היסטוגרמת MACD",
+          "signal": "BULLISH",
+          "score": 0.75
+        },
+        {
+          "id": 28,
+          "category": "מתנדים",
+          "name": "סוכן קרוס שורי ב-MACD",
+          "signal": "BEARISH",
+          "score": 0.4
+        },
+        {
+          "id": 29,
+          "category": "מתנדים",
+          "name": "סוכן מומנטום ביניים (RSI > 55)",
+          "signal": "BULLISH",
+          "score": 0.74
+        },
+        {
+          "id": 30,
+          "category": "מתנדים",
+          "name": "סוכן איזון מתנדים",
+          "signal": "BEARISH",
+          "score": 0.41
+        },
+        {
+          "id": 31,
+          "category": "נפח",
+          "name": "סוכן זינוק נפח (מעל פי 1.3 מהממוצע)",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 32,
+          "category": "נפח",
+          "name": "סוכן נפח תקין ומעלה",
+          "signal": "BEARISH",
+          "score": 0.4
+        },
+        {
+          "id": 33,
+          "category": "נפח",
+          "name": "סוכן נפח בעלייה יומית",
+          "signal": "BEARISH",
+          "score": 0.39
+        },
+        {
+          "id": 34,
+          "category": "נפח",
+          "name": "סוכן אישור פריצה בנפח",
+          "signal": "BEARISH",
+          "score": 0.36
+        },
+        {
+          "id": 35,
+          "category": "נפח",
+          "name": "סוכן צבירה שבועית בנפח",
+          "signal": "BULLISH",
+          "score": 0.74
+        },
+        {
+          "id": 36,
+          "category": "נפח",
+          "name": "סוכן נזילות גבוהה",
+          "signal": "BULLISH",
+          "score": 0.75
+        },
+        {
+          "id": 37,
+          "category": "נפח",
+          "name": "סוכן יחס נפח-מחיר חיובי",
+          "signal": "BEARISH",
+          "score": 0.42
+        },
+        {
+          "id": 38,
+          "category": "נפח",
+          "name": "סוכן הימנעות ממימוש בנפח חריג",
+          "signal": "BULLISH",
+          "score": 0.71
+        },
+        {
+          "id": 39,
+          "category": "נפח",
+          "name": "סוכן עקביות מחזור מסחר",
+          "signal": "BULLISH",
+          "score": 0.7
+        },
+        {
+          "id": 40,
+          "category": "נפח",
+          "name": "סוכן דחיפת קונים בסגירה",
+          "signal": "BULLISH",
+          "score": 0.75
+        },
+        {
+          "id": 41,
+          "category": "סיכון",
+          "name": "סוכן תנודתיות תומכת יעד",
+          "signal": "BULLISH",
+          "score": 0.78
+        },
+        {
+          "id": 42,
+          "category": "סיכון",
+          "name": "סוכן מרחק סביר מ-SMA20",
+          "signal": "BULLISH",
+          "score": 0.73
+        },
+        {
+          "id": 43,
+          "category": "סיכון",
+          "name": "סוכן יחס סיכוי-סיכון ליעד",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 44,
+          "category": "סיכון",
+          "name": "סוכן יציבות סגירה יומית",
+          "signal": "BULLISH",
+          "score": 0.72
+        },
+        {
+          "id": 45,
+          "category": "סיכון",
+          "name": "סוכן מרווח ביטחון מתמיכה",
+          "signal": "BULLISH",
+          "score": 0.74
+        },
+        {
+          "id": 46,
+          "category": "סיכון",
+          "name": "סוכן הימנעות ממתיחה קיצונית מעל EMA21",
+          "signal": "BULLISH",
+          "score": 0.73
+        },
+        {
+          "id": 47,
+          "category": "סיכון",
+          "name": "סוכן עקביות טווח קצר",
+          "signal": "BULLISH",
+          "score": 0.74
+        },
+        {
+          "id": 48,
+          "category": "סיכון",
+          "name": "סוכן מומנטום פוטנציאלי ליעד",
+          "signal": "BULLISH",
+          "score": 0.76
+        },
+        {
+          "id": 49,
+          "category": "סיכון",
+          "name": "סוכן איכות מגמה כוללת",
+          "signal": "BEARISH",
+          "score": 0.36
+        },
+        {
+          "id": 50,
+          "category": "סיכון",
+          "name": "סוכן אישור סופי לתרחיש לונג",
+          "signal": "BULLISH",
+          "score": 0.77
+        }
+      ]
+    },
+    {
       "ticker": "LLY",
       "price": 1392.22,
       "changePct": -1.09,
@@ -3158,20 +3246,31 @@
       "bearCount": 24,
       "scorePct": 67.5,
       "weightedScore": 0.675,
-      "breakoutLevel": 1479.68,
-      "supportLevel": 1356.76,
-      "entry": 1479.68,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 6.28,
-      "stopLoss": 1429.66,
-      "stopPct": 3.4,
-      "targetPrice": 1627.65,
-      "targetPct": 10.0,
-      "trailExit": 1429.66,
-      "recommendedExit": 1392.22,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.96,
+      "breakoutLevel": 1478.2,
+      "supportLevel": 1398.73,
+      "entry": 1392.22,
+      "entryType": "כניסה בנסיגה לתמיכה (Pullback)",
+      "entryNote": "מגמה עולה — כניסה סביב תמיכה/ממוצע קצר במקום רדיפה אחרי שיא",
+      "deltaToEntryPct": 0.0,
+      "stopLoss": 1308.69,
+      "stopPct": 6.0,
+      "targetPrice": 1475.75,
+      "targetPct": 6.0,
+      "trailExit": 1388.09,
+      "recommendedExit": 1475.75,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $1475.75, סטופ $1308.69 או טריילינג $1388.09",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 55.0,
+        "macdHist": -10.352,
+        "volRatio": 0.88,
+        "atrPct": 2.87,
+        "ema9": 1388.09,
+        "ema21": 1370.92,
+        "sma20": 1398.73,
+        "sma50": 1280.71
+      },
       "sentiment": {
         "code": "BULLISH_SOFT",
         "label": "שורי מתון",
@@ -3548,20 +3647,31 @@
       "bearCount": 25,
       "scorePct": 65.7,
       "weightedScore": 0.657,
-      "breakoutLevel": 235.24,
-      "supportLevel": 208.0,
-      "entry": 235.24,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 11.51,
-      "stopLoss": 229.79,
-      "stopPct": 2.3,
-      "targetPrice": 258.76,
-      "targetPct": 10.0,
-      "trailExit": 229.79,
-      "recommendedExit": 210.95,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 4.32,
+      "breakoutLevel": 235.0,
+      "supportLevel": 214.43,
+      "entry": 210.95,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": 0.0,
+      "stopLoss": 198.29,
+      "stopPct": 6.0,
+      "targetPrice": 223.61,
+      "targetPct": 6.0,
+      "trailExit": 210.15,
+      "recommendedExit": 223.61,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $223.61, סטופ $198.29 או טריילינג $210.15",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 49.7,
+        "macdHist": -0.808,
+        "volRatio": 0.85,
+        "atrPct": 2.07,
+        "ema9": 210.15,
+        "ema21": 212.89,
+        "sma20": 214.43,
+        "sma50": 213.5
+      },
       "sentiment": {
         "code": "NEUTRAL",
         "label": "ניטרלי / מעורב",
@@ -3938,20 +4048,31 @@
       "bearCount": 26,
       "scorePct": 64.0,
       "weightedScore": 0.64,
-      "breakoutLevel": 179.73,
-      "supportLevel": 163.84,
-      "entry": 179.73,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 9.24,
-      "stopLoss": 173.19,
-      "stopPct": 3.6,
-      "targetPrice": 197.7,
-      "targetPct": 10.0,
-      "trailExit": 173.19,
-      "recommendedExit": 164.53,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.75,
+      "breakoutLevel": 179.55,
+      "supportLevel": 169.44,
+      "entry": 164.53,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": 0.0,
+      "stopLoss": 154.66,
+      "stopPct": 6.0,
+      "targetPrice": 174.4,
+      "targetPct": 6.0,
+      "trailExit": 164.28,
+      "recommendedExit": 174.4,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $174.40, סטופ $154.66 או טריילינג $164.28",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 37.3,
+        "macdHist": 0.091,
+        "volRatio": 0.76,
+        "atrPct": 3.18,
+        "ema9": 164.28,
+        "ema21": 169.44,
+        "sma20": 168.91,
+        "sma50": 181.46
+      },
       "sentiment": {
         "code": "NEUTRAL",
         "label": "ניטרלי / מעורב",
@@ -4321,396 +4442,6 @@
       ]
     },
     {
-      "ticker": "NIO",
-      "price": 2.69,
-      "changePct": 4.26,
-      "bullCount": 23,
-      "bearCount": 27,
-      "scorePct": 62.1,
-      "weightedScore": 0.621,
-      "breakoutLevel": 3.45,
-      "supportLevel": 2.91,
-      "entry": 3.45,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 28.25,
-      "stopLoss": 3.28,
-      "stopPct": 4.9,
-      "targetPrice": 3.8,
-      "targetPct": 10.0,
-      "trailExit": 3.28,
-      "recommendedExit": 2.69,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.06,
-      "sentiment": {
-        "code": "NEUTRAL",
-        "label": "ניטרלי / מעורב",
-        "description": "ניטרלי / מעורב (23 בעד / 27 נגד | RSI 34.0 - מאוזן)",
-        "categories": {
-          "פריצות": "1/3",
-          "מומנטום": "2/5",
-          "נרות יפניים": "1/2",
-          "מגמה": "1/10",
-          "מתנדים": "4/10",
-          "נפח": "7/10",
-          "סיכון": "7/10"
-        }
-      },
-      "reason": "מומנטום מחיר חיובי • איתות חיובי ב-RSI/MACD • תמיכה של נפח מסחר",
-      "agents": [
-        {
-          "id": 1,
-          "category": "פריצות",
-          "name": "סוכן פריצת שיא 20 ימים",
-          "signal": "BEARISH",
-          "score": 0.35
-        },
-        {
-          "id": 2,
-          "category": "פריצות",
-          "name": "סוכן התקרבות לפריצה",
-          "signal": "BEARISH",
-          "score": 0.42
-        },
-        {
-          "id": 3,
-          "category": "פריצות",
-          "name": "סוכן הגנה מתחתית 20 ימים",
-          "signal": "BULLISH",
-          "score": 0.72
-        },
-        {
-          "id": 4,
-          "category": "מומנטום",
-          "name": "סוכן מומנטום יומי חיובי",
-          "signal": "BULLISH",
-          "score": 0.76
-        },
-        {
-          "id": 5,
-          "category": "מומנטום",
-          "name": "סוכן מומנטום 3 ימים",
-          "signal": "BULLISH",
-          "score": 0.75
-        },
-        {
-          "id": 6,
-          "category": "מומנטום",
-          "name": "סוכן מומנטום שבועי (5 ימים)",
-          "signal": "BEARISH",
-          "score": 0.41
-        },
-        {
-          "id": 7,
-          "category": "מומנטום",
-          "name": "סוכן מגמה 10 ימים",
-          "signal": "BEARISH",
-          "score": 0.42
-        },
-        {
-          "id": 8,
-          "category": "מומנטום",
-          "name": "סוכן מגמה חודשית (20 ימים)",
-          "signal": "BEARISH",
-          "score": 0.4
-        },
-        {
-          "id": 9,
-          "category": "נרות יפניים",
-          "name": "סוכן פער מחיר (Gap Up/Down)",
-          "signal": "BEARISH",
-          "score": 0.44
-        },
-        {
-          "id": 10,
-          "category": "נרות יפניים",
-          "name": "סוכן נר שורי דומיננטי",
-          "signal": "BULLISH",
-          "score": 0.76
-        },
-        {
-          "id": 11,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל SMA5",
-          "signal": "BULLISH",
-          "score": 0.72
-        },
-        {
-          "id": 12,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל SMA10",
-          "signal": "BEARISH",
-          "score": 0.38
-        },
-        {
-          "id": 13,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל SMA20",
-          "signal": "BEARISH",
-          "score": 0.35
-        },
-        {
-          "id": 14,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל SMA50",
-          "signal": "BEARISH",
-          "score": 0.34
-        },
-        {
-          "id": 15,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל EMA9",
-          "signal": "BEARISH",
-          "score": 0.39
-        },
-        {
-          "id": 16,
-          "category": "מגמה",
-          "name": "סוכן מחיר מעל EMA21",
-          "signal": "BEARISH",
-          "score": 0.36
-        },
-        {
-          "id": 17,
-          "category": "מגמה",
-          "name": "סוכן יישור ממוצעים (EMA9 > EMA21)",
-          "signal": "BEARISH",
-          "score": 0.35
-        },
-        {
-          "id": 18,
-          "category": "מגמה",
-          "name": "סוכן מבנה שורי (SMA20 > SMA50)",
-          "signal": "BEARISH",
-          "score": 0.34
-        },
-        {
-          "id": 19,
-          "category": "מגמה",
-          "name": "סוכן מיקום בטווח 52 שבועות",
-          "signal": "BEARISH",
-          "score": 0.43
-        },
-        {
-          "id": 20,
-          "category": "מגמה",
-          "name": "סוכן שיפוע ממוצע 20 ימים",
-          "signal": "BEARISH",
-          "score": 0.38
-        },
-        {
-          "id": 21,
-          "category": "מתנדים",
-          "name": "סוכן RSI אזור כוח (50-72)",
-          "signal": "BEARISH",
-          "score": 0.42
-        },
-        {
-          "id": 22,
-          "category": "מתנדים",
-          "name": "סוכן RSI עולה מעל אתמול",
-          "signal": "BULLISH",
-          "score": 0.73
-        },
-        {
-          "id": 23,
-          "category": "מתנדים",
-          "name": "סוכן היפוך ממכירת יתר (RSI < 35)",
-          "signal": "BULLISH",
-          "score": 0.76
-        },
-        {
-          "id": 24,
-          "category": "מתנדים",
-          "name": "סוכן הימנעות מקניית יתר קיצונית",
-          "signal": "BULLISH",
-          "score": 0.7
-        },
-        {
-          "id": 25,
-          "category": "מתנדים",
-          "name": "סוכן MACD מעל קו האות",
-          "signal": "BEARISH",
-          "score": 0.35
-        },
-        {
-          "id": 26,
-          "category": "מתנדים",
-          "name": "סוכן היסטוגרמת MACD חיובית",
-          "signal": "BEARISH",
-          "score": 0.36
-        },
-        {
-          "id": 27,
-          "category": "מתנדים",
-          "name": "סוכן האצת היסטוגרמת MACD",
-          "signal": "BULLISH",
-          "score": 0.75
-        },
-        {
-          "id": 28,
-          "category": "מתנדים",
-          "name": "סוכן קרוס שורי ב-MACD",
-          "signal": "BEARISH",
-          "score": 0.4
-        },
-        {
-          "id": 29,
-          "category": "מתנדים",
-          "name": "סוכן מומנטום ביניים (RSI > 55)",
-          "signal": "BEARISH",
-          "score": 0.39
-        },
-        {
-          "id": 30,
-          "category": "מתנדים",
-          "name": "סוכן איזון מתנדים",
-          "signal": "BEARISH",
-          "score": 0.41
-        },
-        {
-          "id": 31,
-          "category": "נפח",
-          "name": "סוכן זינוק נפח (מעל פי 1.3 מהממוצע)",
-          "signal": "BEARISH",
-          "score": 0.38
-        },
-        {
-          "id": 32,
-          "category": "נפח",
-          "name": "סוכן נפח תקין ומעלה",
-          "signal": "BULLISH",
-          "score": 0.72
-        },
-        {
-          "id": 33,
-          "category": "נפח",
-          "name": "סוכן נפח בעלייה יומית",
-          "signal": "BEARISH",
-          "score": 0.39
-        },
-        {
-          "id": 34,
-          "category": "נפח",
-          "name": "סוכן אישור פריצה בנפח",
-          "signal": "BEARISH",
-          "score": 0.36
-        },
-        {
-          "id": 35,
-          "category": "נפח",
-          "name": "סוכן צבירה שבועית בנפח",
-          "signal": "BULLISH",
-          "score": 0.74
-        },
-        {
-          "id": 36,
-          "category": "נפח",
-          "name": "סוכן נזילות גבוהה",
-          "signal": "BULLISH",
-          "score": 0.75
-        },
-        {
-          "id": 37,
-          "category": "נפח",
-          "name": "סוכן יחס נפח-מחיר חיובי",
-          "signal": "BULLISH",
-          "score": 0.73
-        },
-        {
-          "id": 38,
-          "category": "נפח",
-          "name": "סוכן הימנעות ממימוש בנפח חריג",
-          "signal": "BULLISH",
-          "score": 0.71
-        },
-        {
-          "id": 39,
-          "category": "נפח",
-          "name": "סוכן עקביות מחזור מסחר",
-          "signal": "BULLISH",
-          "score": 0.7
-        },
-        {
-          "id": 40,
-          "category": "נפח",
-          "name": "סוכן דחיפת קונים בסגירה",
-          "signal": "BULLISH",
-          "score": 0.75
-        },
-        {
-          "id": 41,
-          "category": "סיכון",
-          "name": "סוכן תנודתיות תומכת יעד",
-          "signal": "BULLISH",
-          "score": 0.78
-        },
-        {
-          "id": 42,
-          "category": "סיכון",
-          "name": "סוכן מרחק סביר מ-SMA20",
-          "signal": "BULLISH",
-          "score": 0.73
-        },
-        {
-          "id": 43,
-          "category": "סיכון",
-          "name": "סוכן יחס סיכוי-סיכון ליעד",
-          "signal": "BULLISH",
-          "score": 0.77
-        },
-        {
-          "id": 44,
-          "category": "סיכון",
-          "name": "סוכן יציבות סגירה יומית",
-          "signal": "BULLISH",
-          "score": 0.72
-        },
-        {
-          "id": 45,
-          "category": "סיכון",
-          "name": "סוכן מרווח ביטחון מתמיכה",
-          "signal": "BULLISH",
-          "score": 0.74
-        },
-        {
-          "id": 46,
-          "category": "סיכון",
-          "name": "סוכן הימנעות ממתיחה קיצונית מעל EMA21",
-          "signal": "BULLISH",
-          "score": 0.73
-        },
-        {
-          "id": 47,
-          "category": "סיכון",
-          "name": "סוכן עקביות טווח קצר",
-          "signal": "BULLISH",
-          "score": 0.74
-        },
-        {
-          "id": 48,
-          "category": "סיכון",
-          "name": "סוכן מומנטום פוטנציאלי ליעד",
-          "signal": "BEARISH",
-          "score": 0.4
-        },
-        {
-          "id": 49,
-          "category": "סיכון",
-          "name": "סוכן איכות מגמה כוללת",
-          "signal": "BEARISH",
-          "score": 0.36
-        },
-        {
-          "id": 50,
-          "category": "סיכון",
-          "name": "סוכן אישור סופי לתרחיש לונג",
-          "signal": "BEARISH",
-          "score": 0.38
-        }
-      ]
-    },
-    {
       "ticker": "GE",
       "price": 316.98,
       "changePct": -0.33,
@@ -4718,20 +4449,31 @@
       "bearCount": 27,
       "scorePct": 62.1,
       "weightedScore": 0.621,
-      "breakoutLevel": 344.62,
-      "supportLevel": 313.41,
-      "entry": 344.62,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 8.72,
-      "stopLoss": 331.55,
-      "stopPct": 3.8,
-      "targetPrice": 379.08,
-      "targetPct": 10.0,
-      "trailExit": 331.55,
+      "breakoutLevel": 344.28,
+      "supportLevel": 323.1,
+      "entry": 316.98,
+      "entryType": "כניסה בנסיגה לתמיכה (Pullback)",
+      "entryNote": "מגמה עולה — כניסה סביב תמיכה/ממוצע קצר במקום רדיפה אחרי שיא",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 297.96,
+      "stopPct": 6.0,
+      "targetPrice": 336.0,
+      "targetPct": 6.0,
+      "trailExit": 320.57,
       "recommendedExit": 316.98,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.64,
+      "exitAction": "צא בהחלשות מגמה",
+      "exitReason": "שבירת EMA9 ומומנטום MACD שלילי",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 51.3,
+        "macdHist": -1.527,
+        "volRatio": 0.94,
+        "atrPct": 3.3,
+        "ema9": 320.57,
+        "ema21": 320.0,
+        "sma20": 323.1,
+        "sma50": 314.3
+      },
       "sentiment": {
         "code": "NEUTRAL",
         "label": "ניטרלי / מעורב",
@@ -5101,6 +4843,407 @@
       ]
     },
     {
+      "ticker": "NIO",
+      "price": 2.69,
+      "changePct": 4.26,
+      "bullCount": 22,
+      "bearCount": 28,
+      "scorePct": 60.1,
+      "weightedScore": 0.601,
+      "breakoutLevel": 3.45,
+      "supportLevel": 2.51,
+      "entry": 2.69,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 2.49,
+      "stopPct": 7.4,
+      "targetPrice": 2.85,
+      "targetPct": 6.0,
+      "trailExit": 2.72,
+      "recommendedExit": 2.69,
+      "exitAction": "צא בהחלשות מגמה",
+      "exitReason": "שבירת EMA9 ומומנטום MACD שלילי",
+      "rrRatio": 0.8,
+      "indicatorsSnapshot": {
+        "rsi14": 34.0,
+        "macdHist": -0.034,
+        "volRatio": 1.03,
+        "atrPct": 6.19,
+        "ema9": 2.72,
+        "ema21": 2.94,
+        "sma20": 3.0,
+        "sma50": 3.28
+      },
+      "sentiment": {
+        "code": "NEUTRAL",
+        "label": "ניטרלי / מעורב",
+        "description": "ניטרלי / מעורב (22 בעד / 28 נגד | RSI 34.0 - מאוזן)",
+        "categories": {
+          "פריצות": "1/3",
+          "מומנטום": "2/5",
+          "נרות יפניים": "1/2",
+          "מגמה": "1/10",
+          "מתנדים": "4/10",
+          "נפח": "7/10",
+          "סיכון": "6/10"
+        }
+      },
+      "reason": "מומנטום מחיר חיובי • איתות חיובי ב-RSI/MACD • תמיכה של נפח מסחר",
+      "agents": [
+        {
+          "id": 1,
+          "category": "פריצות",
+          "name": "סוכן פריצת שיא 20 ימים",
+          "signal": "BEARISH",
+          "score": 0.35
+        },
+        {
+          "id": 2,
+          "category": "פריצות",
+          "name": "סוכן התקרבות לפריצה",
+          "signal": "BEARISH",
+          "score": 0.42
+        },
+        {
+          "id": 3,
+          "category": "פריצות",
+          "name": "סוכן הגנה מתחתית 20 ימים",
+          "signal": "BULLISH",
+          "score": 0.72
+        },
+        {
+          "id": 4,
+          "category": "מומנטום",
+          "name": "סוכן מומנטום יומי חיובי",
+          "signal": "BULLISH",
+          "score": 0.76
+        },
+        {
+          "id": 5,
+          "category": "מומנטום",
+          "name": "סוכן מומנטום 3 ימים",
+          "signal": "BULLISH",
+          "score": 0.75
+        },
+        {
+          "id": 6,
+          "category": "מומנטום",
+          "name": "סוכן מומנטום שבועי (5 ימים)",
+          "signal": "BEARISH",
+          "score": 0.41
+        },
+        {
+          "id": 7,
+          "category": "מומנטום",
+          "name": "סוכן מגמה 10 ימים",
+          "signal": "BEARISH",
+          "score": 0.42
+        },
+        {
+          "id": 8,
+          "category": "מומנטום",
+          "name": "סוכן מגמה חודשית (20 ימים)",
+          "signal": "BEARISH",
+          "score": 0.4
+        },
+        {
+          "id": 9,
+          "category": "נרות יפניים",
+          "name": "סוכן פער מחיר (Gap Up/Down)",
+          "signal": "BEARISH",
+          "score": 0.44
+        },
+        {
+          "id": 10,
+          "category": "נרות יפניים",
+          "name": "סוכן נר שורי דומיננטי",
+          "signal": "BULLISH",
+          "score": 0.76
+        },
+        {
+          "id": 11,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל SMA5",
+          "signal": "BULLISH",
+          "score": 0.72
+        },
+        {
+          "id": 12,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל SMA10",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 13,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל SMA20",
+          "signal": "BEARISH",
+          "score": 0.35
+        },
+        {
+          "id": 14,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל SMA50",
+          "signal": "BEARISH",
+          "score": 0.34
+        },
+        {
+          "id": 15,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל EMA9",
+          "signal": "BEARISH",
+          "score": 0.39
+        },
+        {
+          "id": 16,
+          "category": "מגמה",
+          "name": "סוכן מחיר מעל EMA21",
+          "signal": "BEARISH",
+          "score": 0.36
+        },
+        {
+          "id": 17,
+          "category": "מגמה",
+          "name": "סוכן יישור ממוצעים (EMA9 > EMA21)",
+          "signal": "BEARISH",
+          "score": 0.35
+        },
+        {
+          "id": 18,
+          "category": "מגמה",
+          "name": "סוכן מבנה שורי (SMA20 > SMA50)",
+          "signal": "BEARISH",
+          "score": 0.34
+        },
+        {
+          "id": 19,
+          "category": "מגמה",
+          "name": "סוכן מיקום בטווח 52 שבועות",
+          "signal": "BEARISH",
+          "score": 0.43
+        },
+        {
+          "id": 20,
+          "category": "מגמה",
+          "name": "סוכן שיפוע ממוצע 20 ימים",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 21,
+          "category": "מתנדים",
+          "name": "סוכן RSI אזור כוח (50-72)",
+          "signal": "BEARISH",
+          "score": 0.42
+        },
+        {
+          "id": 22,
+          "category": "מתנדים",
+          "name": "סוכן RSI עולה מעל אתמול",
+          "signal": "BULLISH",
+          "score": 0.73
+        },
+        {
+          "id": 23,
+          "category": "מתנדים",
+          "name": "סוכן היפוך ממכירת יתר (RSI < 35)",
+          "signal": "BULLISH",
+          "score": 0.76
+        },
+        {
+          "id": 24,
+          "category": "מתנדים",
+          "name": "סוכן הימנעות מקניית יתר קיצונית",
+          "signal": "BULLISH",
+          "score": 0.7
+        },
+        {
+          "id": 25,
+          "category": "מתנדים",
+          "name": "סוכן MACD מעל קו האות",
+          "signal": "BEARISH",
+          "score": 0.35
+        },
+        {
+          "id": 26,
+          "category": "מתנדים",
+          "name": "סוכן היסטוגרמת MACD חיובית",
+          "signal": "BEARISH",
+          "score": 0.36
+        },
+        {
+          "id": 27,
+          "category": "מתנדים",
+          "name": "סוכן האצת היסטוגרמת MACD",
+          "signal": "BULLISH",
+          "score": 0.75
+        },
+        {
+          "id": 28,
+          "category": "מתנדים",
+          "name": "סוכן קרוס שורי ב-MACD",
+          "signal": "BEARISH",
+          "score": 0.4
+        },
+        {
+          "id": 29,
+          "category": "מתנדים",
+          "name": "סוכן מומנטום ביניים (RSI > 55)",
+          "signal": "BEARISH",
+          "score": 0.39
+        },
+        {
+          "id": 30,
+          "category": "מתנדים",
+          "name": "סוכן איזון מתנדים",
+          "signal": "BEARISH",
+          "score": 0.41
+        },
+        {
+          "id": 31,
+          "category": "נפח",
+          "name": "סוכן זינוק נפח (מעל פי 1.3 מהממוצע)",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 32,
+          "category": "נפח",
+          "name": "סוכן נפח תקין ומעלה",
+          "signal": "BULLISH",
+          "score": 0.72
+        },
+        {
+          "id": 33,
+          "category": "נפח",
+          "name": "סוכן נפח בעלייה יומית",
+          "signal": "BEARISH",
+          "score": 0.39
+        },
+        {
+          "id": 34,
+          "category": "נפח",
+          "name": "סוכן אישור פריצה בנפח",
+          "signal": "BEARISH",
+          "score": 0.36
+        },
+        {
+          "id": 35,
+          "category": "נפח",
+          "name": "סוכן צבירה שבועית בנפח",
+          "signal": "BULLISH",
+          "score": 0.74
+        },
+        {
+          "id": 36,
+          "category": "נפח",
+          "name": "סוכן נזילות גבוהה",
+          "signal": "BULLISH",
+          "score": 0.75
+        },
+        {
+          "id": 37,
+          "category": "נפח",
+          "name": "סוכן יחס נפח-מחיר חיובי",
+          "signal": "BULLISH",
+          "score": 0.73
+        },
+        {
+          "id": 38,
+          "category": "נפח",
+          "name": "סוכן הימנעות ממימוש בנפח חריג",
+          "signal": "BULLISH",
+          "score": 0.71
+        },
+        {
+          "id": 39,
+          "category": "נפח",
+          "name": "סוכן עקביות מחזור מסחר",
+          "signal": "BULLISH",
+          "score": 0.7
+        },
+        {
+          "id": 40,
+          "category": "נפח",
+          "name": "סוכן דחיפת קונים בסגירה",
+          "signal": "BULLISH",
+          "score": 0.75
+        },
+        {
+          "id": 41,
+          "category": "סיכון",
+          "name": "סוכן תנודתיות תומכת יעד",
+          "signal": "BULLISH",
+          "score": 0.78
+        },
+        {
+          "id": 42,
+          "category": "סיכון",
+          "name": "סוכן מרחק סביר מ-SMA20",
+          "signal": "BULLISH",
+          "score": 0.73
+        },
+        {
+          "id": 43,
+          "category": "סיכון",
+          "name": "סוכן יחס סיכוי-סיכון ליעד",
+          "signal": "BEARISH",
+          "score": 0.38
+        },
+        {
+          "id": 44,
+          "category": "סיכון",
+          "name": "סוכן יציבות סגירה יומית",
+          "signal": "BULLISH",
+          "score": 0.72
+        },
+        {
+          "id": 45,
+          "category": "סיכון",
+          "name": "סוכן מרווח ביטחון מתמיכה",
+          "signal": "BULLISH",
+          "score": 0.74
+        },
+        {
+          "id": 46,
+          "category": "סיכון",
+          "name": "סוכן הימנעות ממתיחה קיצונית מעל EMA21",
+          "signal": "BULLISH",
+          "score": 0.73
+        },
+        {
+          "id": 47,
+          "category": "סיכון",
+          "name": "סוכן עקביות טווח קצר",
+          "signal": "BULLISH",
+          "score": 0.74
+        },
+        {
+          "id": 48,
+          "category": "סיכון",
+          "name": "סוכן מומנטום פוטנציאלי ליעד",
+          "signal": "BEARISH",
+          "score": 0.4
+        },
+        {
+          "id": 49,
+          "category": "סיכון",
+          "name": "סוכן איכות מגמה כוללת",
+          "signal": "BEARISH",
+          "score": 0.36
+        },
+        {
+          "id": 50,
+          "category": "סיכון",
+          "name": "סוכן אישור סופי לתרחיש לונג",
+          "signal": "BEARISH",
+          "score": 0.38
+        }
+      ]
+    },
+    {
       "ticker": "SLB",
       "price": 48.52,
       "changePct": 3.26,
@@ -5108,20 +5251,31 @@
       "bearCount": 28,
       "scorePct": 60.1,
       "weightedScore": 0.601,
-      "breakoutLevel": 54.76,
-      "supportLevel": 48.49,
-      "entry": 54.76,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 12.86,
-      "stopLoss": 52.62,
-      "stopPct": 3.9,
-      "targetPrice": 60.24,
-      "targetPct": 10.0,
-      "trailExit": 52.62,
-      "recommendedExit": 48.52,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.56,
+      "breakoutLevel": 54.71,
+      "supportLevel": 49.32,
+      "entry": 48.52,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 45.61,
+      "stopPct": 6.0,
+      "targetPrice": 51.43,
+      "targetPct": 6.0,
+      "trailExit": 48.16,
+      "recommendedExit": 51.43,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $51.43, סטופ $45.61 או טריילינג $48.16",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 45.1,
+        "macdHist": -0.333,
+        "volRatio": 0.86,
+        "atrPct": 3.52,
+        "ema9": 48.16,
+        "ema21": 49.32,
+        "sma20": 49.99,
+        "sma50": 50.26
+      },
       "sentiment": {
         "code": "NEUTRAL",
         "label": "ניטרלי / מעורב",
@@ -5494,28 +5648,39 @@
       "ticker": "RIVN",
       "price": 11.71,
       "changePct": 3.17,
-      "bullCount": 22,
-      "bearCount": 28,
-      "scorePct": 60.0,
-      "weightedScore": 0.6,
-      "breakoutLevel": 14.35,
-      "supportLevel": 12.07,
-      "entry": 14.35,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 22.54,
-      "stopLoss": 13.63,
-      "stopPct": 5.0,
-      "targetPrice": 15.79,
-      "targetPct": 10.0,
-      "trailExit": 13.63,
-      "recommendedExit": 11.71,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.0,
+      "bullCount": 21,
+      "bearCount": 29,
+      "scorePct": 58.0,
+      "weightedScore": 0.58,
+      "breakoutLevel": 14.34,
+      "supportLevel": 11.1,
+      "entry": 11.71,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 11.01,
+      "stopPct": 6.0,
+      "targetPrice": 12.41,
+      "targetPct": 6.0,
+      "trailExit": 11.67,
+      "recommendedExit": 12.41,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $12.41, סטופ $11.01 או טריילינג $11.67",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 36.3,
+        "macdHist": -0.093,
+        "volRatio": 0.87,
+        "atrPct": 5.75,
+        "ema9": 11.67,
+        "ema21": 12.2,
+        "sma20": 12.45,
+        "sma50": 13.25
+      },
       "sentiment": {
         "code": "NEUTRAL",
         "label": "ניטרלי / מעורב",
-        "description": "ניטרלי / מעורב (22 בעד / 28 נגד | RSI 36.3 - מאוזן)",
+        "description": "ניטרלי / מעורב (21 בעד / 29 נגד | RSI 36.3 - מאוזן)",
         "categories": {
           "פריצות": "1/3",
           "מומנטום": "2/5",
@@ -5523,7 +5688,7 @@
           "מגמה": "3/10",
           "מתנדים": "3/10",
           "נפח": "5/10",
-          "סיכון": "8/10"
+          "סיכון": "7/10"
         }
       },
       "reason": "מומנטום מחיר חיובי • מגמה עולה מעל ממוצעים • איתות חיובי ב-RSI/MACD",
@@ -5826,8 +5991,8 @@
           "id": 43,
           "category": "סיכון",
           "name": "סוכן יחס סיכוי-סיכון ליעד",
-          "signal": "BULLISH",
-          "score": 0.77
+          "signal": "BEARISH",
+          "score": 0.38
         },
         {
           "id": 44,
@@ -5884,28 +6049,39 @@
       "ticker": "CAT",
       "price": 543.69,
       "changePct": 0.57,
-      "bullCount": 22,
-      "bearCount": 28,
-      "scorePct": 60.0,
-      "weightedScore": 0.6,
-      "breakoutLevel": 734.93,
-      "supportLevel": 561.68,
-      "entry": 734.93,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 35.17,
-      "stopLoss": 698.71,
-      "stopPct": 4.9,
-      "targetPrice": 808.42,
-      "targetPct": 10.0,
-      "trailExit": 698.71,
-      "recommendedExit": 543.69,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.03,
+      "bullCount": 21,
+      "bearCount": 29,
+      "scorePct": 58.0,
+      "weightedScore": 0.58,
+      "breakoutLevel": 734.2,
+      "supportLevel": 531.4,
+      "entry": 543.69,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 511.07,
+      "stopPct": 6.0,
+      "targetPrice": 576.31,
+      "targetPct": 6.0,
+      "trailExit": 553.46,
+      "recommendedExit": 576.31,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $576.31, סטופ $511.07 או טריילינג $553.46",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 47.8,
+        "macdHist": 1.806,
+        "volRatio": 0.88,
+        "atrPct": 5.33,
+        "ema9": 553.46,
+        "ema21": 591.96,
+        "sma20": 579.05,
+        "sma50": 698.83
+      },
       "sentiment": {
         "code": "NEUTRAL",
         "label": "ניטרלי / מעורב",
-        "description": "ניטרלי / מעורב (22 בעד / 28 נגד | RSI 47.8 - מאוזן)",
+        "description": "ניטרלי / מעורב (21 בעד / 29 נגד | RSI 47.8 - מאוזן)",
         "categories": {
           "פריצות": "1/3",
           "מומנטום": "1/5",
@@ -5913,7 +6089,7 @@
           "מגמה": "1/10",
           "מתנדים": "6/10",
           "נפח": "5/10",
-          "סיכון": "7/10"
+          "סיכון": "6/10"
         }
       },
       "reason": "איתות חיובי ב-RSI/MACD • תמיכה של נפח מסחר • יחס סיכון סביר ליעד",
@@ -6216,8 +6392,8 @@
           "id": 43,
           "category": "סיכון",
           "name": "סוכן יחס סיכוי-סיכון ליעד",
-          "signal": "BULLISH",
-          "score": 0.77
+          "signal": "BEARISH",
+          "score": 0.38
         },
         {
           "id": 44,
@@ -6274,28 +6450,39 @@
       "ticker": "UNH",
       "price": 346.19,
       "changePct": 1.26,
-      "bullCount": 20,
-      "bearCount": 30,
-      "scorePct": 56.0,
-      "weightedScore": 0.56,
-      "breakoutLevel": 417.44,
-      "supportLevel": 372.79,
-      "entry": 417.44,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 20.58,
-      "stopLoss": 397.55,
-      "stopPct": 4.8,
-      "targetPrice": 459.18,
-      "targetPct": 10.0,
-      "trailExit": 397.55,
+      "bullCount": 19,
+      "bearCount": 31,
+      "scorePct": 53.9,
+      "weightedScore": 0.539,
+      "breakoutLevel": 417.02,
+      "supportLevel": 332.1,
+      "entry": 346.19,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 325.42,
+      "stopPct": 6.0,
+      "targetPrice": 366.96,
+      "targetPct": 6.0,
+      "trailExit": 357.24,
       "recommendedExit": 346.19,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.1,
+      "exitAction": "צא בהחלשות מגמה",
+      "exitReason": "שבירת EMA9 ומומנטום MACD שלילי",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 30.7,
+        "macdHist": -7.037,
+        "volRatio": 0.87,
+        "atrPct": 4.6,
+        "ema9": 357.24,
+        "ema21": 375.26,
+        "sma20": 384.32,
+        "sma50": 386.49
+      },
       "sentiment": {
-        "code": "NEUTRAL",
-        "label": "ניטרלי / מעורב",
-        "description": "ניטרלי / מעורב (20 בעד / 30 נגד | RSI 30.7 - מאוזן)",
+        "code": "BEARISH",
+        "label": "דובי / לחץ מכירה",
+        "description": "דובי / לחץ מכירה (19 בעד / 31 נגד | RSI 30.7 - מאוזן)",
         "categories": {
           "פריצות": "1/3",
           "מומנטום": "1/5",
@@ -6303,7 +6490,7 @@
           "מגמה": "1/10",
           "מתנדים": "4/10",
           "נפח": "5/10",
-          "סיכון": "7/10"
+          "סיכון": "6/10"
         }
       },
       "reason": "איתות חיובי ב-RSI/MACD • תמיכה של נפח מסחר • יחס סיכון סביר ליעד",
@@ -6606,8 +6793,8 @@
           "id": 43,
           "category": "סיכון",
           "name": "סוכן יחס סיכוי-סיכון ליעד",
-          "signal": "BULLISH",
-          "score": 0.77
+          "signal": "BEARISH",
+          "score": 0.38
         },
         {
           "id": 44,
@@ -6664,28 +6851,39 @@
       "ticker": "XPEV",
       "price": 8.99,
       "changePct": -0.33,
-      "bullCount": 19,
-      "bearCount": 31,
-      "scorePct": 54.0,
-      "weightedScore": 0.54,
-      "breakoutLevel": 10.39,
-      "supportLevel": 9.2,
-      "entry": 10.39,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 15.57,
-      "stopLoss": 9.87,
-      "stopPct": 5.0,
-      "targetPrice": 11.43,
-      "targetPct": 10.0,
-      "trailExit": 9.87,
+      "bullCount": 18,
+      "bearCount": 32,
+      "scorePct": 51.8,
+      "weightedScore": 0.518,
+      "breakoutLevel": 10.38,
+      "supportLevel": 8.8,
+      "entry": 8.99,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": 0.0,
+      "stopLoss": 8.45,
+      "stopPct": 6.0,
+      "targetPrice": 9.53,
+      "targetPct": 6.0,
+      "trailExit": 9.14,
       "recommendedExit": 8.99,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.0,
+      "exitAction": "צא בהחלשות מגמה",
+      "exitReason": "שבירת EMA9 ומומנטום MACD שלילי",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 43.9,
+        "macdHist": -0.086,
+        "volRatio": 1.26,
+        "atrPct": 5.83,
+        "ema9": 9.14,
+        "ema21": 9.37,
+        "sma20": 9.49,
+        "sma50": 9.61
+      },
       "sentiment": {
         "code": "BEARISH",
         "label": "דובי / לחץ מכירה",
-        "description": "דובי / לחץ מכירה (19 בעד / 31 נגד | RSI 43.9 - מאוזן)",
+        "description": "דובי / לחץ מכירה (18 בעד / 32 נגד | RSI 43.9 - מאוזן)",
         "categories": {
           "פריצות": "1/3",
           "מומנטום": "1/5",
@@ -6693,7 +6891,7 @@
           "מגמה": "1/10",
           "מתנדים": "4/10",
           "נפח": "6/10",
-          "סיכון": "6/10"
+          "סיכון": "5/10"
         }
       },
       "reason": "איתות חיובי ב-RSI/MACD • תמיכה של נפח מסחר • יחס סיכון סביר ליעד",
@@ -6996,8 +7194,8 @@
           "id": 43,
           "category": "סיכון",
           "name": "סוכן יחס סיכוי-סיכון ליעד",
-          "signal": "BULLISH",
-          "score": 0.77
+          "signal": "BEARISH",
+          "score": 0.38
         },
         {
           "id": 44,
@@ -7058,20 +7256,31 @@
       "bearCount": 33,
       "scorePct": 49.5,
       "weightedScore": 0.495,
-      "breakoutLevel": 220.65,
-      "supportLevel": 167.3,
-      "entry": 220.65,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 47.79,
-      "stopLoss": 209.62,
-      "stopPct": 5.0,
-      "targetPrice": 242.72,
-      "targetPct": 10.0,
-      "trailExit": 209.62,
+      "breakoutLevel": 220.43,
+      "supportLevel": 150.61,
+      "entry": 149.3,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 129.51,
+      "stopPct": 13.3,
+      "targetPrice": 158.26,
+      "targetPct": 6.0,
+      "trailExit": 155.25,
       "recommendedExit": 149.3,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.0,
+      "exitAction": "צא בהחלשות מגמה",
+      "exitReason": "שבירת EMA9 ומומנטום MACD שלילי",
+      "rrRatio": 0.45,
+      "indicatorsSnapshot": {
+        "rsi14": 37.7,
+        "macdHist": -0.688,
+        "volRatio": 1.04,
+        "atrPct": 10.6,
+        "ema9": 155.25,
+        "ema21": 170.81,
+        "sma20": 172.48,
+        "sma50": 203.65
+      },
       "sentiment": {
         "code": "BEARISH",
         "label": "דובי / לחץ מכירה",
@@ -7448,20 +7657,31 @@
       "bearCount": 34,
       "scorePct": 47.4,
       "weightedScore": 0.474,
-      "breakoutLevel": 64.26,
-      "supportLevel": 55.32,
-      "entry": 64.26,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 19.11,
-      "stopLoss": 62.23,
-      "stopPct": 3.2,
-      "targetPrice": 70.69,
-      "targetPct": 10.0,
-      "trailExit": 62.23,
+      "breakoutLevel": 64.2,
+      "supportLevel": 52.78,
+      "entry": 53.95,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 50.71,
+      "stopPct": 6.0,
+      "targetPrice": 57.19,
+      "targetPct": 6.0,
+      "trailExit": 54.68,
       "recommendedExit": 53.95,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 3.17,
+      "exitAction": "צא בהחלשות מגמה",
+      "exitReason": "שבירת EMA9 ומומנטום MACD שלילי",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 39.3,
+        "macdHist": -0.413,
+        "volRatio": 0.75,
+        "atrPct": 3.01,
+        "ema9": 54.68,
+        "ema21": 56.58,
+        "sma20": 57.03,
+        "sma50": 58.68
+      },
       "sentiment": {
         "code": "BEARISH",
         "label": "דובי / לחץ מכירה",
@@ -7838,20 +8058,31 @@
       "bearCount": 35,
       "scorePct": 45.3,
       "weightedScore": 0.453,
-      "breakoutLevel": 187.88,
-      "supportLevel": 161.9,
-      "entry": 187.88,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 18.85,
-      "stopLoss": 183.53,
-      "stopPct": 2.3,
-      "targetPrice": 206.67,
-      "targetPct": 10.0,
-      "trailExit": 183.53,
+      "breakoutLevel": 187.69,
+      "supportLevel": 157.09,
+      "entry": 158.08,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": -0.0,
+      "stopLoss": 148.6,
+      "stopPct": 6.0,
+      "targetPrice": 167.56,
+      "targetPct": 6.0,
+      "trailExit": 161.03,
       "recommendedExit": 158.08,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 4.32,
+      "exitAction": "צא בהחלשות מגמה",
+      "exitReason": "שבירת EMA9 ומומנטום MACD שלילי",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 37.6,
+        "macdHist": -1.272,
+        "volRatio": 1.39,
+        "atrPct": 2.2,
+        "ema9": 161.03,
+        "ema21": 165.12,
+        "sma20": 166.91,
+        "sma50": 167.95
+      },
       "sentiment": {
         "code": "BEARISH",
         "label": "דובי / לחץ מכירה",
@@ -8228,20 +8459,31 @@
       "bearCount": 36,
       "scorePct": 42.9,
       "weightedScore": 0.429,
-      "breakoutLevel": 8626.33,
-      "supportLevel": 7702.83,
-      "entry": 8626.33,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 10.37,
-      "stopLoss": 8334.44,
-      "stopPct": 3.4,
-      "targetPrice": 9488.96,
-      "targetPct": 10.0,
-      "trailExit": 8334.44,
-      "recommendedExit": 7816.0,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.96,
+      "breakoutLevel": 8617.73,
+      "supportLevel": 7989.86,
+      "entry": 7816.0,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": 0.0,
+      "stopLoss": 7347.04,
+      "stopPct": 6.0,
+      "targetPrice": 8284.96,
+      "targetPct": 6.0,
+      "trailExit": 7904.63,
+      "recommendedExit": 8284.96,
+      "exitAction": "יעד / טריילינג",
+      "exitReason": "מימוש ביעד $8284.96, סטופ $7347.04 או טריילינג $7904.63",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 46.9,
+        "macdHist": 12.293,
+        "volRatio": 1.1,
+        "atrPct": 2.99,
+        "ema9": 7904.63,
+        "ema21": 7989.86,
+        "sma20": 7941.06,
+        "sma50": 8256.16
+      },
       "sentiment": {
         "code": "BEARISH",
         "label": "דובי / לחץ מכירה",
@@ -8619,19 +8861,30 @@
       "scorePct": 32.2,
       "weightedScore": 0.322,
       "breakoutLevel": 4.21,
-      "supportLevel": 2.95,
-      "entry": 4.21,
-      "entryType": "כניסה בפריצת התנגדות",
-      "gapToEntryPct": 64.45,
-      "stopLoss": 4.0,
-      "stopPct": 5.0,
-      "targetPrice": 4.63,
-      "targetPct": 10.0,
-      "trailExit": 4.0,
+      "supportLevel": 2.51,
+      "entry": 2.56,
+      "entryType": "מחיר נוכחי (זהירות / בדיקת תמיכה)",
+      "entryNote": "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה",
+      "deltaToEntryPct": 0.0,
+      "stopLoss": 2.41,
+      "stopPct": 5.9,
+      "targetPrice": 2.71,
+      "targetPct": 6.0,
+      "trailExit": 2.71,
       "recommendedExit": 2.56,
-      "exitAction": "צא מיד (סטופ)",
-      "exitReason": "המחיר ירד מתחת לרמת הסטופ לוס",
-      "rrRatio": 2.0,
+      "exitAction": "צא בהחלשות מגמה",
+      "exitReason": "שבירת EMA9 ומומנטום MACD שלילי",
+      "rrRatio": 1.0,
+      "indicatorsSnapshot": {
+        "rsi14": 41.8,
+        "macdHist": -0.043,
+        "volRatio": 0.7,
+        "atrPct": 12.75,
+        "ema9": 2.77,
+        "ema21": 3.01,
+        "sma20": 3.04,
+        "sma50": 3.48
+      },
       "sentiment": {
         "code": "BEARISH",
         "label": "דובי / לחץ מכירה",
