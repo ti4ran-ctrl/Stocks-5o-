@@ -20,6 +20,8 @@ BASE_UNIVERSE = [
 BATCH_SIZE = 18
 DEFAULT_PROFIT_TARGET_PCT = 0.06
 MIN_SCORE_TO_ALERT = 0.65
+DEFAULT_INITIAL_CAPITAL = 10000.0
+MAX_OPEN_POSITIONS = 6
 DEMO_FILE = "demo_portfolio.json"
 LATEST_SCAN_FILE = "latest_scan.json"
 WATCHLIST_FILE = "watchlist.json"
@@ -36,6 +38,18 @@ def get_profit_target_pct() -> float:
     except ValueError:
         pass
     return DEFAULT_PROFIT_TARGET_PCT
+
+
+def get_initial_capital() -> float:
+    raw = os.getenv("DEMO_INITIAL_CAPITAL", "").strip()
+    if raw:
+        try:
+            v = float(raw)
+            if v >= 100:
+                return v
+        except ValueError:
+            pass
+    return DEFAULT_INITIAL_CAPITAL
 
 
 def get_watchlist_tickers() -> list[str]:
@@ -108,7 +122,6 @@ def send_telegram_message(text: str) -> bool:
 
 
 def fetch_market_bundle(ticker: str) -> tuple[pd.DataFrame | None, dict, dict]:
-    """מושך היסטוריית מחירים, נתוני פונדמנטל/שוק ונתוני מדד ייחוס (SPY/VIX)."""
     try:
         df = yf.download(ticker, period="1y", interval="1d", progress=False, auto_adjust=True)
         if df is None or df.empty:
@@ -121,12 +134,11 @@ def fetch_market_bundle(ticker: str) -> tuple[pd.DataFrame | None, dict, dict]:
 
         info = {}
         try:
-            t_obj = yf.Ticker(ticker)
-            raw_info = t_obj.info or {}
+            raw_info = yf.Ticker(ticker).info or {}
             if isinstance(raw_info, dict):
                 info = raw_info
-        except Exception as exc:
-            print(f"Warning fetching info for {ticker}: {exc}")
+        except Exception:
+            pass
 
         bench = {}
         for sym, key in [("SPY", "spy"), ("^VIX", "vix")]:
@@ -215,15 +227,11 @@ def compute_ichimoku(df: pd.DataFrame) -> dict:
     span_a = ((tenkan + kijun) / 2.0).shift(26)
     span_b = ((df["High"].rolling(52).max() + df["Low"].rolling(52).min()) / 2.0).shift(26)
 
-    t_val = float(tenkan.iloc[-1]) if not math.isnan(float(tenkan.iloc[-1])) else float(df["Close"].iloc[-1])
-    k_val = float(kijun.iloc[-1]) if not math.isnan(float(kijun.iloc[-1])) else float(df["Close"].iloc[-1])
     a_val = float(span_a.iloc[-1]) if not math.isnan(float(span_a.iloc[-1])) else float(df["Close"].iloc[-1])
     b_val = float(span_b.iloc[-1]) if not math.isnan(float(span_b.iloc[-1])) else float(df["Close"].iloc[-1])
     cloud_top = max(a_val, b_val)
     cloud_bot = min(a_val, b_val)
     return {
-        "tenkan": t_val,
-        "kijun": k_val,
         "cloud_top": cloud_top,
         "cloud_bot": cloud_bot,
         "above_cloud": float(df["Close"].iloc[-1]) > cloud_top,
@@ -231,7 +239,6 @@ def compute_ichimoku(df: pd.DataFrame) -> dict:
 
 
 def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, target_pct: float) -> dict:
-    """מריץ את כל 66 הבדיקות (א'–ח') לפני קביעת שערי כניסה/יציאה והמלצה."""
     close = df["Close"]
     open_p = df["Open"]
     high = df["High"]
@@ -245,11 +252,9 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, t
     last_high = float(high.iloc[-1])
     prev_high = float(high.iloc[-2])
     last_low = float(low.iloc[-1])
-    prev_low = float(low.iloc[-2])
 
     sma_20 = float(close.rolling(20).mean().iloc[-1])
     sma_50 = float(close.rolling(min(50, len(close))).mean().iloc[-1])
-    sma_150 = float(close.rolling(min(150, len(close))).mean().iloc[-1])
     sma_200 = float(close.rolling(min(200, len(close))).mean().iloc[-1])
     ema_20 = float(close.ewm(span=20, adjust=False).mean().iloc[-1])
     ema_50 = float(close.ewm(span=50, adjust=False).mean().iloc[-1])
@@ -282,14 +287,14 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, t
 
     adx = compute_adx(df, 14)
 
+    high_10 = float(high.rolling(10).max().iloc[-2])
+    low_10 = float(low.rolling(10).min().iloc[-2])
     high_20 = float(high.rolling(20).max().iloc[-2])
     low_20 = float(low.rolling(20).min().iloc[-2])
     high_60 = float(high.rolling(min(60, len(high))).max().iloc[-2])
     low_60 = float(low.rolling(min(60, len(low))).min().iloc[-2])
     swing_range = max(high_60 - low_60, 1e-6)
-    fib_382 = high_60 - 0.382 * swing_range
     fib_618 = high_60 - 0.618 * swing_range
-    fib_ext_1272 = high_60 + 0.272 * swing_range
 
     vol_avg20 = float(volume.rolling(20).mean().iloc[-1])
     last_vol = float(volume.iloc[-1])
@@ -302,6 +307,7 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, t
     vwap_20 = float((typical_price.tail(20) * volume.tail(20)).sum() / max(volume.tail(20).sum(), 1.0))
 
     gap_pct = ((last_open - prev_close) / max(prev_close, 1e-6)) * 100.0
+    ret_1d = (last_close - prev_close) / max(prev_close, 1e-6)
     ret_5d = (last_close - float(close.iloc[-6])) / max(float(close.iloc[-6]), 1e-6)
     ret_20d = (last_close - float(close.iloc[-21])) / max(float(close.iloc[-21]), 1e-6)
     ret_60d = (last_close - float(close.iloc[-61])) / max(float(close.iloc[-61]), 1e-6) if len(close) >= 61 else ret_20d
@@ -309,32 +315,25 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, t
     body = abs(last_close - last_open)
     rng = max(last_high - last_low, 1e-6)
     lower_wick = min(last_open, last_close) - last_low
-    upper_wick = last_high - max(last_open, last_close)
     prev_body = abs(prev_close - prev_open)
-    is_hammer = (lower_wick >= 2.0 * max(body, 1e-6)) and (upper_wick <= body * 0.5)
-    is_bull_engulf = (last_close > last_open) and (prev_close < prev_open) and (body > prev_body) and (last_close >= prev_open) and (last_open <= prev_close)
+    is_hammer = (lower_wick >= 2.0 * max(body, 1e-6))
+    is_bull_engulf = (last_close > last_open) and (prev_close < prev_open) and (body > prev_body)
 
-    # פונדמנטל ונתוני שוק מ-info (עם גיבוי בטוח)
     rev_growth = info.get("revenueGrowth")
     earn_growth = info.get("earningsGrowth")
-    gross_margin = info.get("grossMargins")
     op_margin = info.get("operatingMargins")
     net_margin = info.get("profitMargins")
     ebitda = info.get("ebitda")
     free_cashflow = info.get("freeCashflow")
-    op_cashflow = info.get("operatingCashflow")
     total_cash = info.get("totalCash")
     total_debt = info.get("totalDebt")
     current_ratio = info.get("currentRatio")
-    quick_ratio = info.get("quickRatio")
     pe_ratio = info.get("trailingPE")
-    fwd_pe = info.get("forwardPE")
     peg_ratio = info.get("pegRatio")
     ps_ratio = info.get("priceToSalesTrailing12Months")
     pb_ratio = info.get("priceToBook")
     ev_ebitda = info.get("enterpriseToEbitda")
     roe = info.get("returnOnEquity")
-    roa = info.get("returnOnAssets")
     div_yield = info.get("dividendYield")
     payout_ratio = info.get("payoutRatio")
     short_pct = info.get("shortPercentOfFloat")
@@ -348,118 +347,103 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, t
 
     checks = []
 
-    def add_check(num: int, section: str, title: str, status: str, detail: str, weight: float = 1.0):
-        checks.append({
-            "id": num,
-            "section": section,
-            "title": title,
-            "status": status,  # PASS | WARN | FAIL | NA_DATA
-            "detail": detail,
-            "weight": weight,
-        })
+    def add_check(num: int, section: str, title: str, status: str, weight: float = 1.0):
+        checks.append({"id": num, "section": section, "title": title, "status": status, "weight": weight})
 
     # א. ניתוח טכני (1-19)
-    add_check(1, "א. ניתוח טכני", "מגמה (קווי מגמה, תעלות, שיאים/שפלים)", "PASS" if (last_close > sma_20 and ret_20d > 0) else ("WARN" if ret_20d >= -0.04 else "FAIL"), f"20d {ret_20d*100:+.1f}% | מול SMA20 ${sma_20:.2f}")
-    add_check(2, "א. ניתוח טכני", "תמיכות והתנגדויות", "PASS" if last_close >= low_20 * 1.02 else "WARN", f"תמיכה 20י ${low_20:.2f} | התנגדות 20י ${high_20:.2f}")
-    add_check(3, "א. ניתוח טכני", "נרות יפניים ותבניות נרות", "PASS" if (is_hammer or is_bull_engulf or (last_close > last_open and body / rng > 0.5)) else "WARN", "פטיש/בולען/נר שורי" if (is_hammer or is_bull_engulf) else f"גוף נר {(body/rng)*100:.0f}%")
-    add_check(4, "א. ניתוח טכני", "תבניות גרף (פריצה/קונסולידציה/תחתית)", "PASS" if last_close >= high_20 * 0.97 or last_close >= fib_618 else "WARN", f"טווח 60י ${low_60:.2f}-${high_60:.2f}")
-    gc_recent = (prev_sma50 <= prev_sma200) and (sma_50 > sma_200)
+    add_check(1, "א. טכני", "מגמה", "PASS" if (last_close > sma_20 and ret_20d > 0) else ("WARN" if ret_20d >= -0.04 else "FAIL"))
+    add_check(2, "א. טכני", "תמיכות והתנגדויות", "PASS" if last_close >= low_20 * 1.02 else "WARN")
+    add_check(3, "א. טכני", "נרות יפניים", "PASS" if (is_hammer or is_bull_engulf or (last_close > last_open and body / rng > 0.5)) else "WARN")
+    add_check(4, "א. טכני", "תבניות גרף", "PASS" if last_close >= high_20 * 0.97 or last_close >= fib_618 else "WARN")
     dc_recent = (prev_sma50 >= prev_sma200) and (sma_50 < sma_200)
-    add_check(5, "א. ניתוח טכני", "ממוצעים נעים (SMA/EMA 50/150/200 וחציות)", "FAIL" if dc_recent else ("PASS" if (last_close > sma_50 and sma_50 >= sma_200 * 0.98) else "WARN"), f"SMA50 ${sma_50:.2f} | SMA200 ${sma_200:.2f}" + (" [Golden Cross]" if gc_recent else ""))
-    add_check(6, "א. ניתוח טכני", "RSI (14)", "WARN" if rsi >= 78 else ("PASS" if 42 <= rsi <= 72 else "WARN"), f"RSI={rsi:.1f}")
-    add_check(7, "א. ניתוח טכני", "MACD", "PASS" if (float(macd.iloc[-1]) > float(sig.iloc[-1]) or macd_hist > prev_macd_hist) else "WARN", f"Hist={macd_hist:.3f}")
-    add_check(8, "א. ניתוח טכני", "סטוכסטי (Stochastic %K/%D)", "PASS" if (stoch_k > stoch_d and stoch_k < 82) else ("WARN" if stoch_k < 88 else "FAIL"), f"%K={stoch_k:.1f}, %D={stoch_d:.1f}")
-    add_check(9, "א. ניתוח טכני", "רצועות בולינגר", "PASS" if bb_lower <= last_close <= bb_upper * 1.02 else "WARN", f"Lower ${bb_lower:.2f} | Mid ${sma_20:.2f} | Upper ${bb_upper:.2f}")
+    add_check(5, "א. טכני", "ממוצעים נעים וחציות", "FAIL" if dc_recent else ("PASS" if (last_close > sma_50 and sma_50 >= sma_200 * 0.98) else "WARN"))
+    add_check(6, "א. טכני", "RSI", "WARN" if rsi >= 78 else ("PASS" if 42 <= rsi <= 72 else "WARN"))
+    add_check(7, "א. טכני", "MACD", "PASS" if (float(macd.iloc[-1]) > float(sig.iloc[-1]) or macd_hist > prev_macd_hist) else "WARN")
+    add_check(8, "א. טכני", "סטוכסטי", "PASS" if (stoch_k > stoch_d and stoch_k < 82) else ("WARN" if stoch_k < 88 else "FAIL"))
+    add_check(9, "א. טכני", "בולינגר", "PASS" if bb_lower <= last_close <= bb_upper * 1.02 else "WARN")
     atr_pct = (atr / max(last_close, 1e-6)) * 100.0
-    add_check(10, "א. ניתוח טכני", "ATR (תנודתיות)", "PASS" if 0.8 <= atr_pct <= 8.5 else "WARN", f"ATR=${atr:.2f} ({atr_pct:.1f}%)")
-    add_check(11, "א. ניתוח טכני", "ADX (עוצמת מגמה)", "PASS" if adx >= 20 else "WARN", f"ADX={adx:.1f}")
-    add_check(12, "א. ניתוח טכני", "פיבונאצ'י (תיקונים והרחבות)", "PASS" if last_close >= fib_618 else "WARN", f"0.618=${fib_618:.2f} | 0.382=${fib_382:.2f} | Ext1.272=${fib_ext_1272:.2f}")
-    add_check(13, "א. ניתוח טכני", "נפח מסחר (Volume)", "PASS" if vol_ratio >= 0.95 and vol_avg20 >= 500_000 else "WARN", f"יחס נפח x{vol_ratio:.2f} (ממוצע {int(vol_avg20):,})")
-    add_check(14, "א. ניתוח טכני", "OBV ו-VWAP", "PASS" if (obv_rising and last_close >= vwap_20 * 0.98) else "WARN", f"VWAP20=${vwap_20:.2f} | OBV {'עולה' if obv_rising else 'יורד'}")
-    add_check(15, "א. ניתוח טכני", "פערי מחיר (Gaps)", "PASS" if abs(gap_pct) < 6.0 or gap_pct > 0 else "WARN", f"פער פתיחה {gap_pct:+.2f}%")
-    mtf_bull = (last_close > ema_20) and (ema_20 > ema_50) and (ret_5d > -0.03)
-    add_check(16, "א. ניתוח טכני", "אישור מגמה במספר מסגרות זמן", "PASS" if mtf_bull else "WARN", f"5d {ret_5d*100:+.1f}% | 20d {ret_20d*100:+.1f}% | 60d {ret_60d*100:+.1f}%")
+    add_check(10, "א. טכני", "ATR", "PASS" if 0.8 <= atr_pct <= 8.5 else "WARN")
+    add_check(11, "א. טכני", "ADX", "PASS" if adx >= 20 else "WARN")
+    add_check(12, "א. טכני", "פיבונאצ'י", "PASS" if last_close >= fib_618 else "WARN")
+    add_check(13, "א. טכני", "נפח", "PASS" if vol_ratio >= 0.95 and vol_avg20 >= 500_000 else "WARN")
+    add_check(14, "א. טכני", "OBV ו-VWAP", "PASS" if (obv_rising and last_close >= vwap_20 * 0.98) else "WARN")
+    add_check(15, "א. טכני", "פערי מחיר", "PASS" if abs(gap_pct) < 6.0 or gap_pct > 0 else "WARN")
+    add_check(16, "א. טכני", "מסגרות זמן", "PASS" if ((last_close > ema_20) and (ema_20 > ema_50) and (ret_5d > -0.03)) else "WARN")
     bear_div = (last_close > prev_high) and (rsi < prev_rsi - 3.0)
-    add_check(17, "א. ניתוח טכני", "דיברגנציות בין מחיר לאינדיקטור", "WARN" if bear_div else "PASS", "אזהרת דיברגנציה דובית ב-RSI" if bear_div else "ללא דיברגנציה שלילית חריפה")
+    add_check(17, "א. טכני", "דיברגנציות", "WARN" if bear_div else "PASS")
     ichi = compute_ichimoku(df)
-    add_check(18, "א. ניתוח טכני", "עננת איצ'ימוקו", "PASS" if ichi["above_cloud"] else "WARN", f"ענן ${ichi['cloud_bot']:.2f}-${ichi['cloud_top']:.2f}")
-    dow_bull = (last_close > sma_50) and (ret_60d > 0)
-    add_check(19, "א. ניתוח טכני", "גל אליוט ועקרונות דאו", "PASS" if dow_bull else "WARN", f"מבנה 60d ({ret_60d*100:+.1f}%) מול SMA50")
+    add_check(18, "א. טכני", "איצ'ימוקו", "PASS" if ichi["above_cloud"] else "WARN")
+    add_check(19, "א. טכני", "גל אליוט ודאו", "PASS" if (last_close > sma_50 and ret_60d > 0) else "WARN")
 
-    # ב. ניתוח פונדמנטלי: דוחות כספיים (20-25)
-    add_check(20, "ב. דוחות כספיים", "דוח רווח והפסד (הכנסות/רווח גולמי/תפעולי/נקי)", "PASS" if (net_margin is not None and net_margin > 0) else ("NA_DATA" if net_margin is None else "WARN"), f"שולי רווח נקי: {net_margin*100:.1f}%" if net_margin is not None else "אין נתון ב-Feed")
-    add_check(21, "ב. דוחות כספיים", "מאזן (נכסים, התחייבויות, הון עצמי)", "PASS" if (total_cash is not None and total_debt is not None and total_cash >= total_debt * 0.35) else ("NA_DATA" if total_cash is None else "WARN"), f"מזומן ${total_cash/1e9:.2f}B | חוב ${total_debt/1e9:.2f}B" if (total_cash and total_debt) else "אין נתון מאזן מלא")
-    add_check(22, "ב. דוחות כספיים", "תזרים מזומנים ו-Free Cash Flow", "PASS" if (free_cashflow is not None and free_cashflow > 0) else ("NA_DATA" if free_cashflow is None else "WARN"), f"FCF ${free_cashflow/1e9:.2f}B" if free_cashflow is not None else "אין נתון FCF")
-    add_check(23, "ב. דוחות כספיים", "צמיחה שנתית ורבעונית (YoY, QoQ)", "PASS" if (rev_growth is not None and rev_growth > 0.05) else ("NA_DATA" if rev_growth is None else "WARN"), f"צמיחת הכנסות: {rev_growth*100:+.1f}%" if rev_growth is not None else "אין נתון צמיחה")
-    add_check(24, "ב. דוחות כספיים", "שולי רווח (גולמי, תפעולי, נקי)", "PASS" if (op_margin is not None and op_margin > 0.08) else ("NA_DATA" if op_margin is None else "WARN"), f"תפעולי {op_margin*100:.1f}%" if op_margin is not None else "אין נתון שוליים")
-    add_check(25, "ב. דוחות כספיים", "EBITDA", "PASS" if (ebitda is not None and ebitda > 0) else ("NA_DATA" if ebitda is None else "WARN"), f"EBITDA ${ebitda/1e9:.2f}B" if ebitda is not None else "אין נתון EBITDA")
+    # ב. דוחות כספיים (20-25)
+    add_check(20, "ב. דוחות", "רווח והפסד", "PASS" if (net_margin is not None and net_margin > 0) else ("NA_DATA" if net_margin is None else "WARN"))
+    add_check(21, "ב. דוחות", "מאזן", "PASS" if (total_cash is not None and total_debt is not None and total_cash >= total_debt * 0.35) else ("NA_DATA" if total_cash is None else "WARN"))
+    add_check(22, "ב. דוחות", "תזרים ו-FCF", "PASS" if (free_cashflow is not None and free_cashflow > 0) else ("NA_DATA" if free_cashflow is None else "WARN"))
+    add_check(23, "ב. דוחות", "צמיחה YoY/QoQ", "PASS" if (rev_growth is not None and rev_growth > 0.05) else ("NA_DATA" if rev_growth is None else "WARN"))
+    add_check(24, "ב. דוחות", "שולי רווח", "PASS" if (op_margin is not None and op_margin > 0.08) else ("NA_DATA" if op_margin is None else "WARN"))
+    add_check(25, "ב. דוחות", "EBITDA", "PASS" if (ebitda is not None and ebitda > 0) else ("NA_DATA" if ebitda is None else "WARN"))
 
-    # ג. מכפילים ויחסים פיננסיים (26-37)
-    add_check(26, "ג. מכפילים ויחסים", "P/E ו-Forward P/E", "PASS" if (pe_ratio is not None and 0 < pe_ratio < 65) else ("NA_DATA" if pe_ratio is None else "WARN"), f"P/E={pe_ratio:.1f} | Fwd={fwd_pe:.1f}" if (pe_ratio and fwd_pe) else (f"P/E={pe_ratio:.1f}" if pe_ratio else "אין נתון P/E"))
-    add_check(27, "ג. מכפילים ויחסים", "PEG", "PASS" if (peg_ratio is not None and 0 < peg_ratio <= 2.5) else ("NA_DATA" if peg_ratio is None else "WARN"), f"PEG={peg_ratio:.2f}" if peg_ratio else "אין נתון PEG")
-    add_check(28, "ג. מכפילים ויחסים", "P/S", "PASS" if (ps_ratio is not None and 0 < ps_ratio < 20) else ("NA_DATA" if ps_ratio is None else "WARN"), f"P/S={ps_ratio:.2f}" if ps_ratio else "אין נתון P/S")
-    add_check(29, "ג. מכפילים ויחסים", "P/B", "PASS" if (pb_ratio is not None and 0 < pb_ratio < 25) else ("NA_DATA" if pb_ratio is None else "WARN"), f"P/B={pb_ratio:.2f}" if pb_ratio else "אין נתון P/B")
-    add_check(30, "ג. מכפילים ויחסים", "EV/EBITDA", "PASS" if (ev_ebitda is not None and 0 < ev_ebitda < 35) else ("NA_DATA" if ev_ebitda is None else "WARN"), f"EV/EBITDA={ev_ebitda:.1f}" if ev_ebitda else "אין נתון EV/EBITDA")
-    add_check(31, "ג. מכפילים ויחסים", "EPS ותחזיות EPS", "PASS" if (earn_growth is not None and earn_growth > 0) else ("NA_DATA" if earn_growth is None else "WARN"), f"צמיחת רווח/EPS: {earn_growth*100:+.1f}%" if earn_growth is not None else "אין נתון EPS growth")
-    add_check(32, "ג. מכפילים ויחסים", "ROE, ROA ו-ROIC", "PASS" if (roe is not None and roe > 0.10) else ("NA_DATA" if roe is None else "WARN"), f"ROE={roe*100:.1f}%" + (f" | ROA={roa*100:.1f}%" if roa is not None else "") if roe is not None else "אין נתון ROE")
-    add_check(33, "ג. מכפילים ויחסים", "חוב להון / חוב נטו ל-EBITDA / כיסוי ריבית", "PASS" if (total_debt is None or total_cash is None or total_debt <= total_cash * 2.5) else "WARN", "יחס מזומן/חוב תקין" if (total_cash and total_debt and total_debt <= total_cash * 2.5) else "בדיקת מינוף")
-    add_check(34, "ג. מכפילים ויחסים", "נזילות (יחס שוטף / יחס מהיר)", "PASS" if (current_ratio is not None and current_ratio >= 1.1) else ("NA_DATA" if current_ratio is None else "WARN"), f"Current Ratio={current_ratio:.2f}" + (f" | Quick={quick_ratio:.2f}" if quick_ratio is not None else "") if current_ratio is not None else "אין נתון נזילות")
-    add_check(35, "ג. מכפילים ויחסים", "דיבידנד (תשואה, יחס חלוקה, יציבות)", "PASS" if (div_yield is not None and (payout_ratio is None or payout_ratio < 0.85)) else "NA_DATA", f"תשואת דיבידנד {(div_yield*100 if div_yield<0.2 else div_yield):.2f}%" if div_yield else "ללא דיבידנד / לא זמין")
-    add_check(36, "ג. מכפילים ויחסים", "Buyback (רכישה עצמית של מניות)", "PASS" if (free_cashflow is not None and free_cashflow > 0 and (payout_ratio is None or payout_ratio < 0.75)) else "NA_DATA", "תזרים פנוי תומך רכישה עצמית" if (free_cashflow and free_cashflow > 0) else "לא זמין")
-    add_check(37, "ג. מכפילים ויחסים", "השוואה למתחרים ולממוצע הענף", "PASS" if (sector or industry) else "NA_DATA", f"סקטור: {sector or 'N/A'} | ענף: {industry or 'N/A'}")
+    # ג. מכפילים ויחסים (26-37)
+    add_check(26, "ג. מכפילים", "P/E", "PASS" if (pe_ratio is not None and 0 < pe_ratio < 65) else ("NA_DATA" if pe_ratio is None else "WARN"))
+    add_check(27, "ג. מכפילים", "PEG", "PASS" if (peg_ratio is not None and 0 < peg_ratio <= 2.5) else ("NA_DATA" if peg_ratio is None else "WARN"))
+    add_check(28, "ג. מכפילים", "P/S", "PASS" if (ps_ratio is not None and 0 < ps_ratio < 20) else ("NA_DATA" if ps_ratio is None else "WARN"))
+    add_check(29, "ג. מכפילים", "P/B", "PASS" if (pb_ratio is not None and 0 < pb_ratio < 25) else ("NA_DATA" if pb_ratio is None else "WARN"))
+    add_check(30, "ג. מכפילים", "EV/EBITDA", "PASS" if (ev_ebitda is not None and 0 < ev_ebitda < 35) else ("NA_DATA" if ev_ebitda is None else "WARN"))
+    add_check(31, "ג. מכפילים", "EPS", "PASS" if (earn_growth is not None and earn_growth > 0) else ("NA_DATA" if earn_growth is None else "WARN"))
+    add_check(32, "ג. מכפילים", "ROE/ROA/ROIC", "PASS" if (roe is not None and roe > 0.10) else ("NA_DATA" if roe is None else "WARN"))
+    add_check(33, "ג. מכפילים", "חוב וריבית", "PASS" if (total_debt is None or total_cash is None or total_debt <= total_cash * 2.5) else "WARN")
+    add_check(34, "ג. מכפילים", "נזילות", "PASS" if (current_ratio is not None and current_ratio >= 1.1) else ("NA_DATA" if current_ratio is None else "WARN"))
+    add_check(35, "ג. מכפילים", "דיבידנד", "PASS" if (div_yield is not None and (payout_ratio is None or payout_ratio < 0.85)) else "NA_DATA")
+    add_check(36, "ג. מכפילים", "Buyback", "PASS" if (free_cashflow is not None and free_cashflow > 0 and (payout_ratio is None or payout_ratio < 0.75)) else "NA_DATA")
+    add_check(37, "ג. מכפילים", "השוואה לענף", "PASS" if (sector or industry) else "NA_DATA")
 
-    # ד. ניתוח איכותי של החברה (38-44)
-    add_check(38, "ד. ניתוח איכותי", "מודל עסקי ומקורות הכנסה", "PASS" if bool(sector) else "NA_DATA", sector or "אין תיאור מודל")
-    add_check(39, "ד. ניתוח איכותי", "יתרון תחרותי (Moat) ונתח שוק", "PASS" if (op_margin is not None and op_margin >= 0.15) else "NA_DATA", f"שוליים תפעוליים {op_margin*100:.1f}%" if op_margin is not None else "בדיקה איכותית")
-    add_check(40, "ד. ניתוח איכותי", "איכות ההנהלה, ניסיון ותגמול", "PASS" if (roe is not None and roe >= 0.12) else "NA_DATA", "תשואה להון תומכת איכות ניהול" if (roe and roe >= 0.12) else "בדיקה איכותית")
-    add_check(41, "ד. ניתוח איכותי", "בעלי עניין ובעלי שליטה", "PASS" if insider_pct is not None else "NA_DATA", f"החזקת בעלי עניין: {insider_pct*100:.1f}%" if insider_pct is not None else "אין נתון בעלי עניין")
-    add_check(42, "ד. ניתוח איכותי", "מוצרים, חדשנות ופיתוח", "PASS" if (rev_growth is not None and rev_growth > 0) else "NA_DATA", "צמיחה תומכת חדשנות/ביקוש" if (rev_growth and rev_growth > 0) else "בדיקה איכותית")
-    add_check(43, "ד. ניתוח איכותי", "ריכוזיות לקוחות וספקים", "PASS" if (vol_avg20 >= 1_000_000) else "WARN", "סחירות גבוהה" if vol_avg20 >= 1_000_000 else "סחירות נמוכה יחסית")
-    add_check(44, "ד. ניתוח איכותי", "סיכונים רגולטוריים ומשפטיים", "WARN" if abs(gap_pct) > 10 else "PASS", "תנודת פער חריגה — בדיקת אירוע/רגולציה" if abs(gap_pct) > 10 else "אין חריגת פער חריפה")
+    # ד. איכותי (38-44)
+    add_check(38, "ד. איכותי", "מודל עסקי", "PASS" if bool(sector) else "NA_DATA")
+    add_check(39, "ד. איכותי", "יתרון תחרותי", "PASS" if (op_margin is not None and op_margin >= 0.15) else "NA_DATA")
+    add_check(40, "ד. איכותי", "הנהלה", "PASS" if (roe is not None and roe >= 0.12) else "NA_DATA")
+    add_check(41, "ד. איכותי", "בעלי עניין", "PASS" if insider_pct is not None else "NA_DATA")
+    add_check(42, "ד. איכותי", "חדשנות", "PASS" if (rev_growth is not None and rev_growth > 0) else "NA_DATA")
+    add_check(43, "ד. איכותי", "סחירות/לקוחות", "PASS" if (vol_avg20 >= 1_000_000) else "WARN")
+    add_check(44, "ד. איכותי", "רגולציה ומשפטי", "WARN" if abs(gap_pct) > 10 else "PASS")
 
-    # ה. דיווחים ופרסומים (45-51)
-    add_check(45, "ה. דיווחים ופרסומים", "דיווחים מיידיים (מאיה/מגנא / 8-K, 10-K, 10-Q)", "NA_DATA", "מחייב בדיקת דיווחי SEC/מאיה לפני כניסה")
-    add_check(46, "ה. דיווחים ופרסומים", "שיחות ועידה של המשקיעים ומצגות", "NA_DATA", "מחייב בדיקת Earnings Call/מצגת")
-    add_check(47, "ה. דיווחים ופרסומים", "עסקאות בעלי עניין (Insider Trading)", "PASS" if insider_pct is not None else "NA_DATA", f"Insiders {insider_pct*100:.1f}%" if insider_pct is not None else "אין נתון")
-    add_check(48, "ה. דיווחים ופרסומים", "החזקות מוסדיים וקרנות גדולות", "PASS" if inst_pct is not None else "NA_DATA", f"מוסדיים {inst_pct*100:.1f}%" if inst_pct is not None else "אין נתון")
-    add_check(49, "ה. דיווחים ופרסומים", "הנפקות, הנפקות חוזרות ודילול", "WARN" if (ret_20d < -0.15 and vol_ratio > 1.5) else "PASS", "ירידה חדה בנפח — בדוק דילול/הנפקה" if (ret_20d < -0.15 and vol_ratio > 1.5) else "אין סימן דילול בולט")
-    add_check(50, "ה. דיווחים ופרסומים", "פרסומים בתקשורת, חדשות והודעות לעיתונות", "PASS" if vol_ratio < 2.5 else "WARN", f"פעילות נפח x{vol_ratio:.2f}")
-    upside_analyst = ((float(target_mean_price) - last_close) / max(last_close, 1e-6) * 100.0) if target_mean_price else None
-    add_check(51, "ה. דיווחים ופרסומים", "המלצות אנליסטים ומחירי יעד", "PASS" if (rec_mean is not None and rec_mean <= 2.5) else ("NA_DATA" if rec_mean is None else "WARN"), f"המלצה ממוצעת {rec_mean:.2f} | יעד אנליסטים ${float(target_mean_price):.2f} ({upside_analyst:+.1f}%)" if (rec_mean and target_mean_price) else "אין נתון אנליסטים")
+    # ה. דיווחים (45-51)
+    add_check(45, "ה. דיווחים", "דיווחים מיידיים", "NA_DATA")
+    add_check(46, "ה. דיווחים", "שיחות ועידה", "NA_DATA")
+    add_check(47, "ה. דיווחים", "עסקאות בעלי עניין", "PASS" if insider_pct is not None else "NA_DATA")
+    add_check(48, "ה. דיווחים", "מוסדיים", "PASS" if inst_pct is not None else "NA_DATA")
+    add_check(49, "ה. דיווחים", "הנפקות ודילול", "WARN" if (ret_20d < -0.15 and vol_ratio > 1.5) else "PASS")
+    add_check(50, "ה. דיווחים", "תקשורת וחדשות", "PASS" if vol_ratio < 2.5 else "WARN")
+    add_check(51, "ה. דיווחים", "אנליסטים", "PASS" if (rec_mean is not None and rec_mean <= 2.5) else ("NA_DATA" if (rec_mean is None and target_mean_price is None) else "WARN"))
 
     # ו. סנטימנט ושוק (52-57)
-    add_check(52, "ו. סנטימנט ושוק", "Short Interest (עמדות שורט)", "WARN" if (short_pct is not None and short_pct > 0.15) else ("PASS" if short_pct is not None else "NA_DATA"), f"Short Float {short_pct*100:.1f}%" if short_pct is not None else "אין נתון שורט")
+    add_check(52, "ו. סנטימנט", "Short Interest", "WARN" if (short_pct is not None and short_pct > 0.15) else ("PASS" if short_pct is not None else "NA_DATA"))
     spy_ret20 = bench.get("spy", {}).get("ret_20d", 0.0)
-    rel_strength = (ret_20d - spy_ret20) * 100.0
-    add_check(53, "ו. סנטימנט ושוק", "חוזק יחסי מול המדד והענף", "PASS" if rel_strength >= 0 else "WARN", f"עודף ביצוע מול SPY (20י): {rel_strength:+.1f}%")
-    add_check(54, "ו. סנטימנט ושוק", "סנטימנט ברשתות ובפורומים", "PASS" if (rsi >= 50 and ret_5d > 0) else "WARN", "מומנטום חיובי" if (rsi >= 50 and ret_5d > 0) else "סנטימנט מעורב/זהיר")
+    add_check(53, "ו. סנטימנט", "חוזק מול מדד", "PASS" if ((ret_20d - spy_ret20) >= 0) else "WARN")
+    add_check(54, "ו. סנטימנט", "סנטימנט מומנטום", "PASS" if (rsi >= 50 and ret_5d > 0) else "WARN")
     vix_last = bench.get("vix", {}).get("last")
-    add_check(55, "ו. סנטימנט ושוק", "VIX ומדדי פחד", "FAIL" if (vix_last is not None and vix_last > 30) else ("WARN" if (vix_last is not None and vix_last > 22) else ("PASS" if vix_last is not None else "NA_DATA")), f"VIX={vix_last:.1f}" if vix_last is not None else "אין נתון VIX")
+    add_check(55, "ו. סנטימנט", "VIX", "FAIL" if (vix_last is not None and vix_last > 30) else ("WARN" if (vix_last is not None and vix_last > 22) else ("PASS" if vix_last is not None else "NA_DATA")))
     spy_up = bench.get("spy", {}).get("above_sma20", True)
-    add_check(56, "ו. סנטימנט ושוק", "מצב השוק הרחב (שורי/דובי)", "PASS" if spy_up else "WARN", "SPY מעל SMA20" if spy_up else "SPY מתחת ל-SMA20")
-    add_check(57, "ו. סנטימנט ושוק", "אופציות (Put/Call Ratio ופעילות חריגה)", "WARN" if vol_ratio > 2.2 else "PASS", "פעילות חריגה — בדוק זרימת אופציות" if vol_ratio > 2.2 else "פעילות רגילה")
+    add_check(56, "ו. סנטימנט", "מצב שוק רחב", "PASS" if spy_up else "WARN")
+    add_check(57, "ו. סנטימנט", "אופציות", "WARN" if vol_ratio > 2.2 else "PASS")
 
-    # ז. ניתוח מקרו (58-61)
+    # ז. מקרו (58-61)
     env_rates = os.getenv("MACRO_RATES_TREND", "NEUTRAL").strip().upper()
-    add_check(58, "ז. ניתוח מקרו", "ריבית בנק מרכזי ואינפלציה", "PASS" if env_rates in ("EASING", "STABLE", "NEUTRAL") else "WARN", f"מגמת ריבית/אינפלציה מוגדרת: {env_rates}")
-    add_check(59, "ז. ניתוח מקרו", "מחזורי ענף ועונתיות", "PASS" if ret_20d > -0.05 else "WARN", f"ענף: {industry or sector or 'כללי'}")
+    add_check(58, "ז. מקרו", "ריבית ואינפלציה", "PASS" if env_rates in ("EASING", "STABLE", "NEUTRAL") else "WARN")
+    add_check(59, "ז. מקרו", "ענף ועונתיות", "PASS" if ret_20d > -0.05 else "WARN")
     env_fx_geo = os.getenv("MACRO_GEO_FX", "NEUTRAL").strip().upper()
-    add_check(60, "ז. ניתוח מקרו", "מצב גיאו-פוליטי ושערי מטבע", "WARN" if env_fx_geo in ("RISK_OFF", "HIGH_RISK") else "PASS", f"מצב גיאו/מטבע מוגדר: {env_fx_geo}")
-    add_check(61, "ז. ניתוח מקרו", "מצב כלכלי כללי (צמיחה, אבטלה)", "PASS" if spy_up else "WARN", "הקשר שוק כללי חיובי" if spy_up else "הקשר שוק כללי זהיר")
+    add_check(60, "ז. מקרו", "גיאו ומטבע", "WARN" if env_fx_geo in ("RISK_OFF", "HIGH_RISK") else "PASS")
+    add_check(61, "ז. מקרו", "כלכלה כללית", "PASS" if spy_up else "WARN")
 
     # ח. ניהול סיכונים (62-66)
-    max_pos_pct = float(os.getenv("RISK_MAX_POSITION_PCT", "15"))
-    add_check(62, "ח. ניהול סיכונים", "גודל פוזיציה ביחס לתיק", "PASS", f"תקרת פוזיציה מומלצת עד {max_pos_pct:.0f}% מהתיק")
-    rr_est = (target_pct * 100.0) / max(atr_pct * 1.1, 1.0)
-    add_check(63, "ח. ניהול סיכונים", "סטופ לוס ויעד רווח", "PASS" if target_pct > 0 else "WARN", f"יעד +{target_pct*100:.1f}% מול סטופ מבוסס ATR")
-    add_check(64, "ח. ניהול סיכונים", "יחס סיכון/סיכוי", "PASS" if rr_est >= 1.2 else "WARN", f"יחס סיכון/סיכוי משוער 1:{rr_est:.2f}")
-    add_check(65, "ח. ניהול סיכונים", "פיזור בין מניות וענפים", "PASS", f"פיזור סקטוריאלי ({sector or 'כללי'}) ודירוג עד 6 פוזיציות")
-    add_check(66, "ח. ניהול סיכונים", "אופק ההשקעה (טווח קצר/ארוך)", "PASS", f"אופק תפעולי מותאם יעד {target_pct*100:.1f}% ו-Beta {beta if beta else 'N/A'}")
+    add_check(62, "ח. סיכונים", "גודל פוזיציה", "PASS")
+    add_check(63, "ח. סיכונים", "סטופ ויעד", "PASS")
+    add_check(64, "ח. סיכונים", "יחס סיכון/סיכוי", "PASS")
+    add_check(65, "ח. סיכונים", "פיזור תיק", "PASS")
+    add_check(66, "ח. סיכונים", "אופק השקעה", "PASS")
 
     passed = [c for c in checks if c["status"] == "PASS"]
     warned = [c for c in checks if c["status"] == "WARN"]
     failed = [c for c in checks if c["status"] == "FAIL"]
-    na_list = [c for c in checks if c["status"] == "NA_DATA"]
 
     scored = [c for c in checks if c["status"] in ("PASS", "WARN", "FAIL")]
     weighted_sum = sum(
@@ -470,9 +454,9 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, t
     score_ratio = weighted_sum / max_sum
 
     if len(failed) >= 2 or score_ratio < 0.45:
-        gate_verdict = "הימנע / המתן (לא עומד בתנאי הסף)"
+        gate_verdict = "הימנע / המתן"
     elif len(failed) == 1 or score_ratio < 0.62:
-        gate_verdict = "אזהרה / כניסה מותנית בלבד"
+        gate_verdict = "אזהרה / כניסה מותנית"
     else:
         gate_verdict = "מאושר לבחינת כניסה"
 
@@ -481,42 +465,44 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, t
         "passedCount": len(passed),
         "warnedCount": len(warned),
         "failedCount": len(failed),
-        "naDataCount": len(na_list),
         "scorePct": round(score_ratio * 100, 1),
         "weightedScore": round(score_ratio, 3),
         "gateVerdict": gate_verdict,
-        "checks": checks,
         "levelsRaw": {
             "last_close": last_close,
             "prev_close": prev_close,
+            "ret_1d": ret_1d,
             "sma_20": sma_20,
             "sma_50": sma_50,
             "ema_20": ema_20,
+            "high_10": high_10,
+            "low_10": low_10,
             "high_20": high_20,
             "low_20": low_20,
+            "bb_upper": bb_upper,
             "fib_618": fib_618,
             "atr": atr,
             "rsi": rsi,
             "macd_hist": macd_hist,
             "vol_ratio": vol_ratio,
             "vwap_20": vwap_20,
-            "target_mean_price": target_mean_price,
         },
     }
 
 
 def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict:
-    """מחשב שערי כניסה, פריצה, יציאה וסטופ לאחר השלמת 66 הבדיקות."""
     r = eval_66["levelsRaw"]
     last_close = r["last_close"]
     prev_close = r["prev_close"]
     change_pct = round(((last_close - prev_close) / max(prev_close, 0.01)) * 100, 2)
 
+    high_10 = r["high_10"]
+    low_10 = r["low_10"]
     high_20 = r["high_20"]
     low_20 = r["low_20"]
     sma_20 = r["sma_20"]
-    sma_50 = r["sma_50"]
     ema_20 = r["ema_20"]
+    bb_upper = r["bb_upper"]
     fib_618 = r["fib_618"]
     vwap_20 = r["vwap_20"]
     atr = r["atr"]
@@ -524,65 +510,64 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
     macd_hist = r["macd_hist"]
     vol_ratio = r["vol_ratio"]
 
-    breakout_level = round(max(0.01, high_20 * 1.002), 2)
-    support_candidates = [x for x in [vwap_20, ema_20, sma_20, fib_618, low_20] if 0 < x < last_close * 1.02]
-    support_level = round(max(support_candidates), 2) if support_candidates else round(max(0.01, low_20), 2)
+    near_res_candidates = [x for x in [high_10 * 1.002, high_20 * 1.002, bb_upper] if x > last_close * 0.99]
+    breakout_level = round(min(near_res_candidates), 2) if near_res_candidates else round(last_close * 1.015, 2)
 
-    broke_out = last_close > high_20 and (vol_ratio >= 1.0 or macd_hist > 0)
-    near_breakout = (high_20 * 0.985) <= last_close <= high_20
-    pullback_ok = (last_close > sma_50 * 0.98) and (last_close >= support_level * 0.985) and (rsi < 74)
+    near_sup_candidates = [x for x in [vwap_20, ema_20, sma_20, low_10, fib_618] if 0 < x < last_close * 1.01]
+    support_level = round(max(near_sup_candidates), 2) if near_sup_candidates else round(max(0.01, low_20), 2)
 
-    if eval_66["failedCount"] >= 2:
-        entry_price = round(last_close, 2)
-        entry_type = "המתן — אי עמידה בתנאי 66 הבדיקות"
-        entry_note = "יש כשלים בתנאי סיכון/מגמה — מומלץ לא להיכנס עד לשיפור"
-    elif broke_out:
-        entry_price = round(last_close, 2)
-        entry_type = "כניסה בפריצת התנגדות מאושרת"
-        entry_note = "המחיר מעל שיא 20 ימים לאחר אישור 66 הבדיקות"
-    elif pullback_ok:
-        entry_price = round(max(0.01, min(last_close, max(support_level, last_close - atr * 0.4))), 2)
-        entry_type = "כניסה בנסיגה לתמיכה (אחרי 66 בדיקות)"
-        entry_note = "כניסה סביב רמת תמיכה/ממוצע במקום רדיפה אחרי שיא"
-    elif near_breakout:
-        entry_price = breakout_level
-        entry_type = "כניסה באישור פריצה מעל התנגדות"
-        entry_note = "ממתין לפריצה מאושרת מעל ההתנגדות"
-    else:
-        entry_price = round(last_close, 2)
-        entry_type = "כניסה מדודה / בדיקת תמיכה"
-        entry_note = "מחושב לאחר ניתוח טכני, פונדמנטלי, סנטימנט וסיכון"
+    weak_short_term = (last_close < ema_20) and (macd_hist < 0) and (r["ret_1d"] < -0.015)
 
-    delta_pct = round(((entry_price - last_close) / max(last_close, 0.01)) * 100, 2)
-
-    raw_stop = max(entry_price - max(atr * 1.25, entry_price * 0.015), support_level * 0.99)
-    stop_loss = round(max(0.01, min(raw_stop, entry_price * 0.985)), 2)
-    stop_pct = round(((entry_price - stop_loss) / max(entry_price, 0.01)) * 100, 1)
-
-    target_price = round(entry_price * (1.0 + target_pct), 2)
-    trail_exit = round(max(stop_loss, min(target_price, max(ema_20, last_close - atr * 1.1))), 2)
-
-    if last_close >= target_price * 0.985:
-        exit_action = "צא למימוש רווח"
-        recommended_exit = round(last_close, 2)
-        exit_reason = "המחיר הגיע או קרוב ליעד הרווח"
-    elif last_close <= stop_loss:
-        exit_action = "צא מיד (סטופ)"
-        recommended_exit = round(last_close, 2)
-        exit_reason = "המחיר מתחת לסטופ לוס"
-    elif eval_66["failedCount"] >= 2 or (last_close < ema_20 and macd_hist < 0):
-        exit_action = "צא / הימנע מפוזיציה"
-        recommended_exit = round(last_close, 2)
-        exit_reason = "החלשות טכנית או כשל בבדיקות הסף"
-    else:
-        exit_action = "יעד / טריילינג"
+    if eval_66["failedCount"] >= 2 or weak_short_term:
+        entry_price = round(max(last_close * 1.01, ema_20), 2) if ema_20 > last_close * 1.005 else round(breakout_level, 2)
+        entry_type = "כניסה מותנית (לאחר התייצבות)"
+        exit_action = "הימנע / המתן לכניסה"
+        target_price = round(entry_price * (1.0 + target_pct), 2)
+        max_risk_pct = min(max(target_pct / 1.5, 0.02), target_pct * 0.75)
+        stop_loss = round(max(0.01, entry_price * (1.0 - max_risk_pct)), 2)
         recommended_exit = target_price
-        exit_reason = f"יעד ${target_price:.2f} | סטופ ${stop_loss:.2f} | טריילינג ${trail_exit:.2f}"
+        exit_reason = f"יעד מותנה ${target_price:.2f} | סטופ ${stop_loss:.2f}"
+    else:
+        broke_out = last_close > high_20 and (vol_ratio >= 1.0 or macd_hist > 0)
+        pullback_ok = (last_close >= sma_20 * 0.975) and (rsi < 72)
 
+        if broke_out:
+            entry_price = round(last_close, 2)
+            entry_type = "כניסה בפריצה מאושרת"
+        elif pullback_ok and support_level < last_close * 0.995:
+            entry_price = round(max(support_level, last_close - min(atr * 0.4, last_close * 0.02)), 2)
+            entry_type = "כניסה בנסיגה לתמיכה"
+        else:
+            entry_price = round(last_close, 2)
+            entry_type = "כניסה במחיר נוכחי"
+
+        target_price = round(entry_price * (1.0 + target_pct), 2)
+        max_risk_pct = min(max(target_pct / 1.5, 0.015), target_pct * 0.75)
+        stop_from_risk = entry_price * (1.0 - max_risk_pct)
+        stop_from_sup = support_level * 0.992 if support_level < entry_price else stop_from_risk
+        stop_loss = round(max(0.01, min(entry_price * 0.988, max(stop_from_risk, stop_from_sup))), 2)
+
+        # שער יציאה דינמי (מתעדכן גם כשהמניה עולה תוך כדי החזקה)
+        dynamic_trail = round(max(stop_loss * 1.005, min(target_price, max(ema_20, last_close - atr * 0.85))), 2)
+        if last_close >= target_price * 0.985:
+            exit_action = "צא למימוש רווח"
+            recommended_exit = round(last_close, 2)
+            exit_reason = "הגיע ליעד הרווח"
+        elif last_close > entry_price * 1.025 and dynamic_trail > stop_loss:
+            exit_action = "יציאה דינמית (טריילינג עולה)"
+            recommended_exit = dynamic_trail
+            exit_reason = f"עודכן ל-${dynamic_trail:.2f} (יעד ${target_price:.2f})"
+        else:
+            exit_action = "יעד רווח / סטופ"
+            recommended_exit = target_price
+            exit_reason = f"יעד ${target_price:.2f} | סטופ ${stop_loss:.2f}"
+
+    stop_pct = round(((entry_price - stop_loss) / max(entry_price, 0.01)) * 100, 1)
+    delta_pct = round(((entry_price - last_close) / max(last_close, 0.01)) * 100, 2)
     rr_ratio = round(max(target_price - entry_price, 0.01) / max(entry_price - stop_loss, 0.01), 2)
 
-    sent_code = "BULLISH" if eval_66["scorePct"] >= 65 else ("BEARISH" if eval_66["failedCount"] >= 2 else "NEUTRAL")
-    sent_label = "שורי" if sent_code == "BULLISH" else ("דובי/זהיר" if sent_code == "BEARISH" else "מעורב")
+    sent_code = "BULLISH" if (eval_66["scorePct"] >= 65 and not weak_short_term) else ("BEARISH" if (eval_66["failedCount"] >= 2 or weak_short_term) else "NEUTRAL")
+    sent_label = "שורי" if sent_code == "BULLISH" else ("דובי/נסיגה" if sent_code == "BEARISH" else "מעורב")
 
     return {
         "price": round(last_close, 2),
@@ -591,43 +576,243 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
         "bearCount": eval_66["failedCount"],
         "scorePct": eval_66["scorePct"],
         "weightedScore": eval_66["weightedScore"],
-        "gateVerdict": eval_66["gateVerdict"],
+        "gateVerdict": "הימנע / המתן" if weak_short_term else eval_66["gateVerdict"],
         "checksSummary": {
             "total": eval_66["totalChecks"],
             "passed": eval_66["passedCount"],
             "warned": eval_66["warnedCount"],
             "failed": eval_66["failedCount"],
-            "naData": eval_66["naDataCount"],
         },
         "breakoutLevel": breakout_level,
         "supportLevel": support_level,
         "entry": entry_price,
         "entryType": entry_type,
-        "entryNote": entry_note,
         "deltaToEntryPct": delta_pct,
         "stopLoss": stop_loss,
         "stopPct": stop_pct,
         "targetPrice": target_price,
         "targetPct": round(target_pct * 100, 1),
-        "trailExit": trail_exit,
         "recommendedExit": recommended_exit,
         "exitAction": exit_action,
         "exitReason": exit_reason,
         "rrRatio": rr_ratio,
-        "sentiment": {
-            "code": sent_code,
-            "label": sent_label,
-            "description": f"{sent_label} | עברו {eval_66['passedCount']}/66 בדיקות ({eval_66['gateVerdict']})",
-        },
-        "reason": f"{eval_66['gateVerdict']} • עברו {eval_66['passedCount']} ואזהרות {eval_66['warnedCount']} מתוך 66 בדיקות",
-        "checks": eval_66["checks"],
+        "sentiment": {"code": sent_code, "label": sent_label},
     }
+
+
+def load_demo_portfolio(initial_capital: float) -> dict:
+    if os.path.exists(DEMO_FILE):
+        try:
+            with open(DEMO_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, dict) and "open_positions" in data and "closed_positions" in data:
+                    data.setdefault("initial_capital", initial_capital)
+                    data.setdefault("cash", initial_capital)
+                    return data
+        except Exception as exc:
+            print(f"Error loading {DEMO_FILE}: {exc}")
+    return {
+        "initial_capital": initial_capital,
+        "cash": initial_capital,
+        "open_positions": [],
+        "closed_positions": [],
+    }
+
+
+def save_demo_portfolio(data: dict):
+    with open(DEMO_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def update_demo_portfolio(
+    evaluated: list[dict],
+    qualified: list[dict],
+    watchlist_tickers: list[str],
+    demo_mode: str,
+    initial_capital: float,
+) -> tuple[dict, str]:
+    portfolio = load_demo_portfolio(initial_capital)
+    eval_map = {item["ticker"]: item for item in evaluated}
+    now_str = datetime.now(timezone.utc).strftime("%d/%m %H:%M UTC")
+    status_lines = []
+
+    init_cap = float(portfolio.get("initial_capital", initial_capital) or initial_capital)
+    cash = float(portfolio.get("cash", init_cap))
+
+    # 1. עדכון שער יציאה דינמי וסגירת עסקאות כשמגיעים ליעד / שער יציאה / סטופ
+    if demo_mode in ("check", "both"):
+        still_open = []
+        for pos in portfolio["open_positions"]:
+            t = pos["ticker"]
+            item = eval_map.get(t)
+            if item:
+                curr = float(item["price"])
+                # עדכון שער יציאה דינמי כלפי מעלה כשהמניה מתקדמת
+                prev_exit = float(pos.get("exit_price_target", pos.get("target_price", curr)))
+                new_rec_exit = float(item.get("recommendedExit", prev_exit))
+                if curr > float(pos["entry"]) * 1.015 and new_rec_exit > prev_exit:
+                    pos["exit_price_target"] = round(new_rec_exit, 2)
+                    pos["exit_action"] = item.get("exitAction", "יציאה דינמית")
+                else:
+                    pos.setdefault("exit_price_target", round(float(pos.get("target_price", curr)), 2))
+                    pos.setdefault("exit_action", item.get("exitAction", "יעד רווח / סטופ"))
+            else:
+                df, _, _ = fetch_market_bundle(t)
+                curr = round(float(df["Close"].iloc[-1]), 2) if df is not None else float(pos["entry"])
+                pos.setdefault("exit_price_target", round(float(pos.get("target_price", curr)), 2))
+                pos.setdefault("exit_action", "יעד רווח / סטופ")
+
+            entry_p = float(pos["entry"])
+            shares = float(pos.get("shares") or (float(pos.get("allocated", 1500.0)) / max(entry_p, 0.01)))
+            allocated = round(shares * entry_p, 2)
+            pos["shares"] = round(shares, 4)
+            pos["allocated"] = allocated
+
+            target_p = float(pos["target_price"])
+            stop_p = float(pos["stop_loss"])
+            active_exit_p = float(pos.get("exit_price_target", target_p))
+
+            # תנאי יציאה מהמניה: הגעה ליעד, הגעה לשער יציאה דינמי ממומש, או פגיעה בסטופ
+            hit_target = curr >= target_p
+            hit_dynamic_exit = (active_exit_p != target_p) and (curr >= active_exit_p)
+            hit_stop = curr <= stop_p
+
+            if hit_target or hit_dynamic_exit or hit_stop:
+                pnl_dollar = round((curr - entry_p) * shares, 2)
+                pnl_pct = round(((curr - entry_p) / max(entry_p, 0.01)) * 100, 2)
+                cash = round(cash + (curr * shares), 2)
+                reason = "הגיעה ליעד רווח" if hit_target else ("מימוש בשער יציאה דינמי" if hit_dynamic_exit else "פגעה בסטופ לוס")
+                result = "WIN" if pnl_dollar >= 0 else "LOSS"
+
+                portfolio["closed_positions"].append({
+                    **pos,
+                    "exit_price": round(curr, 2),
+                    "pnl_dollar": pnl_dollar,
+                    "pnl_pct": pnl_pct,
+                    "result": result,
+                    "exit_reason": reason,
+                    "closed_at": now_str,
+                })
+                icon = "✅" if pnl_dollar >= 0 else "🛑"
+                status_lines.append(f"{icon} נמכרה <b>{t}</b> ב-${curr:.2f} ({pnl_pct:+.1f}% | {pnl_dollar:+.2f}$) — {reason}")
+            else:
+                unrealized_dollar = round((curr - entry_p) * shares, 2)
+                unrealized_pct = round(((curr - entry_p) / max(entry_p, 0.01)) * 100, 2)
+                pos["current_price"] = round(curr, 2)
+                pos["unrealized_dollar"] = unrealized_dollar
+                pos["unrealized_pct"] = unrealized_pct
+                still_open.append(pos)
+                status_lines.append(
+                    f"⏳ <b>{t}</b> ב-${curr:.2f} ({unrealized_pct:+.1f}% | {unrealized_dollar:+.2f}$) | יציאה עדכנית: ${active_exit_p:.2f}"
+                )
+
+        portfolio["open_positions"] = still_open
+
+    # 2. קנייה אוטומטית (מהרשימה האוטומטית + מניות מרשימת המעקב שבחרת)
+    if demo_mode in ("open", "both"):
+        open_tickers = {p["ticker"] for p in portfolio["open_positions"]}
+        watch_picks = [eval_map[t] for t in watchlist_tickers if t in eval_map and "הימנע" not in eval_map[t].get("exitAction", "")]
+        candidates = list(dict.fromkeys([x["ticker"] for x in (watch_picks + qualified)]))
+
+        # חישוב גודל פוזיציה אוטומטי ביחס לתיק
+        per_trade_budget = round(max(250.0, init_cap / max(MAX_OPEN_POSITIONS, 1)), 2)
+
+        for t in candidates:
+            if len(portfolio["open_positions"]) >= MAX_OPEN_POSITIONS:
+                break
+            if t in open_tickers:
+                continue
+            pick = eval_map.get(t)
+            if not pick or "הימנע" in pick.get("exitAction", ""):
+                continue
+
+            entry_p = float(pick["entry"])
+            if entry_p <= 0 or cash < min(250.0, per_trade_budget * 0.5):
+                continue
+
+            invest_amt = min(cash, per_trade_budget)
+            shares = round(invest_amt / entry_p, 4)
+            actual_cost = round(shares * entry_p, 2)
+            if shares <= 0 or actual_cost > cash:
+                continue
+
+            cash = round(cash - actual_cost, 2)
+            source_type = "רשימת מעקב" if t in watchlist_tickers else "בחירה אוטומטית"
+
+            pos_obj = {
+                "ticker": t,
+                "source": source_type,
+                "entry": round(entry_p, 2),
+                "current_price": round(float(pick["price"]), 2),
+                "shares": shares,
+                "allocated": actual_cost,
+                "stop_loss": round(float(pick["stopLoss"]), 2),
+                "target_price": round(float(pick["targetPrice"]), 2),
+                "exit_price_target": round(float(pick["recommendedExit"]), 2),
+                "exit_action": pick.get("exitAction", "יעד רווח / סטופ"),
+                "unrealized_dollar": round((float(pick["price"]) - entry_p) * shares, 2),
+                "unrealized_pct": round(((float(pick["price"]) - entry_p) / max(entry_p, 0.01)) * 100, 2),
+                "score": pick["weightedScore"],
+                "opened_at": now_str,
+            }
+            portfolio["open_positions"].append(pos_obj)
+            open_tickers.add(t)
+            status_lines.append(
+                f"🆕 נקנתה <b>{t}</b> ({source_type}) ב-${entry_p:.2f} (${actual_cost:.0f}) | יעד ${pick['targetPrice']:.2f} | יציאה ${pick['recommendedExit']:.2f}"
+            )
+
+    # חישוב רווח על כל מניה ורווח כללי על התיק
+    open_market_value = 0.0
+    open_unrealized_pnl = 0.0
+    for p in portfolio["open_positions"]:
+        c_p = float(eval_map.get(p["ticker"], {}).get("price", p.get("current_price", p["entry"])))
+        sh = float(p.get("shares", 0))
+        en = float(p.get("entry", c_p))
+        val = round(c_p * sh, 2)
+        upnl = round((c_p - en) * sh, 2)
+        p["current_price"] = round(c_p, 2)
+        p["unrealized_dollar"] = upnl
+        p["unrealized_pct"] = round(((c_p - en) / max(en, 0.01)) * 100, 2)
+        open_market_value += val
+        open_unrealized_pnl += upnl
+
+    realized_pnl = round(sum(float(c.get("pnl_dollar", 0)) for c in portfolio["closed_positions"]), 2)
+    total_equity = round(cash + open_market_value, 2)
+    total_pnl_dollar = round(total_equity - init_cap, 2)
+    total_pnl_pct = round((total_pnl_dollar / max(init_cap, 1.0)) * 100, 2)
+
+    portfolio["initial_capital"] = round(init_cap, 2)
+    portfolio["cash"] = round(cash, 2)
+    portfolio["summary"] = {
+        "initial_capital": round(init_cap, 2),
+        "cash": round(cash, 2),
+        "open_market_value": round(open_market_value, 2),
+        "total_equity": total_equity,
+        "realized_pnl_dollar": realized_pnl,
+        "unrealized_pnl_dollar": round(open_unrealized_pnl, 2),
+        "total_pnl_dollar": total_pnl_dollar,
+        "total_pnl_pct": total_pnl_pct,
+    }
+
+    save_demo_portfolio(portfolio)
+
+    closed = portfolio["closed_positions"]
+    wins = len([c for c in closed if c.get("result") == "WIN"])
+    win_rate = round((wins / len(closed)) * 100, 1) if closed else 0.0
+
+    header = (
+        f"<b>תיק אוטומטי:</b> שווי ${total_equity:,.0f} | רווח כללי: <b>{total_pnl_dollar:+,.2f}$ ({total_pnl_pct:+.2f}%)</b>\n"
+        f"מזומן: ${cash:,.0f} | ממומש: {realized_pnl:+,.2f}$ | פתוח: {open_unrealized_pnl:+,.2f}$ | הצלחה: {win_rate}%"
+    )
+    if not status_lines:
+        return portfolio, f"{header}\nאין שינויים חדשים בפוזיציות."
+    return portfolio, f"{header}\n" + "\n".join(status_lines[:7])
 
 
 def save_latest_scan(evaluated: list[dict], scanned_tickers: list[str], target_pct_label: float, is_manual: bool):
     payload = {
         "updatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-        "source": "Yahoo Finance (yfinance) — 66 Checks Engine",
+        "source": "Yahoo Finance (yfinance) — Universal Dynamic Exit & Auto Portfolio",
         "mode": "manual" if is_manual else "auto",
         "targetPct": target_pct_label,
         "scannedCount": len(scanned_tickers),
@@ -638,105 +823,10 @@ def save_latest_scan(evaluated: list[dict], scanned_tickers: list[str], target_p
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
 
-def load_demo_portfolio() -> dict:
-    if os.path.exists(DEMO_FILE):
-        try:
-            with open(DEMO_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, dict) and "open_positions" in data and "closed_positions" in data:
-                    return data
-        except Exception as exc:
-            print(f"Error loading {DEMO_FILE}: {exc}")
-    return {"open_positions": [], "closed_positions": []}
-
-
-def save_demo_portfolio(data: dict):
-    with open(DEMO_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-
-def update_demo_portfolio(evaluated: list[dict], qualified: list[dict], demo_mode: str) -> str:
-    portfolio = load_demo_portfolio()
-    price_map = {item["ticker"]: item["price"] for item in evaluated}
-    now_str = datetime.now(timezone.utc).strftime("%d/%m %H:%M UTC")
-    status_lines = []
-
-    if demo_mode in ("check", "both"):
-        still_open = []
-        for pos in portfolio["open_positions"]:
-            t = pos["ticker"]
-            curr = price_map.get(t)
-            if curr is None:
-                df, _, _ = fetch_market_bundle(t)
-                curr = round(float(df["Close"].iloc[-1]), 2) if df is not None else pos["entry"]
-
-            if curr >= pos["target_price"]:
-                pnl_pct = round(((curr - pos["entry"]) / pos["entry"]) * 100, 2)
-                portfolio["closed_positions"].append({
-                    **pos,
-                    "exit_price": curr,
-                    "pnl_pct": pnl_pct,
-                    "result": "WIN",
-                    "exit_reason": "הגיעה ליעד רווח",
-                    "closed_at": now_str,
-                })
-                status_lines.append(f"✅ <b>{t}</b> הגיעה ליעד (+{pnl_pct}%) ב-${curr:.2f}")
-            elif curr <= pos["stop_loss"]:
-                pnl_pct = round(((curr - pos["entry"]) / pos["entry"]) * 100, 2)
-                portfolio["closed_positions"].append({
-                    **pos,
-                    "exit_price": curr,
-                    "pnl_pct": pnl_pct,
-                    "result": "LOSS",
-                    "exit_reason": "פגעה בסטופ לוס",
-                    "closed_at": now_str,
-                })
-                status_lines.append(f"🛑 <b>{t}</b> פגעה בסטופ ({pnl_pct}%) ב-${curr:.2f}")
-            else:
-                pnl_pct = round(((curr - pos["entry"]) / pos["entry"]) * 100, 2)
-                still_open.append(pos)
-                status_lines.append(f"⏳ <b>{t}</b> פתוחה (עכשיו ${curr:.2f} | {pnl_pct:+.1f}%)")
-
-        portfolio["open_positions"] = still_open
-
-    if demo_mode in ("open", "both"):
-        open_tickers = {p["ticker"] for p in portfolio["open_positions"]}
-        for pick in qualified:
-            if len(portfolio["open_positions"]) >= 6:
-                break
-            if pick["ticker"] in open_tickers or pick.get("checksSummary", {}).get("failed", 0) >= 2:
-                continue
-            portfolio["open_positions"].append({
-                "ticker": pick["ticker"],
-                "entry": pick["entry"],
-                "entry_type": pick["entryType"],
-                "breakout_level": pick["breakoutLevel"],
-                "stop_loss": pick["stopLoss"],
-                "target_price": pick["targetPrice"],
-                "target_pct": pick["targetPct"],
-                "score": pick["weightedScore"],
-                "opened_at": now_str,
-            })
-            open_tickers.add(pick["ticker"])
-            status_lines.append(f"🆕 נפתחה עסקת דמו ב-<b>{pick['ticker']}</b> ב-${pick['entry']:.2f} (יעד ${pick['targetPrice']:.2f})")
-
-    save_demo_portfolio(portfolio)
-
-    closed = portfolio["closed_positions"]
-    wins = len([c for c in closed if c.get("result") == "WIN"])
-    total_closed = len(closed)
-    win_rate = round((wins / total_closed) * 100, 1) if total_closed > 0 else 0.0
-
-    summary_header = f"<b>תיק דמו:</b> {len(portfolio['open_positions'])} פתוחות | {total_closed} סגורות (הצלחה: {win_rate}%)"
-    if not status_lines:
-        return f"{summary_header}\nאין שינויים חדשים בעסקאות הדמו."
-    return f"{summary_header}\n" + "\n".join(status_lines[:6])
-
-
 def build_watchlist_telegram_section(watchlist_tickers: list[str], eval_map: dict[str, dict], target_pct: float) -> str:
     if not watchlist_tickers:
         return ""
-    lines = ["<b>📌 עדכון רשימת מעקב (לאחר 66 בדיקות):</b>"]
+    lines = ["<b>📌 מעקב וניהול המניות שלך:</b>"]
     for t in watchlist_tickers[:8]:
         item = eval_map.get(t)
         if not item:
@@ -746,38 +836,31 @@ def build_watchlist_telegram_section(watchlist_tickers: list[str], eval_map: dic
                 item = {"ticker": t, **compute_entry_exit_after_66_checks(e66, target_pct)}
         if item:
             sign = "+" if item["changePct"] >= 0 else ""
-            cs = item.get("checksSummary", {})
             lines.append(
                 f"• <b>{t}</b>: ${item['price']:.2f} ({sign}{item['changePct']}%) | "
-                f"{cs.get('passed', 0)}/66 עברו ({item.get('gateVerdict', '')}) | "
-                f"כניסה ${item['entry']:.2f} | יעד ${item['targetPrice']:.2f} | סטופ ${item['stopLoss']:.2f} | "
-                f"יציאה: <b>{item['exitAction']}</b> (${item['recommendedExit']:.2f})"
+                f"כניסה ${item['entry']:.2f} | יעד ${item['targetPrice']:.2f} | "
+                f"יציאה דינמית: <b>${item['recommendedExit']:.2f}</b> ({item['exitAction']})"
             )
-        else:
-            lines.append(f"• <b>{t}</b>: אין נתון זמין כרגע")
     return "\n".join(lines)
 
 
 def format_telegram_alert(picks: list[dict], scanned_tickers: list[str], target_pct_label: float, is_manual_tickers: bool, demo_summary: str, watchlist_section: str) -> str:
     now_str = datetime.now(timezone.utc).strftime("%d/%m %H:%M UTC")
-    mode_label = "בדיקת מניות נבחרות" if is_manual_tickers else "סריקה אוטומטית מתחלפת"
+    mode_label = "בדיקת מניות נבחרות" if is_manual_tickers else "סריקה וניהול אוטומטי"
     sample_tickers = ", ".join(scanned_tickers[:10]) + ("..." if len(scanned_tickers) > 10 else "")
 
     lines = [
-        f"<b>66-Checks Scanner — {mode_label}</b>",
+        f"<b>66-Checks Engine — {mode_label}</b>",
         f"נסרקו {len(scanned_tickers)} מניות | יעד: <b>+{target_pct_label}%</b> | {now_str}",
         f"מניות: <code>{sample_tickers}</code>",
         "━━━━━━━━━━━━━━━━━━━━",
     ]
 
     for idx, item in enumerate(picks, start=1):
-        cs = item.get("checksSummary", {})
         lines.extend([
-            f"<b>{idx}. {item['ticker']}</b> — ${item['price']:.2f} | ציון <b>{item['scorePct']}%</b> ({cs.get('passed', 0)}/66 עברו)",
-            f"סטטוס סף: <b>{item.get('gateVerdict', '')}</b> | סנטימנט: <b>{item.get('sentiment', {}).get('label', '')}</b>",
-            f"כניסה: <b>${item['entry']:.2f}</b> ({item['entryType']}) | פריצה: ${item['breakoutLevel']:.2f} | תמיכה: ${item['supportLevel']:.2f}",
-            f"יעד (+{item['targetPct']}%): <b>${item['targetPrice']:.2f}</b> | סטופ: <b>${item['stopLoss']:.2f}</b> (-{item['stopPct']}%) | 1:{item['rrRatio']}",
-            f"יציאה: <b>{item['exitAction']}</b> ב-<b>${item['recommendedExit']:.2f}</b> — {item['exitReason']}",
+            f"<b>{idx}. {item['ticker']}</b> — ${item['price']:.2f} | ציון <b>{item['scorePct']}%</b>",
+            f"כניסה: <b>${item['entry']:.2f}</b> ({item['entryType']}) | יעד: <b>${item['targetPrice']:.2f}</b> | סטופ: <b>${item['stopLoss']:.2f}</b>",
+            f"יציאה דינמית: <b>${item['recommendedExit']:.2f}</b> — <b>{item['exitAction']}</b>",
             "────────────────────",
         ])
 
@@ -792,6 +875,7 @@ def format_telegram_alert(picks: list[dict], scanned_tickers: list[str], target_
 def main():
     target_pct = get_profit_target_pct()
     target_pct_label = round(target_pct * 100, 1)
+    initial_capital = get_initial_capital()
     demo_mode = os.getenv("INPUT_DEMO_MODE", "both").strip().lower()
 
     watchlist_tickers = get_watchlist_tickers()
@@ -808,11 +892,6 @@ def main():
         levels = compute_entry_exit_after_66_checks(eval_66, target_pct)
         summary = {"ticker": ticker, **levels}
         evaluated.append(summary)
-        print(
-            f"{ticker}: passed={summary['checksSummary']['passed']}/66 "
-            f"gate={summary['gateVerdict']} entry={summary['entry']} "
-            f"target={summary['targetPrice']} stop={summary['stopLoss']} exit={summary['exitAction']}"
-        )
 
     evaluated.sort(key=lambda x: x["weightedScore"], reverse=True)
     save_latest_scan(evaluated, scanned_ok, target_pct_label, is_manual_tickers)
@@ -820,19 +899,16 @@ def main():
     qualified = (
         evaluated[:5]
         if is_manual_tickers
-        else [x for x in evaluated if x["weightedScore"] >= MIN_SCORE_TO_ALERT and x["checksSummary"]["failed"] < 2][:5]
+        else [x for x in evaluated if x["weightedScore"] >= MIN_SCORE_TO_ALERT and "הימנע" not in x.get("exitAction", "")][:5]
     )
-    demo_summary = update_demo_portfolio(evaluated, qualified, demo_mode)
+
+    _, demo_summary = update_demo_portfolio(evaluated, qualified, watchlist_tickers, demo_mode, initial_capital)
     eval_map = {item["ticker"]: item for item in evaluated}
     watchlist_section = build_watchlist_telegram_section(watchlist_tickers, eval_map, target_pct)
-
-    print(f"Scanned {len(scanned_ok)}/{len(tickers_to_scan)}; qualified: {len(qualified)}")
 
     if qualified or is_manual_tickers or watchlist_section:
         msg = format_telegram_alert(qualified, scanned_ok, target_pct_label, is_manual_tickers, demo_summary, watchlist_section)
         send_telegram_message(msg)
-    else:
-        print("No stocks passed threshold and no watchlist items; skipping Telegram message.")
 
 
 if __name__ == "__main__":
