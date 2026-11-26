@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מעקב מניות ו-50 סוכנים</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #14171a;
+      --muted: #5b6570;
+      --line: #e5e8eb;
+      --accent: #0f766e;
+      --accent-soft: #ecfdf5;
+      --ok: #15803d;
+      --bad: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 18px 14px 48px;
+    }
+    .top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .top h1 { margin: 0; font-size: 1.2rem; }
+    .meta { font-size: 0.85rem; color: var(--muted); }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 14px;
+      padding-bottom: 4px;
+    }
+    .tab {
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+    }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+    input {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 9px 11px;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--text);
+    }
+    button.btn {
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.btn.secondary {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid #a7f3d0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fcfcfd;
+    }
+    .item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .badge {
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+    }
+    .pos { color: var(--ok); font-weight: 700; }
+    .neg { color: var(--bad); font-weight: 700; }
+    .hidden { display: none; }
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .list-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>מערכת סריקה ומעקב מניות</h1>
+        <div class="meta" id="syncStatus">טוען נתוני סנכרון מ-Yahoo Finance...</div>
+      </div>
+      <button class="btn secondary" onclick="loadSyncedData()">רענן סנכרון</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="scan" onclick="switchTab('scan')">סריקה ומניות</button>
+      <button class="tab" data-tab="watchlist" onclick="switchTab('watchlist')">רשימת מעקב</button>
+      <button class="tab" data-tab="my-demo" onclick="switchTab('my-demo')">תיק דמו ידני</button>
+      <button class="tab" data-tab="bot-demo" onclick="switchTab('bot-demo')">תיק דמו אוטומטי</button>
+    </div>
+
+    <section id="tab-scan" class="card">
+      <div class="row">
+        <div>
+          <label for="filterTicker">חיפוש סימול מניה</label>
+          <input id="filterTicker" placeholder="למשל NVDA, PLTR..." oninput="renderScanResults()" />
+        </div>
+        <div>
+          <label for="customTargetPct">יעד רווח לחישוב (%)</label>
+          <input id="customTargetPct" type="number" step="0.5" min="0.5" max="100" value="6" style="width:110px" oninput="renderScanResults()" />
+        </div>
+      </div>
+      <div class="grid" id="scanGrid"></div>
+    </section>
+
+    <section id="tab-watchlist" class="card hidden">
+      <div class="row">
+        <div>
+          <label for="watchInput">הוסף מניה למעקב</label>
+          <input id="watchInput" placeholder="למשל AAPL" />
+        </div>
+        <button class="btn" onclick="addToWatchlist()">הוסף למעקב</button>
+      </div>
+      <div class="meta" id="watchlistSecretHelper" style="margin-top:8px;"></div>
+      <div id="watchlistContainer" style="margin-top:12px;"></div>
+    </section>
+
+    <section id="tab-my-demo" class="card hidden">
+      <div class="row" style="margin-bottom:14px;">
+        <div>
+          <label for="myCapitalInput">גודל התיק ההתחלתי ($)</label>
+          <input id="myCapitalInput" type="number" min="100" step="100" value="10000" onchange="saveMyCapital()" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="buyTicker">מניה</label>
+          <input id="buyTicker" placeholder="NVDA" style="width:100px" />
+        </div>
+        <div>
+          <label for="buyAmount">סכום השקעה ($)</label>
+          <input id="buyAmount" type="number" min="1" step="10" placeholder="2000" style="width:120px" />
+        </div>
+        <div>
+          <label for="buyPrice">שער קנייה ($)</label>
+          <input id="buyPrice" type="number" min="0.01" step="0.01" placeholder="135.00" style="width:120px" />
+        </div>
+        <button class="btn" onclick="openManualTrade()">קנה לתיק</button>
+      </div>
+      <div id="myDemoSummary" class="meta" style="margin-top:14px;"></div>
+      <div id="myDemoTrades" style="margin-top:8px;"></div>
+    </section>
+
+    <section id="tab-bot-demo" class="card hidden">
+      <div class="row" style="margin-bottom:12px;">
+        <div>
+          <label for="botCapitalInput">גודל תיק לבדיקת ביצועי הסוכנים ($)</label>
+          <input id="botCapitalInput" type="number" min="100" step="100" value="10000" onchange="renderBotDemo()" />
+        </div>
+      </div>
+      <div id="botDemoContent"></div>
+    </section>
+  </div>
+
+  <script>
+    let scanData = { updatedAt: "", results: [] };
+    let botPortfolio = { open_positions: [], closed_positions: [] };
+
+    let watchlist = JSON.parse(localStorage.getItem("user_watchlist") || '["NVDA","PLTR","COIN"]');
+    let myCapital = Number(localStorage.getItem("my_demo_capital") || 10000);
+    let myTrades = JSON.parse(localStorage.getItem("my_demo_trades") || "[]");
+
+    document.getElementById("myCapitalInput").value = myCapital;
+
+    function switchTab(tabName) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tabName));
+      ["scan", "watchlist", "my-demo", "bot-demo"].forEach(id => {
+        document.getElementById("tab-" + id).classList.toggle("hidden", id !== tabName);
+      });
+    }
+
+    async function loadSyncedData() {
+      const statusEl = document.getElementById("syncStatus");
+      try {
+        const [scanRes, demoRes] = await Promise.all([
+          fetch("./latest_scan.json?t=" + Date.now()),
+          fetch("./demo_portfolio.json?t=" + Date.now())
+        ]);
+        if (scanRes.ok) {
+          scanData = await scanRes.json();
+          statusEl.textContent = `מסונכרן עם Yahoo Finance | עודכן: ${scanData.updatedAt || "לא ידוע"} (${scanData.results?.length || 0} מניות)`;
+        } else {
+          statusEl.textContent = "ממתין להרצת סריקה ראשונה ב-GitHub Actions (latest_scan.json)";
+        }
+        if (demoRes.ok) {
+          botPortfolio = await demoRes.json();
+        }
+      } catch (err) {
+        statusEl.textContent = "מצב מקומי / לא מחובר לשרת";
+      }
+      renderScanResults();
+      renderWatchlist();
+      renderMyDemo();
+      renderBotDemo();
+    }
+
+    function getLivePrice(ticker) {
+      const found = (scanData.results || []).find(r => r.ticker === ticker);
+      return found ? Number(found.price) : null;
+    }
+
+    function renderScanResults() {
+      const query = (document.getElementById("filterTicker").value || "").trim().toUpperCase();
+      const targetPct = Math.max(0.5, Number(document.getElementById("customTargetPct").value || 6));
+      const grid = document.getElementById("scanGrid");
+
+      const items = (scanData.results || []).filter(r => !query || r.ticker.includes(query));
+      if (!items.length) {
+        grid.innerHTML = `<div class="meta">אין מניות להצגה כרגע. הפעל ריצה ב-GitHub Actions כדי למשוך נתונים מ-Yahoo Finance.</div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(r => {
+        const entry = Number(r.entry || r.price || 0);
+        const calcTarget = (entry * (1 + targetPct / 100)).toFixed(2);
+        const chg = Number(r.changePct || 0);
+        const chgClass = chg >= 0 ? "pos" : "neg";
+        return `
+          <div class="item">
+            <div class="item-head">
+              <span>${r.ticker} — $${entry.toFixed(2)}</span>
+              <span class="badge">${r.scorePct}% (${r.bullCount}/50)</span>
+            </div>
+            <div class="meta">שינוי יומי: <span class="${chgClass}">${chg >= 0 ? "+" : ""}${chg}%</span></div>
+            <div class="meta">יעד (+${targetPct}%): <b>$${calcTarget}</b> | סטופ: <b>$${Number(r.stopLoss || 0).toFixed(2)}</b></div>
+            <div class="meta" style="margin-top:6px;">${r.reason || ""}</div>
+            <div style="margin-top:10px;">
+              <button class="btn secondary" onclick="quickWatch('${r.ticker}')">+ למעקב</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function quickWatch(ticker) {
+      if (!watchlist.includes(ticker)) {
+        watchlist.push(ticker);
+        localStorage.setItem("user_watchlist", JSON.stringify(watchlist));
+        renderWatchlist();
+      }
+      switchTab("watchlist");
+    }
+
+    function addToWatchlist() {
+      const input = document.getElementById("watchInput");
+      const t = (input.value || "").trim().toUpperCase();
+      if (!t) return;
+      if (!watchlist.includes(t)) {
+        watchlist.push(t);
+        localStorage.setItem("user_watchlist", JSON.stringify(watchlist));
+      }
+      input.value = "";
+      renderWatchlist();
+    }
+
+    function removeFromWatchlist(t) {
+      watchlist = watchlist.filter(x => x !== t);
+      localStorage.setItem("user_watchlist", JSON.stringify(watchlist));
+      renderWatchlist();
+    }
+
+    function renderWatchlist() {
+      const container = document.getElementById("watchlistContainer");
+      const helper = document.getElementById("watchlistSecretHelper");
+      helper.textContent = watchlist.length
+        ? `לשליחת עדכוני מעקב לטלגרם בסריקות, הגדר ב-GitHub Secret בשם WATCHLIST_TICKERS: ${watchlist.join(",")}`
+        : "";
+
+      if (!watchlist.length) {
+        container.innerHTML = `<div class="meta">רשימת המעקב ריקה.</div>`;
+        return;
+      }
+      container.innerHTML = watchlist.map(t => {
+        const p = getLivePrice(t);
+        return `
+          <div class="list-row">
+            <div><b>${t}</b> ${p ? `— $${p.toFixed(2)}` : "(אין נתון עדכני בסריקה האחרונה)"}</div>
+            <button class="btn secondary" onclick="removeFromWatchlist('${t}')">הסר</button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function saveMyCapital() {
+      myCapital = Math.max(100, Number(document.getElementById("myCapitalInput").value || 10000));
+      localStorage.setItem("my_demo_capital", String(myCapital));
+      renderMyDemo();
+    }
+
+    function openManualTrade() {
+      const ticker = (document.getElementById("buyTicker").value || "").trim().toUpperCase();
+      const amount = Number(document.getElementById("buyAmount").value || 0);
+      const buyPrice = Number(document.getElementById("buyPrice").value || 0);
+      if (!ticker || amount <= 0 || buyPrice <= 0) return;
+
+      myTrades.push({
+        id: Date.now(),
+        ticker,
+        amount,
+        shares: amount / buyPrice,
+        buyPrice,
+        sellPrice: null
+      });
+      localStorage.setItem("my_demo_trades", JSON.stringify(myTrades));
+      document.getElementById("buyTicker").value = "";
+      document.getElementById("buyAmount").value = "";
+      document.getElementById("buyPrice").value = "";
+      renderMyDemo();
+    }
+
+    function sellManualTrade(id) {
+      const raw = prompt("באיזה שער מכרת את המניה ($)?");
+      if (!raw) return;
+      const sellPrice = Number(raw);
+      if (!(sellPrice > 0)) return;
+      myTrades = myTrades.map(tr => tr.id === id ? { ...tr, sellPrice } : tr);
+      localStorage.setItem("my_demo_trades", JSON.stringify(myTrades));
+      renderMyDemo();
+    }
+
+    function renderMyDemo() {
+      const summaryEl = document.getElementById("myDemoSummary");
+      const tradesEl = document.getElementById("myDemoTrades");
+
+      let totalPnl = 0;
+      let allocated = 0;
+
+      const html = myTrades.map(tr => {
+        allocated += tr.amount;
+        const live = getLivePrice(tr.ticker);
+        const refPrice = tr.sellPrice !== null ? tr.sellPrice : live;
+        const pnl = refPrice !== null ? (refPrice - tr.buyPrice) * tr.shares : 0;
+        const pnlPct = refPrice !== null ? ((refPrice - tr.buyPrice) / tr.buyPrice) * 100 : 0;
+        totalPnl += pnl;
+
+        const statusText = tr.sellPrice !== null
+          ? `נמכר ב-$${tr.sellPrice.toFixed(2)}`
+          : (live !== null ? `פתוח (מחיר נוכחי $${live.toFixed(2)})` : "פתוח (ממתין למחיר)");
+
+        return `
+          <div class="list-row">
+            <div>
+              <b>${tr.ticker}</b> | קנייה: $${tr.buyPrice.toFixed(2)} | סכום: $${tr.amount.toFixed(0)}<br/>
+              <span class="meta">${statusText}</span>
+            </div>
+            <div style="text-align:left;">
+              <div class="${pnl >= 0 ? "pos" : "neg"}">${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)} (${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(1)}%)</div>
+              ${tr.sellPrice === null ? `<button class="btn secondary" style="margin-top:4px;" onclick="sellManualTrade(${tr.id})">מכור בשער</button>` : ""}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const totalReturnPct = (totalPnl / myCapital) * 100;
+      summaryEl.innerHTML = `הון התחלתי: <b>$${myCapital.toLocaleString()}</b> | בשימוש: <b>$${allocated.toLocaleString()}</b> | רווח/הפסד מצטבר: <span class="${totalPnl >= 0 ? "pos" : "neg"}">${totalPnl >= 0 ? "+" : ""}$${totalPnl.toFixed(2)} (${totalReturnPct >= 0 ? "+" : ""}${totalReturnPct.toFixed(2)}%)</span>`;
+      tradesEl.innerHTML = html || `<div class="meta">עדיין לא הוזנו עסקאות לתיק הידני.</div>`;
+    }
+
+    function renderBotDemo() {
+      const cap = Math.max(100, Number(document.getElementById("botCapitalInput").value || 10000));
+      const openList = botPortfolio.open_positions || [];
+      const closedList = botPortfolio.closed_positions || [];
+
+      const closedPnlPct = closedList.reduce((acc, c) => acc + Number(c.pnl_pct || 0), 0);
+      const wins = closedList.filter(c => c.result === "WIN").length;
+      const winRate = closedList.length ? ((wins / closedList.length) * 100).toFixed(1) : "0.0";
+      const estProfitDollars = (cap * closedPnlPct) / 100;
+
+      let html = `
+        <div class="meta" style="margin-bottom:10px;">
+          עסקאות פתוחות: <b>${openList.length}</b> | עסקאות סגורות: <b>${closedList.length}</b> | אחוז הצלחה: <b>${winRate}%</b><br/>
+          תשואה מצטברת בעסקאות סגורות: <span class="${closedPnlPct >= 0 ? "pos" : "neg"}">${closedPnlPct >= 0 ? "+" : ""}${closedPnlPct.toFixed(2)}% (${estProfitDollars >= 0 ? "+" : ""}$${estProfitDollars.toFixed(2)})</span>
+        </div>
+      `;
+
+      if (openList.length) {
+        html += `<h3 style="margin:10px 0 6px;font-size:1rem;">עסקאות פתוחות</h3>`;
+        html += openList.map(p => `
+          <div class="list-row">
+            <div><b>${p.ticker}</b> — כניסה $${Number(p.entry).toFixed(2)} | יעד $${Number(p.target_price).toFixed(2)} | סטופ $${Number(p.stop_loss).toFixed(2)}</div>
+            <span class="badge">פתוח</span>
+          </div>
+        `).join("");
+      }
+
+      if (closedList.length) {
+        html += `<h3 style="margin:14px 0 6px;font-size:1rem;">עסקאות סגורות</h3>`;
+        html += closedList.slice().reverse().slice(0, 10).map(c => `
+          <div class="list-row">
+            <div><b>${c.ticker}</b> — כניסה $${Number(c.entry).toFixed(2)} ← יציאה $${Number(c.exit_price).toFixed(2)} (${c.result})</div>
+            <span class="${Number(c.pnl_pct) >= 0 ? "pos" : "neg"}">${Number(c.pnl_pct) >= 0 ? "+" : ""}${Number(c.pnl_pct).toFixed(2)}%</span>
+          </div>
+        `).join("");
+      }
+
+      document.getElementById("botDemoContent").innerHTML = html;
+    }
+
+    loadSyncedData();
+  </script>
+</body>
+</html>
