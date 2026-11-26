@@ -139,7 +139,7 @@ def compute_atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
     return tr.rolling(window=period).mean()
 
 
-def run_50_agents(df: pd.DataFrame, target_pct: float) -> list[dict]:
+def compute_indicators_pack(df: pd.DataFrame) -> dict:
     close = df["Close"]
     open_p = df["Open"]
     high = df["High"]
@@ -148,6 +148,8 @@ def run_50_agents(df: pd.DataFrame, target_pct: float) -> list[dict]:
 
     last_close = float(close.iloc[-1])
     prev_close = float(close.iloc[-2])
+    prev_high = float(high.iloc[-2])
+    prev_low = float(low.iloc[-2])
     last_open = float(open_p.iloc[-1])
     last_high = float(high.iloc[-1])
     last_low = float(low.iloc[-1])
@@ -159,6 +161,16 @@ def run_50_agents(df: pd.DataFrame, target_pct: float) -> list[dict]:
     ema_9 = float(close.ewm(span=9, adjust=False).mean().iloc[-1])
     ema_21 = float(close.ewm(span=21, adjust=False).mean().iloc[-1])
 
+    std_20 = float(close.rolling(20).std().iloc[-1])
+    if math.isnan(std_20) or std_20 <= 0:
+        std_20 = last_close * 0.02
+    bb_upper = sma_20 + (2.0 * std_20)
+    bb_lower = max(0.01, sma_20 - (2.0 * std_20))
+
+    pivot = (prev_high + prev_low + prev_close) / 3.0
+    r1 = (2.0 * pivot) - prev_low
+    s1 = max(0.01, (2.0 * pivot) - prev_high)
+
     rsi_series = compute_rsi(close, 14)
     rsi = float(rsi_series.iloc[-1]) if not math.isnan(float(rsi_series.iloc[-1])) else 50.0
     prev_rsi = float(rsi_series.iloc[-2]) if not math.isnan(float(rsi_series.iloc[-2])) else 50.0
@@ -167,6 +179,8 @@ def run_50_agents(df: pd.DataFrame, target_pct: float) -> list[dict]:
     ema_26 = close.ewm(span=26, adjust=False).mean()
     macd = ema_12 - ema_26
     signal = macd.ewm(span=9, adjust=False).mean()
+    macd_val = float(macd.iloc[-1])
+    signal_val = float(signal.iloc[-1])
     macd_hist = float((macd - signal).iloc[-1])
     prev_macd_hist = float((macd - signal).iloc[-2])
 
@@ -177,6 +191,8 @@ def run_50_agents(df: pd.DataFrame, target_pct: float) -> list[dict]:
     last_vol = float(volume.iloc[-1])
     vol_ratio = (last_vol / vol_avg_20) if vol_avg_20 > 0 else 1.0
 
+    high_10 = float(high.rolling(10).max().iloc[-2])
+    low_10 = float(low.rolling(10).min().iloc[-2])
     high_20 = float(high.rolling(20).max().iloc[-2])
     low_20 = float(low.rolling(20).min().iloc[-2])
     high_52 = float(high.max())
@@ -191,6 +207,83 @@ def run_50_agents(df: pd.DataFrame, target_pct: float) -> list[dict]:
     candle_body = abs(last_close - last_open)
     candle_range = max(last_high - last_low, 1e-6)
     body_ratio = candle_body / candle_range
+
+    return {
+        "last_close": last_close,
+        "prev_close": prev_close,
+        "last_open": last_open,
+        "last_high": last_high,
+        "last_low": last_low,
+        "sma_5": sma_5,
+        "sma_10": sma_10,
+        "sma_20": sma_20,
+        "sma_50": sma_50,
+        "ema_9": ema_9,
+        "ema_21": ema_21,
+        "bb_upper": bb_upper,
+        "bb_lower": bb_lower,
+        "pivot": pivot,
+        "r1": r1,
+        "s1": s1,
+        "rsi": rsi,
+        "prev_rsi": prev_rsi,
+        "macd_val": macd_val,
+        "signal_val": signal_val,
+        "macd_hist": macd_hist,
+        "prev_macd_hist": prev_macd_hist,
+        "atr": atr,
+        "vol_ratio": vol_ratio,
+        "vol_avg_20": vol_avg_20,
+        "high_10": high_10,
+        "low_10": low_10,
+        "high_20": high_20,
+        "low_20": low_20,
+        "high_52": high_52,
+        "low_52": low_52,
+        "ret_1d": ret_1d,
+        "ret_3d": ret_3d,
+        "ret_5d": ret_5d,
+        "ret_10d": ret_10d,
+        "ret_20d": ret_20d,
+        "body_ratio": body_ratio,
+        "candle_range": candle_range,
+        "close_series": close,
+        "volume_series": volume,
+    }
+
+
+def run_50_agents(ind: dict, target_pct: float) -> list[dict]:
+    last_close = ind["last_close"]
+    prev_close = ind["prev_close"]
+    last_open = ind["last_open"]
+    last_high = ind["last_high"]
+    last_low = ind["last_low"]
+    sma_5 = ind["sma_5"]
+    sma_10 = ind["sma_10"]
+    sma_20 = ind["sma_20"]
+    sma_50 = ind["sma_50"]
+    ema_9 = ind["ema_9"]
+    ema_21 = ind["ema_21"]
+    rsi = ind["rsi"]
+    prev_rsi = ind["prev_rsi"]
+    macd_hist = ind["macd_hist"]
+    prev_macd_hist = ind["prev_macd_hist"]
+    atr = ind["atr"]
+    vol_ratio = ind["vol_ratio"]
+    vol_avg_20 = ind["vol_avg_20"]
+    high_20 = ind["high_20"]
+    low_20 = ind["low_20"]
+    high_52 = ind["high_52"]
+    low_52 = ind["low_52"]
+    ret_1d = ind["ret_1d"]
+    ret_3d = ind["ret_3d"]
+    ret_5d = ind["ret_5d"]
+    ret_10d = ind["ret_10d"]
+    ret_20d = ind["ret_20d"]
+    body_ratio = ind["body_ratio"]
+    candle_range = ind["candle_range"]
+    close = ind["close_series"]
+    volume = ind["volume_series"]
 
     agents_def = []
 
@@ -229,16 +322,16 @@ def run_50_agents(df: pd.DataFrame, target_pct: float) -> list[dict]:
     add_agent(22, "מתנדים", "סוכן RSI עולה מעל אתמול", rsi > prev_rsi, 0.73 if rsi > prev_rsi else 0.40)
     add_agent(23, "מתנדים", "סוכן היפוך ממכירת יתר (RSI < 35)", rsi < 35.0 and rsi > prev_rsi, 0.76 if rsi < 35.0 and rsi > prev_rsi else 0.38)
     add_agent(24, "מתנדים", "סוכן הימנעות מקניית יתר קיצונית", rsi < 78.0, 0.70 if rsi < 78.0 else 0.25)
-    add_agent(25, "מתנדים", "סוכן MACD מעל קו האות", float(macd.iloc[-1]) > float(signal.iloc[-1]), 0.79 if float(macd.iloc[-1]) > float(signal.iloc[-1]) else 0.35)
+    add_agent(25, "מתנדים", "סוכן MACD מעל קו האות", ind["macd_val"] > ind["signal_val"], 0.79 if ind["macd_val"] > ind["signal_val"] else 0.35)
     add_agent(26, "מתנדים", "סוכן היסטוגרמת MACD חיובית", macd_hist > 0, 0.77 if macd_hist > 0 else 0.36)
     add_agent(27, "מתנדים", "סוכן האצת היסטוגרמת MACD", macd_hist > prev_macd_hist, 0.75 if macd_hist > prev_macd_hist else 0.38)
-    add_agent(28, "מתנדים", "סוכן קרוס שורי ב-MACD", (float(macd.iloc[-2]) <= float(signal.iloc[-2])) and (float(macd.iloc[-1]) > float(signal.iloc[-1])), 0.85 if (float(macd.iloc[-2]) <= float(signal.iloc[-2])) and (float(macd.iloc[-1]) > float(signal.iloc[-1])) else 0.40)
+    add_agent(28, "מתנדים", "סוכן קרוס שורי ב-MACD", macd_hist > 0 and prev_macd_hist <= 0, 0.85 if (macd_hist > 0 and prev_macd_hist <= 0) else 0.40)
     add_agent(29, "מתנדים", "סוכן מומנטום ביניים (RSI > 55)", rsi > 55.0, 0.74 if rsi > 55.0 else 0.39)
     add_agent(30, "מתנדים", "סוכן איזון מתנדים", 42.0 <= rsi <= 68.0 and macd_hist >= -0.1, 0.72 if 42.0 <= rsi <= 68.0 and macd_hist >= -0.1 else 0.41)
 
     add_agent(31, "נפח", "סוכן זינוק נפח (מעל פי 1.3 מהממוצע)", vol_ratio >= 1.3, 0.82 if vol_ratio >= 1.3 else 0.38)
     add_agent(32, "נפח", "סוכן נפח תקין ומעלה", vol_ratio >= 1.0, 0.72 if vol_ratio >= 1.0 else 0.40)
-    add_agent(33, "נפח", "סוכן נפח בעלייה יומית", (last_vol > float(volume.iloc[-2])) and (last_close >= prev_close), 0.76 if (last_vol > float(volume.iloc[-2])) and (last_close >= prev_close) else 0.39)
+    add_agent(33, "נפח", "סוכן נפח בעלייה יומית", (float(volume.iloc[-1]) > float(volume.iloc[-2])) and (last_close >= prev_close), 0.76 if (float(volume.iloc[-1]) > float(volume.iloc[-2])) and (last_close >= prev_close) else 0.39)
     add_agent(34, "נפח", "סוכן אישור פריצה בנפח", (last_close > sma_20) and (vol_ratio > 1.15), 0.80 if (last_close > sma_20) and (vol_ratio > 1.15) else 0.36)
     add_agent(35, "נפח", "סוכן צבירה שבועית בנפח", float(volume.tail(5).mean()) > vol_avg_20, 0.74 if float(volume.tail(5).mean()) > vol_avg_20 else 0.41)
     add_agent(36, "נפח", "סוכן נזילות גבוהה", vol_avg_20 >= 1_000_000, 0.75 if vol_avg_20 >= 1_000_000 else 0.35)
@@ -315,90 +408,99 @@ def build_plain_explanation(agents: list[dict]) -> str:
     return " • ".join(ordered_cats[:3]) if ordered_cats else "שילוב כללי חיובי של רוב הסוכנים"
 
 
-def orchestrator_evaluate(ticker: str, df: pd.DataFrame, agents: list[dict], target_pct: float) -> dict:
-    close = df["Close"]
-    high = df["High"]
-    low = df["Low"]
+def compute_entry_and_exit_levels(ind: dict, weighted_score: float, bull_count: int, target_pct: float) -> dict:
+    last_close = ind["last_close"]
+    sma_20 = ind["sma_20"]
+    sma_50 = ind["sma_50"]
+    ema_9 = ind["ema_9"]
+    ema_21 = ind["ema_21"]
+    high_10 = ind["high_10"]
+    low_10 = ind["low_10"]
+    high_20 = ind["high_20"]
+    low_20 = ind["low_20"]
+    r1 = ind["r1"]
+    s1 = ind["s1"]
+    bb_upper = ind["bb_upper"]
+    atr = ind["atr"]
+    rsi = ind["rsi"]
+    vol_ratio = ind["vol_ratio"]
+    macd_hist = ind["macd_hist"]
 
-    last_close = float(close.iloc[-1])
-    prev_close = float(close.iloc[-2])
-    change_pct = round(((last_close - prev_close) / max(prev_close, 0.01)) * 100, 2)
+    # רמת פריצה אמיתית מהנתונים (ללא דחיפה מלאכותית של המחיר הנוכחי)
+    resistance_ref = max(high_20, min(r1, bb_upper)) if r1 > high_20 * 0.96 else high_20
+    breakout_level = round(max(0.01, resistance_ref * 1.002), 2)
 
-    sma_20 = float(close.rolling(20).mean().iloc[-1])
-    ema_9 = float(close.ewm(span=9, adjust=False).mean().iloc[-1])
-    high_20 = float(high.rolling(20).max().iloc[-2])
-    low_20 = float(low.rolling(20).min().iloc[-2])
+    # תמיכה מרכזית משולבת (ממוצעים, S1 ושפל אחרון)
+    support_candidates = [x for x in [s1, ema_21, sma_20, low_10] if 0 < x < last_close * 1.03]
+    primary_support = round(max(support_candidates), 2) if support_candidates else round(max(0.01, low_20), 2)
 
-    rsi_series = compute_rsi(close, 14)
-    rsi = float(rsi_series.iloc[-1]) if not math.isnan(float(rsi_series.iloc[-1])) else 50.0
-
-    atr_series = compute_atr(df, 14)
-    atr = float(atr_series.iloc[-1]) if not math.isnan(float(atr_series.iloc[-1])) else (last_close * 0.02)
-
-    bullish_agents = [a for a in agents if a["signal"] == "BULLISH"]
-    bearish_agents = [a for a in agents if a["signal"] == "BEARISH"]
-
-    total_weight = sum(a["score"] for a in agents) or 1.0
-    bull_weight = sum(a["score"] for a in bullish_agents)
-    weighted_score = bull_weight / total_weight
-
-    # חישוב נקודת פריצה ושער כניסה מדויק
-    breakout_level = round(max(high_20 * 1.003, last_close * 1.005), 2)
-    already_broke_out = last_close > high_20
+    already_broke_out = last_close > high_20 and (vol_ratio >= 1.0 or macd_hist > 0)
+    near_breakout = (high_20 * 0.988) <= last_close <= high_20
+    uptrend_pullback = (last_close > sma_50) and (last_close >= sma_20 * 0.97) and (last_close <= high_20 * 0.988) and (rsi < 72)
 
     if already_broke_out:
         entry_price = round(last_close, 2)
-        entry_type = "כניסה מיידית (אחרי פריצה)"
-        gap_to_entry_pct = 0.0
-    else:
+        entry_type = "אישור פריצה (שוק נוכחי)"
+        entry_note = "המחיר פרץ מעל שיא 20 ימים עם תמיכת אינדיקטורים"
+    elif uptrend_pullback:
+        # כניסה בנסיגה בריאה לתמיכה/EMA21/S1 (יכולה להיות מתחת למחיר הנוכחי או סביבו)
+        pullback_zone = max(primary_support, min(last_close, max(ema_21, s1, last_close - atr * 0.5)))
+        entry_price = round(max(0.01, min(last_close, pullback_zone)), 2)
+        entry_type = "כניסה בנסיגה לתמיכה (Pullback)"
+        entry_note = "מגמה עולה — כניסה סביב תמיכה/ממוצע קצר במקום רדיפה אחרי שיא"
+    elif near_breakout:
         entry_price = breakout_level
         entry_type = "כניסה בפריצת התנגדות"
-        gap_to_entry_pct = round(((entry_price - last_close) / max(last_close, 0.01)) * 100, 2)
+        entry_note = "המחיר קרוב להתנגדות — כניסה באישור פריצת שיא 20 ימים"
+    else:
+        entry_price = round(last_close, 2)
+        entry_type = "מחיר נוכחי (זהירות / בדיקת תמיכה)"
+        entry_note = "מבנה מעורב — כדאי לוודא החזקת תמיכה ומומנטום לפני כניסה"
 
-    # סטופ ויעד ביחס לשער הכניסה המחושב
-    stop_distance = min(max(atr * 1.25, entry_price * 0.015), entry_price * 0.05)
-    stop_loss = round(max(0.01, entry_price - stop_distance), 2)
+    delta_to_entry_pct = round(((entry_price - last_close) / max(last_close, 0.01)) * 100, 2)
+
+    # חישוב סטופ לוס מבוסס ATR ותמיכה (מבטיח שהסטופ מתחת לכניסה)
+    atr_stop = entry_price - max(atr * 1.25, entry_price * 0.015)
+    support_stop = primary_support * 0.992 if primary_support < entry_price else atr_stop
+    raw_stop = max(atr_stop, support_stop)
+    max_stop_allowed = entry_price * 0.94
+    stop_loss = round(max(0.01, min(raw_stop, max_stop_allowed, entry_price * 0.985)), 2)
     stop_pct = round(((entry_price - stop_loss) / max(entry_price, 0.01)) * 100, 1)
+
+    # חישוב יעד רווח ביחס לשער הכניסה
     target_price = round(entry_price * (1.0 + target_pct), 2)
 
-    # שער יציאה מומלץ כעת ("מתי לצאת")
+    # טריילינג ויציאה מומלצת
     trail_exit = round(max(stop_loss, min(target_price, max(ema_9, last_close - atr * 1.1))), 2)
+
     if last_close >= target_price * 0.985:
         exit_action = "צא למימוש רווח"
         recommended_exit = round(last_close, 2)
-        exit_reason = "המניה קרובה או הגיעה ליעד הרווח שהוגדר"
+        exit_reason = "המחיר הגיע או קרוב מאוד ליעד הרווח"
     elif last_close <= stop_loss:
         exit_action = "צא מיד (סטופ)"
         recommended_exit = round(last_close, 2)
-        exit_reason = "המחיר ירד מתחת לרמת הסטופ לוס"
-    elif last_close < ema_9 and len(bullish_agents) < 22:
+        exit_reason = "המחיר ירד מתחת לסטופ לוס — הגבלת הפסד"
+    elif last_close < ema_9 and macd_hist < 0 and bull_count < 24:
         exit_action = "צא בהחלשות מגמה"
         recommended_exit = round(last_close, 2)
-        exit_reason = "שבירת EMA9 והיחלשות בסנטימנט הסוכנים"
+        exit_reason = "שבירת EMA9 ומומנטום MACD שלילי"
     else:
-        exit_action = "המשך החזקה ליעד"
+        exit_action = "יעד / טריילינג"
         recommended_exit = target_price
-        exit_reason = f"יציאה ביעד ${target_price:.2f} או בסטופ ${stop_loss:.2f} (טריילינג ${trail_exit:.2f})"
+        exit_reason = f"מימוש ביעד ${target_price:.2f}, סטופ ${stop_loss:.2f} או טריילינג ${trail_exit:.2f}"
 
     risk_per_share = max(entry_price - stop_loss, 0.01)
     reward_per_share = max(target_price - entry_price, 0.01)
     rr_ratio = round(reward_per_share / risk_per_share, 2)
 
-    sentiment = build_sentiment_summary(agents, change_pct, rsi)
-
     return {
-        "ticker": ticker,
-        "price": round(last_close, 2),
-        "changePct": change_pct,
-        "bullCount": len(bullish_agents),
-        "bearCount": len(bearish_agents),
-        "scorePct": round(weighted_score * 100, 1),
-        "weightedScore": round(weighted_score, 3),
         "breakoutLevel": breakout_level,
-        "supportLevel": round(max(low_20, sma_20 * 0.97), 2),
+        "supportLevel": primary_support,
         "entry": entry_price,
         "entryType": entry_type,
-        "gapToEntryPct": gap_to_entry_pct,
+        "entryNote": entry_note,
+        "deltaToEntryPct": delta_to_entry_pct,
         "stopLoss": stop_loss,
         "stopPct": stop_pct,
         "targetPrice": target_price,
@@ -408,6 +510,44 @@ def orchestrator_evaluate(ticker: str, df: pd.DataFrame, agents: list[dict], tar
         "exitAction": exit_action,
         "exitReason": exit_reason,
         "rrRatio": rr_ratio,
+        "indicatorsSnapshot": {
+            "rsi14": round(rsi, 1),
+            "macdHist": round(macd_hist, 3),
+            "volRatio": round(vol_ratio, 2),
+            "atrPct": round((atr / max(last_close, 0.01)) * 100, 2),
+            "ema9": round(ema_9, 2),
+            "ema21": round(ema_21, 2),
+            "sma20": round(sma_20, 2),
+            "sma50": round(sma_50, 2),
+        },
+    }
+
+
+def orchestrator_evaluate(ticker: str, df: pd.DataFrame, agents: list[dict], target_pct: float) -> dict:
+    ind = compute_indicators_pack(df)
+    last_close = ind["last_close"]
+    prev_close = ind["prev_close"]
+    change_pct = round(((last_close - prev_close) / max(prev_close, 0.01)) * 100, 2)
+
+    bullish_agents = [a for a in agents if a["signal"] == "BULLISH"]
+    bearish_agents = [a for a in agents if a["signal"] == "BEARISH"]
+
+    total_weight = sum(a["score"] for a in agents) or 1.0
+    bull_weight = sum(a["score"] for a in bullish_agents)
+    weighted_score = bull_weight / total_weight
+
+    levels = compute_entry_and_exit_levels(ind, weighted_score, len(bullish_agents), target_pct)
+    sentiment = build_sentiment_summary(agents, change_pct, ind["rsi"])
+
+    return {
+        "ticker": ticker,
+        "price": round(last_close, 2),
+        "changePct": change_pct,
+        "bullCount": len(bullish_agents),
+        "bearCount": len(bearish_agents),
+        "scorePct": round(weighted_score * 100, 1),
+        "weightedScore": round(weighted_score, 3),
+        **levels,
         "sentiment": sentiment,
         "reason": build_plain_explanation(agents),
         "agents": agents,
@@ -532,13 +672,13 @@ def build_watchlist_telegram_section(watchlist_tickers: list[str], eval_map: dic
         if not item:
             df = fetch_stock_data(t)
             if df is not None:
-                agents = run_50_agents(df, DEFAULT_PROFIT_TARGET_PCT)
+                agents = run_50_agents(compute_indicators_pack(df), DEFAULT_PROFIT_TARGET_PCT)
                 item = orchestrator_evaluate(t, df, agents, DEFAULT_PROFIT_TARGET_PCT)
         if item:
             sign = "+" if item["changePct"] >= 0 else ""
             lines.append(
                 f"• <b>{t}</b>: עכשיו ${item['price']:.2f} ({sign}{item['changePct']}%) | "
-                f"כניסה ${item['entry']:.2f} (פריצה ${item['breakoutLevel']:.2f}) | "
+                f"כניסה ${item['entry']:.2f} ({item['entryType']}) | פריצה ${item['breakoutLevel']:.2f} | "
                 f"יעד ${item['targetPrice']:.2f} | סטופ ${item['stopLoss']:.2f} | "
                 f"יציאה: <b>{item['exitAction']}</b> (${item['recommendedExit']:.2f})"
             )
@@ -561,10 +701,11 @@ def format_telegram_alert(picks: list[dict], scanned_tickers: list[str], target_
 
     for idx, item in enumerate(picks, start=1):
         sent = item.get("sentiment", {}).get("description", "")
+        snap = item.get("indicatorsSnapshot", {})
         lines.extend([
             f"<b>{idx}. {item['ticker']}</b> — מחיר <b>${item['price']:.2f}</b> | התאמה <b>{item['scorePct']}%</b> ({item['bullCount']}/50)",
-            f"סנטימנט: <b>{sent}</b>",
-            f"פריצה: <b>${item['breakoutLevel']:.2f}</b> | כניסה: <b>${item['entry']:.2f}</b> ({item['entryType']})",
+            f"סנטימנט: <b>{sent}</b> | נפח x{snap.get('volRatio', 1)} | ATR {snap.get('atrPct', 0)}%",
+            f"פריצה: <b>${item['breakoutLevel']:.2f}</b> | תמיכה: <b>${item['supportLevel']:.2f}</b> | כניסה: <b>${item['entry']:.2f}</b> ({item['entryType']})",
             f"יעד (+{item['targetPct']}%): <b>${item['targetPrice']:.2f}</b> | סטופ: <b>${item['stopLoss']:.2f}</b> (-{item['stopPct']}%) | 1:{item['rrRatio']}",
             f"יציאה: <b>{item['exitAction']}</b> ב-<b>${item['recommendedExit']:.2f}</b> — {item['exitReason']}",
             f"סיבה: {item['reason']}",
@@ -594,12 +735,14 @@ def main():
         if df is None:
             continue
         scanned_ok.append(ticker)
-        agents = run_50_agents(df, target_pct)
+        ind = compute_indicators_pack(df)
+        agents = run_50_agents(ind, target_pct)
         summary = orchestrator_evaluate(ticker, df, agents, target_pct)
         evaluated.append(summary)
         print(
-            f"{ticker}: price={summary['price']} entry={summary['entry']} "
-            f"breakout={summary['breakoutLevel']} target={summary['targetPrice']} exit={summary['exitAction']}"
+            f"{ticker}: price={summary['price']} entry={summary['entry']} ({summary['entryType']}) "
+            f"breakout={summary['breakoutLevel']} support={summary['supportLevel']} "
+            f"target={summary['targetPrice']} stop={summary['stopLoss']} exit={summary['exitAction']}"
         )
 
     evaluated.sort(key=lambda x: x["weightedScore"], reverse=True)
