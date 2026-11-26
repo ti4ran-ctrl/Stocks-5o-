@@ -44,6 +44,17 @@
       "target_pct": 10.0,
       "score": 0.832,
       "opened_at": "26/11 18:52 UTC"
+    },
+    {
+      "ticker": "LI",
+      "entry": 12.87,
+      "entry_type": "כניסה בפריצת התנגדות",
+      "breakout_level": 12.87,
+      "stop_loss": 12.25,
+      "target_price": 14.16,
+      "target_pct": 10.0,
+      "score": 0.861,
+      "opened_at": "26/11 19:37 UTC"
     }
   ],
   "closed_positions": []
