@@ -1,4 +1,5 @@
 import os
+import json
 import math
 import requests
 import pandas as pd
@@ -6,26 +7,85 @@ import numpy as np
 import yfinance as yf
 from datetime import datetime, timezone
 
-WATCHLIST = [
-    "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "AMD", "AVGO", "PLTR",
-    "COIN", "MSTR", "MARA", "SMCI", "ARM", "NFLX", "INTC", "MU", "QCOM", "CRM",
-    "SHOP", "UBER", "ABNB", "SOFI", "RIVN", "LCID", "NIO", "BABA", "LLY", "UNH"
+BASE_UNIVERSE = [
+    "AAPL", "MSFT", "NVDA", "AMD", "AVGO", "PLTR", "ARM", "SMCI", "INTC", "MU",
+    "QCOM", "CRM", "NOW", "ADBE", "ORCL", "SNOW", "PANW", "CRWD", "DDOG", "MDB",
+    "AMZN", "GOOGL", "META", "TSLA", "NFLX", "UBER", "ABNB", "SHOP", "SPOT", "BKNG",
+    "COST", "WMT", "HD", "TGT", "NKE", "SBUX", "MCD", "DIS", "ROKU", "TTD",
+    "COIN", "MSTR", "MARA", "HOOD", "SOFI", "JPM", "GS", "BAC", "V", "MA",
+    "PYPL", "SQ", "AFRM", "UPST", "RIVN", "LCID", "NIO", "LI", "XPEV", "F",
+    "GM", "LLY", "UNH", "JNJ", "XOM", "CVX", "OXY", "SLB", "BA", "CAT", "DE", "GE"
 ]
 
-PROFIT_TARGET_PCT = 0.06  # יעד רווח של 6%
-MIN_SCORE_TO_ALERT = 0.68  # סף ציון מינימלי להמלצה
+BATCH_SIZE = 18
+DEFAULT_PROFIT_TARGET_PCT = 0.06
+MIN_SCORE_TO_ALERT = 0.68
+DEMO_FILE = "demo_portfolio.json"
+LATEST_SCAN_FILE = "latest_scan.json"
+WATCHLIST_FILE = "watchlist.json"
 
 
-def get_telegram_config():
-    token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
-    return token, chat_id
+def get_profit_target_pct() -> float:
+    raw = os.getenv("INPUT_PROFIT_TARGET_PCT", "").strip()
+    if not raw:
+        return DEFAULT_PROFIT_TARGET_PCT
+    try:
+        val = float(raw)
+        if 0.5 <= val <= 100.0:
+            return val / 100.0
+    except ValueError:
+        pass
+    return DEFAULT_PROFIT_TARGET_PCT
+
+
+def get_watchlist_tickers() -> list[str]:
+    env_list = os.getenv("WATCHLIST_TICKERS", "").strip()
+    if env_list:
+        return list(dict.fromkeys([t.strip().upper() for t in env_list.split(",") if t.strip()]))
+
+    if os.path.exists(WATCHLIST_FILE):
+        try:
+            with open(WATCHLIST_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    return list(dict.fromkeys([str(t).strip().upper() for t in data if str(t).strip()]))
+                if isinstance(data, dict) and isinstance(data.get("tickers"), list):
+                    return list(dict.fromkeys([str(t).strip().upper() for t in data["tickers"] if str(t).strip()]))
+        except Exception as exc:
+            print(f"Error reading {WATCHLIST_FILE}: {exc}")
+
+    return []
+
+
+def get_scan_tickers(watchlist_tickers: list[str]) -> tuple[list[str], bool]:
+    manual = os.getenv("INPUT_TICKERS", "").strip()
+    if manual:
+        tickers = list(dict.fromkeys([t.strip().upper() for t in manual.split(",") if t.strip()]))
+        return tickers, True
+
+    extra_raw = os.getenv("EXTRA_TICKERS", "").strip()
+    extra_tickers = [t.strip().upper() for t in extra_raw.split(",") if t.strip()]
+
+    pool = list(dict.fromkeys(BASE_UNIVERSE))
+    slot_index = int(datetime.now(timezone.utc).timestamp() // 1800)
+    total = len(pool)
+    start_idx = (slot_index * BATCH_SIZE) % total
+
+    if start_idx + BATCH_SIZE <= total:
+        batch = pool[start_idx:start_idx + BATCH_SIZE]
+    else:
+        wrap = (start_idx + BATCH_SIZE) - total
+        batch = pool[start_idx:] + pool[:wrap]
+
+    combined = list(dict.fromkeys(watchlist_tickers + extra_tickers + batch))
+    return combined, False
 
 
 def send_telegram_message(text: str) -> bool:
-    token, chat_id = get_telegram_config()
+    token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
     if not token or not chat_id:
-        print("Telegram credentials missing; skipping Telegram push.")
+        print("Telegram credentials missing; skipping push.")
         return False
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -38,12 +98,12 @@ def send_telegram_message(text: str) -> bool:
     try:
         resp = requests.post(url, json=payload, timeout=15)
         if resp.status_code == 200:
-            print("Telegram message sent successfully.")
+            print("Telegram message sent.")
             return True
         print(f"Telegram API error ({resp.status_code}): {resp.text}")
         return False
     except Exception as exc:
-        print(f"Failed sending Telegram message: {exc}")
+        print(f"Telegram error: {exc}")
         return False
 
 
@@ -79,7 +139,7 @@ def compute_atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
     return tr.rolling(window=period).mean()
 
 
-def run_50_agents(df: pd.DataFrame) -> list[dict]:
+def run_50_agents(df: pd.DataFrame, target_pct: float) -> list[dict]:
     close = df["Close"]
     open_p = df["Open"]
     high = df["High"]
@@ -143,7 +203,6 @@ def run_50_agents(df: pd.DataFrame) -> list[dict]:
             "score": round(max(0.05, min(0.99, confidence)), 2),
         })
 
-    # 1-10: פריצות, מומנטום ונרות יפניים
     add_agent(1, "פריצות", "סוכן פריצת שיא 20 ימים", last_close > high_20, 0.82 if last_close > high_20 else 0.35)
     add_agent(2, "פריצות", "סוכן התקרבות לפריצה", last_close >= high_20 * 0.985, 0.74 if last_close >= high_20 * 0.985 else 0.42)
     add_agent(3, "פריצות", "סוכן הגנה מתחתית 20 ימים", last_close > low_20 * 1.03, 0.72 if last_close > low_20 * 1.03 else 0.30)
@@ -155,7 +214,6 @@ def run_50_agents(df: pd.DataFrame) -> list[dict]:
     add_agent(9, "נרות יפניים", "סוכן פער מחיר (Gap Up/Down)", last_open > prev_close * 1.005, 0.73 if last_open > prev_close * 1.005 else 0.44)
     add_agent(10, "נרות יפניים", "סוכן נר שורי דומיננטי", (last_close > last_open) and (body_ratio > 0.55), 0.76 if (last_close > last_open) and (body_ratio > 0.55) else 0.39)
 
-    # 11-20: ממוצעים נעים ומגמות
     add_agent(11, "מגמה", "סוכן מחיר מעל SMA5", last_close > sma_5, 0.72 if last_close > sma_5 else 0.37)
     add_agent(12, "מגמה", "סוכן מחיר מעל SMA10", last_close > sma_10, 0.74 if last_close > sma_10 else 0.38)
     add_agent(13, "מגמה", "סוכן מחיר מעל SMA20", last_close > sma_20, 0.78 if last_close > sma_20 else 0.35)
@@ -167,7 +225,6 @@ def run_50_agents(df: pd.DataFrame) -> list[dict]:
     add_agent(19, "מגמה", "סוכן מיקום בטווח 52 שבועות", (last_close - low_52) / max(high_52 - low_52, 1e-6) > 0.55, 0.71 if (last_close - low_52) / max(high_52 - low_52, 1e-6) > 0.55 else 0.43)
     add_agent(20, "מגמה", "סוכן שיפוע ממוצע 20 ימים", float(close.rolling(20).mean().iloc[-1]) > float(close.rolling(20).mean().iloc[-4]), 0.75 if float(close.rolling(20).mean().iloc[-1]) > float(close.rolling(20).mean().iloc[-4]) else 0.38)
 
-    # 21-30: מתנדים (RSI, MACD)
     add_agent(21, "מתנדים", "סוכן RSI אזור כוח (50-72)", 50.0 <= rsi <= 72.0, 0.78 if 50.0 <= rsi <= 72.0 else 0.42)
     add_agent(22, "מתנדים", "סוכן RSI עולה מעל אתמול", rsi > prev_rsi, 0.73 if rsi > prev_rsi else 0.40)
     add_agent(23, "מתנדים", "סוכן היפוך ממכירת יתר (RSI < 35)", rsi < 35.0 and rsi > prev_rsi, 0.76 if rsi < 35.0 and rsi > prev_rsi else 0.38)
@@ -179,7 +236,6 @@ def run_50_agents(df: pd.DataFrame) -> list[dict]:
     add_agent(29, "מתנדים", "סוכן מומנטום ביניים (RSI > 55)", rsi > 55.0, 0.74 if rsi > 55.0 else 0.39)
     add_agent(30, "מתנדים", "סוכן איזון מתנדים", 42.0 <= rsi <= 68.0 and macd_hist >= -0.1, 0.72 if 42.0 <= rsi <= 68.0 and macd_hist >= -0.1 else 0.41)
 
-    # 31-40: נפח מסחר (Volume)
     add_agent(31, "נפח", "סוכן זינוק נפח (מעל פי 1.3 מהממוצע)", vol_ratio >= 1.3, 0.82 if vol_ratio >= 1.3 else 0.38)
     add_agent(32, "נפח", "סוכן נפח תקין ומעלה", vol_ratio >= 1.0, 0.72 if vol_ratio >= 1.0 else 0.40)
     add_agent(33, "נפח", "סוכן נפח בעלייה יומית", (last_vol > float(volume.iloc[-2])) and (last_close >= prev_close), 0.76 if (last_vol > float(volume.iloc[-2])) and (last_close >= prev_close) else 0.39)
@@ -191,24 +247,43 @@ def run_50_agents(df: pd.DataFrame) -> list[dict]:
     add_agent(39, "נפח", "סוכן עקביות מחזור מסחר", float(volume.tail(3).min()) > vol_avg_20 * 0.6, 0.70 if float(volume.tail(3).min()) > vol_avg_20 * 0.6 else 0.44)
     add_agent(40, "נפח", "סוכן דחיפת קונים בסגירה", (last_close - last_low) / candle_range > 0.6, 0.75 if (last_close - last_low) / candle_range > 0.6 else 0.39)
 
-    # 41-50: תנודתיות, סיכון והיתכנות יעד 6%
     atr_pct = (atr / last_close) if last_close > 0 else 0.02
-    add_agent(41, "סיכון", "סוכן תנודתיות תומכת יעד 6%", 0.012 <= atr_pct <= 0.08, 0.78 if 0.012 <= atr_pct <= 0.08 else 0.40)
+    add_agent(41, "סיכון", "סוכן תנודתיות תומכת יעד", 0.01 <= atr_pct <= 0.09, 0.78 if 0.01 <= atr_pct <= 0.09 else 0.40)
     add_agent(42, "סיכון", "סוכן מרחק סביר מ-SMA20", abs(last_close - sma_20) / sma_20 < 0.12, 0.73 if abs(last_close - sma_20) / sma_20 < 0.12 else 0.37)
-    add_agent(43, "סיכון", "סוכן יחס סיכוי-סיכון ליעד 6%", (atr * 1.5) < (last_close * PROFIT_TARGET_PCT), 0.77 if (atr * 1.5) < (last_close * PROFIT_TARGET_PCT) else 0.38)
+    add_agent(43, "סיכון", "סוכן יחס סיכוי-סיכון ליעד", (atr * 1.5) < (last_close * target_pct), 0.77 if (atr * 1.5) < (last_close * target_pct) else 0.38)
     add_agent(44, "סיכון", "סוכן יציבות סגירה יומית", abs(ret_1d) < 0.12, 0.72 if abs(ret_1d) < 0.12 else 0.30)
     add_agent(45, "סיכון", "סוכן מרווח ביטחון מתמיכה", (last_close - low_20) / max(last_close, 1e-6) >= 0.025, 0.74 if (last_close - low_20) / max(last_close, 1e-6) >= 0.025 else 0.36)
     add_agent(46, "סיכון", "סוכן הימנעות ממתיחה קיצונית מעל EMA21", (last_close - ema_21) / max(ema_21, 1e-6) < 0.14, 0.73 if (last_close - ema_21) / max(ema_21, 1e-6) < 0.14 else 0.33)
     add_agent(47, "סיכון", "סוכן עקביות טווח קצר", ret_3d > -0.03 and ret_5d > -0.04, 0.74 if ret_3d > -0.03 and ret_5d > -0.04 else 0.35)
-    add_agent(48, "סיכון", "סוכן מומנטום פוטנציאלי ל-6%", (ret_5d + (rsi - 50) / 100.0) > 0.02, 0.76 if (ret_5d + (rsi - 50) / 100.0) > 0.02 else 0.40)
+    add_agent(48, "סיכון", "סוכן מומנטום פוטנציאלי ליעד", (ret_5d + (rsi - 50) / 100.0) > 0.02, 0.76 if (ret_5d + (rsi - 50) / 100.0) > 0.02 else 0.40)
     add_agent(49, "סיכון", "סוכן איכות מגמה כוללת", (last_close > sma_20) and (rsi > 48), 0.78 if (last_close > sma_20) and (rsi > 48) else 0.36)
     add_agent(50, "סיכון", "סוכן אישור סופי לתרחיש לונג", (last_close > ema_9) and (macd_hist >= prev_macd_hist * 0.8), 0.77 if (last_close > ema_9) and (macd_hist >= prev_macd_hist * 0.8) else 0.38)
 
     return agents_def
 
 
-def orchestrator_evaluate(ticker: str, df: pd.DataFrame, agents: list[dict]) -> dict:
+def build_plain_explanation(agents: list[dict]) -> str:
+    cat_labels = {
+        "פריצות": "מבנה פריצה/תמיכה טוב",
+        "מומנטום": "מומנטום מחיר חיובי",
+        "מגמה": "מגמה עולה מעל ממוצעים",
+        "מתנדים": "איתות חיובי ב-RSI/MACD",
+        "נפח": "תמיכה של נפח מסחר",
+        "סיכון": "יחס סיכון סביר ליעד",
+    }
+    bullish = [a for a in agents if a["signal"] == "BULLISH"]
+    ordered_cats = []
+    for cat in ["פריצות", "מומנטום", "מגמה", "מתנדים", "נפח", "סיכון"]:
+        if len([a for a in bullish if a["category"] == cat]) >= 2:
+            ordered_cats.append(cat_labels[cat])
+    return " • ".join(ordered_cats[:3]) if ordered_cats else "שילוב כללי חיובי של רוב הסוכנים"
+
+
+def orchestrator_evaluate(ticker: str, df: pd.DataFrame, agents: list[dict], target_pct: float) -> dict:
     last_close = float(df["Close"].iloc[-1])
+    prev_close = float(df["Close"].iloc[-2])
+    change_pct = round(((last_close - prev_close) / max(prev_close, 0.01)) * 100, 2)
+
     atr_series = compute_atr(df, 14)
     atr = float(atr_series.iloc[-1]) if not math.isnan(float(atr_series.iloc[-1])) else (last_close * 0.02)
 
@@ -222,74 +297,225 @@ def orchestrator_evaluate(ticker: str, df: pd.DataFrame, agents: list[dict]) -> 
     entry_price = round(last_close, 2)
     stop_distance = min(max(atr * 1.25, entry_price * 0.015), entry_price * 0.045)
     stop_loss = round(max(0.01, entry_price - stop_distance), 2)
-    target_6_pct = round(entry_price * (1.0 + PROFIT_TARGET_PCT), 2)
+    stop_pct = round(((entry_price - stop_loss) / max(entry_price, 0.01)) * 100, 1)
+    target_price = round(entry_price * (1.0 + target_pct), 2)
 
     risk_per_share = max(entry_price - stop_loss, 0.01)
-    reward_per_share = max(target_6_pct - entry_price, 0.01)
+    reward_per_share = max(target_price - entry_price, 0.01)
     rr_ratio = round(reward_per_share / risk_per_share, 2)
-
-    top_reasons = [a["name"] for a in sorted(bullish_agents, key=lambda x: x["score"], reverse=True)[:4]]
 
     return {
         "ticker": ticker,
-        "bull_count": len(bullish_agents),
-        "bear_count": len(bearish_agents),
-        "weighted_score": round(weighted_score, 3),
+        "price": entry_price,
+        "changePct": change_pct,
+        "bullCount": len(bullish_agents),
+        "bearCount": len(bearish_agents),
+        "scorePct": round(weighted_score * 100, 1),
+        "weightedScore": round(weighted_score, 3),
         "entry": entry_price,
-        "stop_loss": stop_loss,
-        "target_6_pct": target_6_pct,
-        "rr_ratio": rr_ratio,
-        "top_reasons": top_reasons,
+        "stopLoss": stop_loss,
+        "stopPct": stop_pct,
+        "targetPrice": target_price,
+        "targetPct": round(target_pct * 100, 1),
+        "rrRatio": rr_ratio,
+        "reason": build_plain_explanation(agents),
     }
 
 
-def format_telegram_alert(picks: list[dict], scanned_count: int) -> str:
-    now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+def save_latest_scan(evaluated: list[dict], scanned_tickers: list[str], target_pct_label: float, is_manual: bool):
+    payload = {
+        "updatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        "source": "Yahoo Finance (yfinance)",
+        "mode": "manual" if is_manual else "auto",
+        "targetPct": target_pct_label,
+        "scannedCount": len(scanned_tickers),
+        "scannedTickers": scanned_tickers,
+        "results": evaluated,
+    }
+    with open(LATEST_SCAN_FILE, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+
+def load_demo_portfolio() -> dict:
+    if os.path.exists(DEMO_FILE):
+        try:
+            with open(DEMO_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, dict) and "open_positions" in data and "closed_positions" in data:
+                    return data
+        except Exception as exc:
+            print(f"Error loading {DEMO_FILE}: {exc}")
+    return {"open_positions": [], "closed_positions": []}
+
+
+def save_demo_portfolio(data: dict):
+    with open(DEMO_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def update_demo_portfolio(evaluated: list[dict], qualified: list[dict], demo_mode: str) -> str:
+    portfolio = load_demo_portfolio()
+    price_map = {item["ticker"]: item["entry"] for item in evaluated}
+    now_str = datetime.now(timezone.utc).strftime("%d/%m %H:%M UTC")
+    status_lines = []
+
+    if demo_mode in ("check", "both"):
+        still_open = []
+        for pos in portfolio["open_positions"]:
+            t = pos["ticker"]
+            curr = price_map.get(t)
+            if curr is None:
+                df = fetch_stock_data(t)
+                curr = round(float(df["Close"].iloc[-1]), 2) if df is not None else pos["entry"]
+
+            if curr >= pos["target_price"]:
+                pnl_pct = round(((curr - pos["entry"]) / pos["entry"]) * 100, 2)
+                portfolio["closed_positions"].append({
+                    **pos,
+                    "exit_price": curr,
+                    "pnl_pct": pnl_pct,
+                    "result": "WIN",
+                    "closed_at": now_str,
+                })
+                status_lines.append(f"✅ <b>{t}</b> הגיעה ליעד (+{pnl_pct}%) ב-${curr:.2f}")
+            elif curr <= pos["stop_loss"]:
+                pnl_pct = round(((curr - pos["entry"]) / pos["entry"]) * 100, 2)
+                portfolio["closed_positions"].append({
+                    **pos,
+                    "exit_price": curr,
+                    "pnl_pct": pnl_pct,
+                    "result": "LOSS",
+                    "closed_at": now_str,
+                })
+                status_lines.append(f"🛑 <b>{t}</b> פגעה בסטופ ({pnl_pct}%) ב-${curr:.2f}")
+            else:
+                pnl_pct = round(((curr - pos["entry"]) / pos["entry"]) * 100, 2)
+                still_open.append(pos)
+                status_lines.append(f"⏳ <b>{t}</b> פתוחה (עכשיו ${curr:.2f} | {pnl_pct:+.1f}%)")
+
+        portfolio["open_positions"] = still_open
+
+    if demo_mode in ("open", "both"):
+        open_tickers = {p["ticker"] for p in portfolio["open_positions"]}
+        for pick in qualified:
+            if len(portfolio["open_positions"]) >= 6:
+                break
+            if pick["ticker"] in open_tickers:
+                continue
+            portfolio["open_positions"].append({
+                "ticker": pick["ticker"],
+                "entry": pick["entry"],
+                "stop_loss": pick["stopLoss"],
+                "target_price": pick["targetPrice"],
+                "target_pct": pick["targetPct"],
+                "score": pick["weightedScore"],
+                "opened_at": now_str,
+            })
+            open_tickers.add(pick["ticker"])
+            status_lines.append(f"🆕 נפתחה עסקת דמו ב-<b>{pick['ticker']}</b> ב-${pick['entry']:.2f} (יעד +{pick['targetPct']}%)")
+
+    save_demo_portfolio(portfolio)
+
+    closed = portfolio["closed_positions"]
+    wins = len([c for c in closed if c.get("result") == "WIN"])
+    total_closed = len(closed)
+    win_rate = round((wins / total_closed) * 100, 1) if total_closed > 0 else 0.0
+
+    summary_header = f"<b>תיק דמו:</b> {len(portfolio['open_positions'])} פתוחות | {total_closed} סגורות (הצלחה: {win_rate}%)"
+    if not status_lines:
+        return f"{summary_header}\nאין שינויים חדשים בעסקאות הדמו."
+    return f"{summary_header}\n" + "\n".join(status_lines[:6])
+
+
+def build_watchlist_telegram_section(watchlist_tickers: list[str], eval_map: dict[str, dict]) -> str:
+    if not watchlist_tickers:
+        return ""
+    lines = ["<b>📌 עדכון רשימת מעקב:</b>"]
+    for t in watchlist_tickers[:8]:
+        item = eval_map.get(t)
+        if not item:
+            df = fetch_stock_data(t)
+            if df is not None:
+                agents = run_50_agents(df, DEFAULT_PROFIT_TARGET_PCT)
+                item = orchestrator_evaluate(t, df, agents, DEFAULT_PROFIT_TARGET_PCT)
+        if item:
+            sign = "+" if item["changePct"] >= 0 else ""
+            lines.append(
+                f"• <b>{t}</b>: ${item['price']:.2f} ({sign}{item['changePct']}%) | "
+                f"התאמה {item['scorePct']}% | יעד ${item['targetPrice']:.2f} | סטופ ${item['stopLoss']:.2f}"
+            )
+        else:
+            lines.append(f"• <b>{t}</b>: אין נתון זמין כרגע")
+    return "\n".join(lines)
+
+
+def format_telegram_alert(picks: list[dict], scanned_tickers: list[str], target_pct_label: float, is_manual_tickers: bool, demo_summary: str, watchlist_section: str) -> str:
+    now_str = datetime.now(timezone.utc).strftime("%d/%m %H:%M UTC")
+    mode_label = "בדיקת מניות נבחרות" if is_manual_tickers else "סריקה אוטומטית מתחלפת"
+    sample_tickers = ", ".join(scanned_tickers[:10]) + ("..." if len(scanned_tickers) > 10 else "")
+
     lines = [
-        f"<b>50 Agents Stock Scanner — התראת איתות</b>",
-        f"נסרקו {scanned_count} מניות | {now_str}",
-        "",
+        f"<b>50 Agents Scanner — {mode_label}</b>",
+        f"נסרקו {len(scanned_tickers)} מניות | יעד רווח: <b>+{target_pct_label}%</b> | {now_str}",
+        f"מניות: <code>{sample_tickers}</code>",
+        "━━━━━━━━━━━━━━━━━━━━",
     ]
-    for item in picks:
-        reasons_txt = " • ".join(item["top_reasons"]) if item["top_reasons"] else "איתות מגמה חיובי"
+
+    for idx, item in enumerate(picks, start=1):
         lines.extend([
-            f"<b>{item['ticker']}</b> | ציון מנהל: <b>{int(item['weighted_score'] * 100)}%</b> ({item['bull_count']}/50 שוריים)",
-            f"• שער כניסה: <b>${item['entry']:.2f}</b>",
-            f"• Stop-Loss: <b>${item['stop_loss']:.2f}</b>",
-            f"• יעד רווח (+6%): <b>${item['target_6_pct']:.2f}</b> (יחס סיכוי/סיכון 1:{item['rr_ratio']})",
-            f"• מובילים: {reasons_txt}",
-            "",
+            f"<b>{idx}. {item['ticker']}</b> — התאמה <b>{item['scorePct']}%</b> ({item['bullCount']}/50 בעד)",
+            f"כניסה: <b>${item['entry']:.2f}</b>  |  יעד (+{item['targetPct']}%): <b>${item['targetPrice']:.2f}</b>",
+            f"סטופ: <b>${item['stopLoss']:.2f}</b> (-{item['stopPct']}%)  |  סיכוי/סיכון: <b>1:{item['rrRatio']}</b>",
+            f"סיבה: {item['reason']}",
+            "────────────────────",
         ])
+
+    if watchlist_section:
+        lines.append(watchlist_section)
+        lines.append("────────────────────")
+
+    lines.append(demo_summary)
     return "\n".join(lines).strip()
 
 
 def main():
-    evaluated = []
-    scanned = 0
+    target_pct = get_profit_target_pct()
+    target_pct_label = round(target_pct * 100, 1)
+    demo_mode = os.getenv("INPUT_DEMO_MODE", "both").strip().lower()
 
-    for ticker in WATCHLIST:
+    watchlist_tickers = get_watchlist_tickers()
+    tickers_to_scan, is_manual_tickers = get_scan_tickers(watchlist_tickers)
+    evaluated = []
+    scanned_ok = []
+
+    for ticker in tickers_to_scan:
         df = fetch_stock_data(ticker)
         if df is None:
             continue
-        scanned += 1
-        agents = run_50_agents(df)
-        summary = orchestrator_evaluate(ticker, df, agents)
+        scanned_ok.append(ticker)
+        agents = run_50_agents(df, target_pct)
+        summary = orchestrator_evaluate(ticker, df, agents, target_pct)
         evaluated.append(summary)
         print(
-            f"{ticker}: score={summary['weighted_score']} "
-            f"({summary['bull_count']}/50 bull) entry={summary['entry']} target6={summary['target_6_pct']}"
+            f"{ticker}: score={summary['weightedScore']} "
+            f"({summary['bullCount']}/50 bull) entry={summary['entry']} target={summary['targetPrice']}"
         )
 
-    evaluated.sort(key=lambda x: x["weighted_score"], reverse=True)
-    qualified = [x for x in evaluated if x["weighted_score"] >= MIN_SCORE_TO_ALERT][:5]
+    evaluated.sort(key=lambda x: x["weightedScore"], reverse=True)
+    save_latest_scan(evaluated, scanned_ok, target_pct_label, is_manual_tickers)
 
-    print(f"Total scanned: {scanned}, Qualified picks: {len(qualified)}")
+    qualified = evaluated[:5] if is_manual_tickers else [x for x in evaluated if x["weightedScore"] >= MIN_SCORE_TO_ALERT][:5]
+    demo_summary = update_demo_portfolio(evaluated, qualified, demo_mode)
+    eval_map = {item["ticker"]: item for item in evaluated}
+    watchlist_section = build_watchlist_telegram_section(watchlist_tickers, eval_map)
 
-    if qualified:
-        msg = format_telegram_alert(qualified, scanned)
+    print(f"Scanned {len(scanned_ok)}/{len(tickers_to_scan)}; qualified: {len(qualified)}")
+
+    if qualified or is_manual_tickers or watchlist_section:
+        msg = format_telegram_alert(qualified, scanned_ok, target_pct_label, is_manual_tickers, demo_summary, watchlist_section)
         send_telegram_message(msg)
     else:
-        print("No stocks passed the threshold in this run; no Telegram alert sent.")
+        print("No stocks passed threshold and no watchlist items; skipping Telegram message.")
 
 
 if __name__ == "__main__":
