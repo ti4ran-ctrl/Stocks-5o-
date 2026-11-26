@@ -13,7 +13,9 @@
       --line: #e5e8eb;
       --accent: #0f766e;
       --accent-soft: #ecfdf5;
+      --warn-soft: #fffbeb;
       --ok: #15803d;
+      --warn: #b45309;
       --bad: #b91c1c;
     }
     * { box-sizing: border-box; }
@@ -25,9 +27,9 @@
       line-height: 1.5;
     }
     .wrap {
-      max-width: 920px;
+      max-width: 960px;
       margin: 0 auto;
-      padding: 18px 14px 48px;
+      padding: 18px 14px 54px;
     }
     .top {
       display: flex;
@@ -79,7 +81,7 @@
       align-items: end;
     }
     label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
-    input {
+    input, select {
       border: 1px solid var(--line);
       border-radius: 9px;
       padding: 9px 11px;
@@ -91,7 +93,7 @@
       border: none;
       background: var(--accent);
       color: #fff;
-      padding: 10px 14px;
+      padding: 9px 13px;
       border-radius: 9px;
       font-weight: 600;
       cursor: pointer;
@@ -103,14 +105,14 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
       gap: 12px;
       margin-top: 12px;
     }
     .item {
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 12px;
+      padding: 13px;
       background: #fcfcfd;
     }
     .item-head {
@@ -126,8 +128,26 @@
       padding: 2px 8px;
       border-radius: 999px;
       font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .levels-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 8px 10px;
+      margin: 8px 0;
+      font-size: 0.84rem;
+    }
+    .exit-box {
+      background: var(--warn-soft);
+      border: 1px solid #fde68a;
+      border-radius: 9px;
+      padding: 8px 10px;
+      margin: 8px 0;
+      font-size: 0.84rem;
     }
     .pos { color: var(--ok); font-weight: 700; }
+    .warn { color: var(--warn); font-weight: 700; }
     .neg { color: var(--bad); font-weight: 700; }
     .hidden { display: none; }
     .list-row {
@@ -139,6 +159,21 @@
       border-bottom: 1px solid var(--line);
     }
     .list-row:last-child { border-bottom: none; }
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .agent-pill {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 9px;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
   </style>
 </head>
 <body>
@@ -153,6 +188,7 @@
 
     <div class="tabs">
       <button class="tab active" data-tab="scan" onclick="switchTab('scan')">סריקה ומניות</button>
+      <button class="tab" data-tab="agents" onclick="switchTab('agents')">50 סוכנים וסנטימנט</button>
       <button class="tab" data-tab="watchlist" onclick="switchTab('watchlist')">רשימת מעקב</button>
       <button class="tab" data-tab="my-demo" onclick="switchTab('my-demo')">תיק דמו ידני</button>
       <button class="tab" data-tab="bot-demo" onclick="switchTab('bot-demo')">תיק דמו אוטומטי</button>
@@ -170,6 +206,16 @@
         </div>
       </div>
       <div class="grid" id="scanGrid"></div>
+    </section>
+
+    <section id="tab-agents" class="card hidden">
+      <div class="row">
+        <div>
+          <label for="agentStockSelect">בחר מניה לבדיקת 50 הסוכנים והסנטימנט</label>
+          <select id="agentStockSelect" onchange="renderAgentsReport()"></select>
+        </div>
+      </div>
+      <div id="agentsReportContainer" style="margin-top:12px;"></div>
     </section>
 
     <section id="tab-watchlist" class="card hidden">
@@ -233,7 +279,7 @@
 
     function switchTab(tabName) {
       document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tabName));
-      ["scan", "watchlist", "my-demo", "bot-demo"].forEach(id => {
+      ["scan", "agents", "watchlist", "my-demo", "bot-demo"].forEach(id => {
         document.getElementById("tab-" + id).classList.toggle("hidden", id !== tabName);
       });
     }
@@ -257,7 +303,9 @@
       } catch (err) {
         statusEl.textContent = "מצב מקומי / לא מחובר לשרת";
       }
+      populateAgentSelect();
       renderScanResults();
+      renderAgentsReport();
       renderWatchlist();
       renderMyDemo();
       renderBotDemo();
@@ -266,6 +314,24 @@
     function getLivePrice(ticker) {
       const found = (scanData.results || []).find(r => r.ticker === ticker);
       return found ? Number(found.price) : null;
+    }
+
+    function populateAgentSelect() {
+      const sel = document.getElementById("agentStockSelect");
+      const list = scanData.results || [];
+      if (!list.length) {
+        sel.innerHTML = `<option value="">אין מניות סרוקות</option>`;
+        return;
+      }
+      const prev = sel.value;
+      sel.innerHTML = list.map(r => `<option value="${r.ticker}">${r.ticker} (${r.scorePct}%)</option>`).join("");
+      if (prev && list.some(x => x.ticker === prev)) sel.value = prev;
+    }
+
+    function openAgentDetailsFor(ticker) {
+      document.getElementById("agentStockSelect").value = ticker;
+      renderAgentsReport();
+      switchTab("agents");
     }
 
     function renderScanResults() {
@@ -280,25 +346,79 @@
       }
 
       grid.innerHTML = items.map(r => {
-        const entry = Number(r.entry || r.price || 0);
+        const currPrice = Number(r.price || 0);
+        const breakout = Number(r.breakoutLevel || currPrice);
+        const entry = Number(r.entry || currPrice);
+        const stopLoss = Number(r.stopLoss || 0);
         const calcTarget = (entry * (1 + targetPct / 100)).toFixed(2);
+        const recExit = Number(r.recommendedExit || calcTarget);
         const chg = Number(r.changePct || 0);
         const chgClass = chg >= 0 ? "pos" : "neg";
+        const sentLabel = r.sentiment?.label || "מעורב";
+        const gapTxt = Number(r.gapToEntryPct || 0) > 0 ? ` (+${r.gapToEntryPct}% מעל המחיר כעת)` : "";
+
         return `
           <div class="item">
             <div class="item-head">
-              <span>${r.ticker} — $${entry.toFixed(2)}</span>
+              <span>${r.ticker} — עכשיו $${currPrice.toFixed(2)}</span>
               <span class="badge">${r.scorePct}% (${r.bullCount}/50)</span>
             </div>
-            <div class="meta">שינוי יומי: <span class="${chgClass}">${chg >= 0 ? "+" : ""}${chg}%</span></div>
-            <div class="meta">יעד (+${targetPct}%): <b>$${calcTarget}</b> | סטופ: <b>$${Number(r.stopLoss || 0).toFixed(2)}</b></div>
-            <div class="meta" style="margin-top:6px;">${r.reason || ""}</div>
-            <div style="margin-top:10px;">
+            <div class="meta">שינוי יומי: <span class="${chgClass}">${chg >= 0 ? "+" : ""}${chg}%</span> | סנטימנט: <b>${sentLabel}</b></div>
+
+            <div class="levels-box">
+              <div>נקודת פריצה: <b>$${breakout.toFixed(2)}</b> | תמיכה: <b>$${Number(r.supportLevel || stopLoss).toFixed(2)}</b></div>
+              <div>שער כניסה: <b>$${entry.toFixed(2)}</b>${gapTxt}</div>
+              <div class="meta">${r.entryType || ""}</div>
+            </div>
+
+            <div class="exit-box">
+              <div>יציאה מומלצת: <b class="warn">${r.exitAction || "יעד/סטופ"}</b> ב-<b>$${recExit.toFixed(2)}</b></div>
+              <div>יעד (+${targetPct}%): <b>$${calcTarget}</b> | סטופ: <b>$${stopLoss.toFixed(2)}</b> | יחס 1:${r.rrRatio || "-"}</div>
+              <div class="meta">${r.exitReason || ""}</div>
+            </div>
+
+            <div class="meta">${r.reason || ""}</div>
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
               <button class="btn secondary" onclick="quickWatch('${r.ticker}')">+ למעקב</button>
+              <button class="btn secondary" onclick="openAgentDetailsFor('${r.ticker}')">50 סוכנים</button>
             </div>
           </div>
         `;
       }).join("");
+    }
+
+    function renderAgentsReport() {
+      const container = document.getElementById("agentsReportContainer");
+      const ticker = document.getElementById("agentStockSelect").value;
+      const item = (scanData.results || []).find(r => r.ticker === ticker);
+      if (!item) {
+        container.innerHTML = `<div class="meta">בחר מניה לאחר סריקה כדי לראות פירוט סוכנים וסנטימנט.</div>`;
+        return;
+      }
+
+      const sent = item.sentiment || {};
+      const cats = sent.categories || {};
+      const catHtml = Object.entries(cats).map(([k, v]) => `<span class="badge">${k}: ${v}</span>`).join(" ");
+      const agentsList = item.agents || [];
+
+      container.innerHTML = `
+        <div class="levels-box">
+          <div><b>סנטימנט מניה (${item.ticker}):</b> ${sent.description || sent.label || "-"}</div>
+          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">${catHtml}</div>
+        </div>
+        <div class="exit-box">
+          <div><b>מתי לצאת (${item.exitAction}):</b> שער יציאה מומלץ <b>$${Number(item.recommendedExit || item.targetPrice).toFixed(2)}</b> | יעד <b>$${Number(item.targetPrice).toFixed(2)}</b> | סטופ <b>$${Number(item.stopLoss).toFixed(2)}</b></div>
+          <div class="meta">${item.exitReason || ""}</div>
+        </div>
+        <div class="agents-grid">
+          ${agentsList.map(a => `
+            <div class="agent-pill">
+              <span>#${a.id} ${a.name}</span>
+              <span class="${a.signal === "BULLISH" ? "pos" : "neg"}">${a.signal === "BULLISH" ? "בעד" : "נגד"}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
     }
 
     function quickWatch(ticker) {
@@ -340,10 +460,12 @@
         return;
       }
       container.innerHTML = watchlist.map(t => {
-        const p = getLivePrice(t);
+        const found = (scanData.results || []).find(r => r.ticker === t);
+        const p = found ? Number(found.price) : null;
+        const exitInfo = found ? ` | יציאה: <b>${found.exitAction}</b> ($${Number(found.recommendedExit || found.targetPrice).toFixed(2)})` : "";
         return `
           <div class="list-row">
-            <div><b>${t}</b> ${p ? `— $${p.toFixed(2)}` : "(אין נתון עדכני בסריקה האחרונה)"}</div>
+            <div><b>${t}</b> ${p ? `— $${p.toFixed(2)}${exitInfo}` : "(אין נתון עדכני בסריקה האחרונה)"}</div>
             <button class="btn secondary" onclick="removeFromWatchlist('${t}')">הסר</button>
           </div>
         `;
@@ -396,15 +518,20 @@
 
       const html = myTrades.map(tr => {
         allocated += tr.amount;
-        const live = getLivePrice(tr.ticker);
+        const found = (scanData.results || []).find(r => r.ticker === tr.ticker);
+        const live = found ? Number(found.price) : null;
         const refPrice = tr.sellPrice !== null ? tr.sellPrice : live;
         const pnl = refPrice !== null ? (refPrice - tr.buyPrice) * tr.shares : 0;
         const pnlPct = refPrice !== null ? ((refPrice - tr.buyPrice) / tr.buyPrice) * 100 : 0;
         totalPnl += pnl;
 
+        const exitHint = found && tr.sellPrice === null
+          ? ` | איתות יציאה: <b>${found.exitAction}</b> ($${Number(found.recommendedExit || found.targetPrice).toFixed(2)})`
+          : "";
+
         const statusText = tr.sellPrice !== null
           ? `נמכר ב-$${tr.sellPrice.toFixed(2)}`
-          : (live !== null ? `פתוח (מחיר נוכחי $${live.toFixed(2)})` : "פתוח (ממתין למחיר)");
+          : (live !== null ? `פתוח (מחיר נוכחי $${live.toFixed(2)}${exitHint})` : "פתוח (ממתין למחיר)");
 
         return `
           <div class="list-row">
