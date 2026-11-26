@@ -7,7 +7,14 @@
       "target_price": 397.39,
       "target_pct": 10.0,
       "score": 0.898,
-      "opened_at": "26/11 18:52 UTC"
+      "opened_at": "26/11 18:52 UTC",
+      "exit_price_target": 397.39,
+      "exit_action": "המתן לירידה ל-$350.87",
+      "shares": 4.1521,
+      "allocated": 1500.0,
+      "current_price": 361.26,
+      "unrealized_dollar": 0.0,
+      "unrealized_pct": 0.0
     },
     {
       "ticker": "SPOT",
@@ -16,7 +23,14 @@
       "target_price": 678.11,
       "target_pct": 10.0,
       "score": 0.858,
-      "opened_at": "26/11 18:52 UTC"
+      "opened_at": "26/11 18:52 UTC",
+      "exit_price_target": 678.11,
+      "exit_action": "המתן לירידה ל-$600.39",
+      "shares": 2.4332,
+      "allocated": 1500.0,
+      "current_price": 616.46,
+      "unrealized_dollar": 0.0,
+      "unrealized_pct": 0.0
     },
     {
       "ticker": "SBUX",
@@ -25,7 +39,14 @@
       "target_price": 118.51,
       "target_pct": 10.0,
       "score": 0.845,
-      "opened_at": "26/11 18:52 UTC"
+      "opened_at": "26/11 18:52 UTC",
+      "exit_price_target": 118.51,
+      "exit_action": "יעד רווח / סטופ",
+      "shares": 13.9224,
+      "allocated": 1500.0,
+      "current_price": 107.74,
+      "unrealized_dollar": 0.0,
+      "unrealized_pct": 0.0
     },
     {
       "ticker": "WMT",
@@ -34,7 +55,14 @@
       "target_price": 145.13,
       "target_pct": 10.0,
       "score": 0.833,
-      "opened_at": "26/11 18:52 UTC"
+      "opened_at": "26/11 18:52 UTC",
+      "exit_price_target": 145.13,
+      "exit_action": "יעד רווח / סטופ",
+      "shares": 11.3688,
+      "allocated": 1500.0,
+      "current_price": 131.94,
+      "unrealized_dollar": 0.0,
+      "unrealized_pct": 0.0
     },
     {
       "ticker": "AAPL",
@@ -43,7 +71,14 @@
       "target_price": 391.14,
       "target_pct": 10.0,
       "score": 0.832,
-      "opened_at": "26/11 18:52 UTC"
+      "opened_at": "26/11 18:52 UTC",
+      "exit_price_target": 391.14,
+      "exit_action": "יעד רווח / סטופ",
+      "shares": 4.2185,
+      "allocated": 1500.0,
+      "current_price": 355.58,
+      "unrealized_dollar": 0.0,
+      "unrealized_pct": 0.0
     },
     {
       "ticker": "LI",
@@ -54,7 +89,14 @@
       "target_price": 12.33,
       "target_pct": 6.0,
       "score": 0.847,
-      "opened_at": "26/11 19:45 UTC"
+      "opened_at": "26/11 19:45 UTC",
+      "exit_price_target": 12.33,
+      "exit_action": "יעד רווח / סטופ",
+      "shares": 128.9768,
+      "allocated": 1500.0,
+      "current_price": 11.88,
+      "unrealized_dollar": 32.24,
+      "unrealized_pct": 2.15
     }
   ],
   "closed_positions": [
@@ -74,5 +116,17 @@
       "exit_reason": "פגעה בסטופ לוס",
       "closed_at": "26/11 19:45 UTC"
     }
-  ]
+  ],
+  "initial_capital": 10000.0,
+  "cash": 10000.0,
+  "summary": {
+    "initial_capital": 10000.0,
+    "cash": 10000.0,
+    "open_market_value": 9032.21,
+    "total_equity": 19032.21,
+    "realized_pnl_dollar": 0.0,
+    "unrealized_pnl_dollar": 32.24,
+    "total_pnl_dollar": 9032.21,
+    "total_pnl_pct": 90.32
+  }
 }
