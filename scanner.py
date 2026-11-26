@@ -262,6 +262,42 @@ def run_50_agents(df: pd.DataFrame, target_pct: float) -> list[dict]:
     return agents_def
 
 
+def build_sentiment_summary(agents: list[dict], change_pct: float, rsi: float) -> dict:
+    bullish = [a for a in agents if a["signal"] == "BULLISH"]
+    bearish = [a for a in agents if a["signal"] == "BEARISH"]
+    bull_ratio = len(bullish) / max(len(agents), 1)
+
+    cat_stats = {}
+    for cat in ["פריצות", "מומנטום", "נרות יפניים", "מגמה", "מתנדים", "נפח", "סיכון"]:
+        in_cat = [a for a in agents if a["category"] == cat]
+        if in_cat:
+            b_cat = len([a for a in in_cat if a["signal"] == "BULLISH"])
+            cat_stats[cat] = f"{b_cat}/{len(in_cat)}"
+
+    if bull_ratio >= 0.65 and change_pct >= 0:
+        label = "שורי חזק"
+        code = "BULLISH"
+    elif bull_ratio >= 0.52:
+        label = "שורי מתון"
+        code = "BULLISH_SOFT"
+    elif bull_ratio <= 0.38 or change_pct <= -2.5:
+        label = "דובי / לחץ מכירה"
+        code = "BEARISH"
+    else:
+        label = "ניטרלי / מעורב"
+        code = "NEUTRAL"
+
+    rsi_note = "קניית יתר" if rsi >= 70 else ("מכירת יתר" if rsi <= 30 else "מאוזן")
+    desc = f"{label} ({len(bullish)} בעד / {len(bearish)} נגד | RSI {rsi:.1f} - {rsi_note})"
+
+    return {
+        "code": code,
+        "label": label,
+        "description": desc,
+        "categories": cat_stats,
+    }
+
+
 def build_plain_explanation(agents: list[dict]) -> str:
     cat_labels = {
         "פריצות": "מבנה פריצה/תמיכה טוב",
@@ -280,9 +316,21 @@ def build_plain_explanation(agents: list[dict]) -> str:
 
 
 def orchestrator_evaluate(ticker: str, df: pd.DataFrame, agents: list[dict], target_pct: float) -> dict:
-    last_close = float(df["Close"].iloc[-1])
-    prev_close = float(df["Close"].iloc[-2])
+    close = df["Close"]
+    high = df["High"]
+    low = df["Low"]
+
+    last_close = float(close.iloc[-1])
+    prev_close = float(close.iloc[-2])
     change_pct = round(((last_close - prev_close) / max(prev_close, 0.01)) * 100, 2)
+
+    sma_20 = float(close.rolling(20).mean().iloc[-1])
+    ema_9 = float(close.ewm(span=9, adjust=False).mean().iloc[-1])
+    high_20 = float(high.rolling(20).max().iloc[-2])
+    low_20 = float(low.rolling(20).min().iloc[-2])
+
+    rsi_series = compute_rsi(close, 14)
+    rsi = float(rsi_series.iloc[-1]) if not math.isnan(float(rsi_series.iloc[-1])) else 50.0
 
     atr_series = compute_atr(df, 14)
     atr = float(atr_series.iloc[-1]) if not math.isnan(float(atr_series.iloc[-1])) else (last_close * 0.02)
@@ -294,31 +342,75 @@ def orchestrator_evaluate(ticker: str, df: pd.DataFrame, agents: list[dict], tar
     bull_weight = sum(a["score"] for a in bullish_agents)
     weighted_score = bull_weight / total_weight
 
-    entry_price = round(last_close, 2)
-    stop_distance = min(max(atr * 1.25, entry_price * 0.015), entry_price * 0.045)
+    # חישוב נקודת פריצה ושער כניסה מדויק
+    breakout_level = round(max(high_20 * 1.003, last_close * 1.005), 2)
+    already_broke_out = last_close > high_20
+
+    if already_broke_out:
+        entry_price = round(last_close, 2)
+        entry_type = "כניסה מיידית (אחרי פריצה)"
+        gap_to_entry_pct = 0.0
+    else:
+        entry_price = breakout_level
+        entry_type = "כניסה בפריצת התנגדות"
+        gap_to_entry_pct = round(((entry_price - last_close) / max(last_close, 0.01)) * 100, 2)
+
+    # סטופ ויעד ביחס לשער הכניסה המחושב
+    stop_distance = min(max(atr * 1.25, entry_price * 0.015), entry_price * 0.05)
     stop_loss = round(max(0.01, entry_price - stop_distance), 2)
     stop_pct = round(((entry_price - stop_loss) / max(entry_price, 0.01)) * 100, 1)
     target_price = round(entry_price * (1.0 + target_pct), 2)
+
+    # שער יציאה מומלץ כעת ("מתי לצאת")
+    trail_exit = round(max(stop_loss, min(target_price, max(ema_9, last_close - atr * 1.1))), 2)
+    if last_close >= target_price * 0.985:
+        exit_action = "צא למימוש רווח"
+        recommended_exit = round(last_close, 2)
+        exit_reason = "המניה קרובה או הגיעה ליעד הרווח שהוגדר"
+    elif last_close <= stop_loss:
+        exit_action = "צא מיד (סטופ)"
+        recommended_exit = round(last_close, 2)
+        exit_reason = "המחיר ירד מתחת לרמת הסטופ לוס"
+    elif last_close < ema_9 and len(bullish_agents) < 22:
+        exit_action = "צא בהחלשות מגמה"
+        recommended_exit = round(last_close, 2)
+        exit_reason = "שבירת EMA9 והיחלשות בסנטימנט הסוכנים"
+    else:
+        exit_action = "המשך החזקה ליעד"
+        recommended_exit = target_price
+        exit_reason = f"יציאה ביעד ${target_price:.2f} או בסטופ ${stop_loss:.2f} (טריילינג ${trail_exit:.2f})"
 
     risk_per_share = max(entry_price - stop_loss, 0.01)
     reward_per_share = max(target_price - entry_price, 0.01)
     rr_ratio = round(reward_per_share / risk_per_share, 2)
 
+    sentiment = build_sentiment_summary(agents, change_pct, rsi)
+
     return {
         "ticker": ticker,
-        "price": entry_price,
+        "price": round(last_close, 2),
         "changePct": change_pct,
         "bullCount": len(bullish_agents),
         "bearCount": len(bearish_agents),
         "scorePct": round(weighted_score * 100, 1),
         "weightedScore": round(weighted_score, 3),
+        "breakoutLevel": breakout_level,
+        "supportLevel": round(max(low_20, sma_20 * 0.97), 2),
         "entry": entry_price,
+        "entryType": entry_type,
+        "gapToEntryPct": gap_to_entry_pct,
         "stopLoss": stop_loss,
         "stopPct": stop_pct,
         "targetPrice": target_price,
         "targetPct": round(target_pct * 100, 1),
+        "trailExit": trail_exit,
+        "recommendedExit": recommended_exit,
+        "exitAction": exit_action,
+        "exitReason": exit_reason,
         "rrRatio": rr_ratio,
+        "sentiment": sentiment,
         "reason": build_plain_explanation(agents),
+        "agents": agents,
     }
 
 
@@ -355,7 +447,7 @@ def save_demo_portfolio(data: dict):
 
 def update_demo_portfolio(evaluated: list[dict], qualified: list[dict], demo_mode: str) -> str:
     portfolio = load_demo_portfolio()
-    price_map = {item["ticker"]: item["entry"] for item in evaluated}
+    price_map = {item["ticker"]: item["price"] for item in evaluated}
     now_str = datetime.now(timezone.utc).strftime("%d/%m %H:%M UTC")
     status_lines = []
 
@@ -375,6 +467,7 @@ def update_demo_portfolio(evaluated: list[dict], qualified: list[dict], demo_mod
                     "exit_price": curr,
                     "pnl_pct": pnl_pct,
                     "result": "WIN",
+                    "exit_reason": "הגיעה ליעד רווח",
                     "closed_at": now_str,
                 })
                 status_lines.append(f"✅ <b>{t}</b> הגיעה ליעד (+{pnl_pct}%) ב-${curr:.2f}")
@@ -385,6 +478,7 @@ def update_demo_portfolio(evaluated: list[dict], qualified: list[dict], demo_mod
                     "exit_price": curr,
                     "pnl_pct": pnl_pct,
                     "result": "LOSS",
+                    "exit_reason": "פגעה בסטופ לוס",
                     "closed_at": now_str,
                 })
                 status_lines.append(f"🛑 <b>{t}</b> פגעה בסטופ ({pnl_pct}%) ב-${curr:.2f}")
@@ -405,6 +499,8 @@ def update_demo_portfolio(evaluated: list[dict], qualified: list[dict], demo_mod
             portfolio["open_positions"].append({
                 "ticker": pick["ticker"],
                 "entry": pick["entry"],
+                "entry_type": pick["entryType"],
+                "breakout_level": pick["breakoutLevel"],
                 "stop_loss": pick["stopLoss"],
                 "target_price": pick["targetPrice"],
                 "target_pct": pick["targetPct"],
@@ -412,7 +508,7 @@ def update_demo_portfolio(evaluated: list[dict], qualified: list[dict], demo_mod
                 "opened_at": now_str,
             })
             open_tickers.add(pick["ticker"])
-            status_lines.append(f"🆕 נפתחה עסקת דמו ב-<b>{pick['ticker']}</b> ב-${pick['entry']:.2f} (יעד +{pick['targetPct']}%)")
+            status_lines.append(f"🆕 נפתחה עסקת דמו ב-<b>{pick['ticker']}</b> ב-${pick['entry']:.2f} (יעד ${pick['targetPrice']:.2f})")
 
     save_demo_portfolio(portfolio)
 
@@ -441,8 +537,10 @@ def build_watchlist_telegram_section(watchlist_tickers: list[str], eval_map: dic
         if item:
             sign = "+" if item["changePct"] >= 0 else ""
             lines.append(
-                f"• <b>{t}</b>: ${item['price']:.2f} ({sign}{item['changePct']}%) | "
-                f"התאמה {item['scorePct']}% | יעד ${item['targetPrice']:.2f} | סטופ ${item['stopLoss']:.2f}"
+                f"• <b>{t}</b>: עכשיו ${item['price']:.2f} ({sign}{item['changePct']}%) | "
+                f"כניסה ${item['entry']:.2f} (פריצה ${item['breakoutLevel']:.2f}) | "
+                f"יעד ${item['targetPrice']:.2f} | סטופ ${item['stopLoss']:.2f} | "
+                f"יציאה: <b>{item['exitAction']}</b> (${item['recommendedExit']:.2f})"
             )
         else:
             lines.append(f"• <b>{t}</b>: אין נתון זמין כרגע")
@@ -462,10 +560,13 @@ def format_telegram_alert(picks: list[dict], scanned_tickers: list[str], target_
     ]
 
     for idx, item in enumerate(picks, start=1):
+        sent = item.get("sentiment", {}).get("description", "")
         lines.extend([
-            f"<b>{idx}. {item['ticker']}</b> — התאמה <b>{item['scorePct']}%</b> ({item['bullCount']}/50 בעד)",
-            f"כניסה: <b>${item['entry']:.2f}</b>  |  יעד (+{item['targetPct']}%): <b>${item['targetPrice']:.2f}</b>",
-            f"סטופ: <b>${item['stopLoss']:.2f}</b> (-{item['stopPct']}%)  |  סיכוי/סיכון: <b>1:{item['rrRatio']}</b>",
+            f"<b>{idx}. {item['ticker']}</b> — מחיר <b>${item['price']:.2f}</b> | התאמה <b>{item['scorePct']}%</b> ({item['bullCount']}/50)",
+            f"סנטימנט: <b>{sent}</b>",
+            f"פריצה: <b>${item['breakoutLevel']:.2f}</b> | כניסה: <b>${item['entry']:.2f}</b> ({item['entryType']})",
+            f"יעד (+{item['targetPct']}%): <b>${item['targetPrice']:.2f}</b> | סטופ: <b>${item['stopLoss']:.2f}</b> (-{item['stopPct']}%) | 1:{item['rrRatio']}",
+            f"יציאה: <b>{item['exitAction']}</b> ב-<b>${item['recommendedExit']:.2f}</b> — {item['exitReason']}",
             f"סיבה: {item['reason']}",
             "────────────────────",
         ])
@@ -497,8 +598,8 @@ def main():
         summary = orchestrator_evaluate(ticker, df, agents, target_pct)
         evaluated.append(summary)
         print(
-            f"{ticker}: score={summary['weightedScore']} "
-            f"({summary['bullCount']}/50 bull) entry={summary['entry']} target={summary['targetPrice']}"
+            f"{ticker}: price={summary['price']} entry={summary['entry']} "
+            f"breakout={summary['breakoutLevel']} target={summary['targetPrice']} exit={summary['exitAction']}"
         )
 
     evaluated.sort(key=lambda x: x["weightedScore"], reverse=True)
