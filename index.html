@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>מעקב מניות וניהול תיק אוטומטי</title>
+  <title>מעקב מניות, ידיעות וניהול תיק אוטומטי</title>
   <style>
     :root {
       --bg: #f4f6f8;
@@ -17,6 +17,8 @@
       --entry-line: #bbf7d0;
       --exit-bg: #fffbeb;
       --exit-line: #fde68a;
+      --stop-bg: #fef2f2;
+      --stop-line: #fecaca;
       --ok: #15803d;
       --warn: #b45309;
       --bad: #b91c1c;
@@ -137,6 +139,24 @@
       font-size: 0.78rem;
       font-weight: 800;
     }
+    .no-entry-banner {
+      background: var(--stop-bg);
+      border: 1.5px solid var(--stop-line);
+      color: var(--bad);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .no-entry-big {
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 0.2px;
+    }
+    .no-entry-sub {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 2px;
+    }
     .bar-block {
       background: #f8fafc;
       border: 1px solid var(--line);
@@ -184,6 +204,18 @@
     .box-label { font-size: 0.76rem; font-weight: 700; color: var(--muted); }
     .box-val { font-size: 1.05rem; font-weight: 800; margin: 2px 0; }
     .box-pct { font-size: 0.78rem; font-weight: 700; }
+    .news-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      padding: 9px 11px;
+      font-size: 0.8rem;
+    }
+    .news-title {
+      margin-top: 4px;
+      color: var(--text);
+      font-weight: 600;
+    }
     .sub-levels {
       display: flex;
       justify-content: space-between;
@@ -224,14 +256,14 @@
   <div class="wrap">
     <div class="top">
       <div>
-        <h1>מערכת סריקה וניהול תיק אוטומטי</h1>
+        <h1>מערכת סריקה, ידיעות וניהול תיק אוטומטי</h1>
         <div class="meta" id="syncStatus">טוען נתוני סנכרון מ-Yahoo Finance...</div>
       </div>
       <button class="btn secondary" onclick="loadSyncedData()">רענן סנכרון</button>
     </div>
 
     <div class="tabs">
-      <button class="tab active" data-tab="scan" onclick="switchTab('scan')">סריקה ותוצאות</button>
+      <button class="tab active" data-tab="scan" onclick="switchTab('scan')">סריקה וידיעות</button>
       <button class="tab" data-tab="bot-demo" onclick="switchTab('bot-demo')">תיק אוטומטי ורווחים</button>
       <button class="tab" data-tab="watchlist" onclick="switchTab('watchlist')">רשימת מעקב</button>
       <button class="tab" data-tab="my-demo" onclick="switchTab('my-demo')">תיק דמו ידני</button>
@@ -244,12 +276,11 @@
           <input id="filterTicker" placeholder="הקלד כל סימול..." oninput="renderScanResults()" />
         </div>
         <div>
-          <label for="filterVerdict">סינון סטטוס</label>
+          <label for="filterVerdict">סינון סטטוס כניסה</label>
           <select id="filterVerdict" onchange="renderScanResults()">
             <option value="ALL">הכל</option>
-            <option value="APPROVED">מאושר לבחינת כניסה</option>
-            <option value="WARN">אזהרה / כניסה מותנית</option>
-            <option value="AVOID">הימנע / המתן</option>
+            <option value="APPROVED">מאושר לכניסה</option>
+            <option value="NO_ENTRY">לא להיכנס</option>
           </select>
         </div>
         <div>
@@ -329,7 +360,7 @@
         ]);
         if (scanRes.ok) {
           scanData = await scanRes.json();
-          statusEl.textContent = `מסונכרן עם Yahoo Finance | עודכן: ${scanData.updatedAt || "לא ידוע"} (${scanData.results?.length || 0} מניות)`;
+          statusEl.textContent = `מסונכרן עם Yahoo Finance וידיעות ברשת | עודכן: ${scanData.updatedAt || "לא ידוע"} (${scanData.results?.length || 0} מניות)`;
         } else {
           statusEl.textContent = "ממתין להרצת סריקה ראשונה ב-GitHub Actions (latest_scan.json)";
         }
@@ -349,8 +380,7 @@
       const v = String(verdictText || "");
       if (filterVal === "ALL") return true;
       if (filterVal === "APPROVED") return v.includes("מאושר");
-      if (filterVal === "WARN") return v.includes("אזהרה");
-      if (filterVal === "AVOID") return v.includes("הימנע") || v.includes("המתן");
+      if (filterVal === "NO_ENTRY") return v.includes("לא להיכנס");
       return true;
     }
 
@@ -381,25 +411,35 @@
         const chgClass = chg >= 0 ? "pos" : "neg";
         const sentLabel = r.sentiment?.label || "מעורב";
         const scorePct = Math.max(0, Math.min(100, Number(r.scorePct || 0)));
+        const isNoEntry = String(r.gateVerdict || "").includes("לא להיכנס");
 
         const deltaEntryPct = Number(r.deltaToEntryPct ?? (((entry - currPrice) / Math.max(currPrice, 0.01)) * 100));
-        const entryPctLabel = Math.abs(deltaEntryPct) < 0.05
-          ? "0.0% מהמחיר הנוכחי"
-          : (deltaEntryPct < 0 ? `${deltaEntryPct.toFixed(1)}% מתחת לעכשיו` : `+${deltaEntryPct.toFixed(1)}% מעל לעכשיו`);
+        const entryPctLabel = `${deltaEntryPct >= 0 ? "+" : ""}${deltaEntryPct.toFixed(1)}% מול מחיר נוכחי`;
 
-        const exitDiffPct = (((recExit - currPrice) / Math.max(currPrice, 0.01)) * 100);
-        const exitPctLabel = `${exitDiffPct >= 0 ? "+" : ""}${exitDiffPct.toFixed(1)}% מול עכשיו (יעד +${targetPct}%)`;
+        const exitDiffPct = (((recExit - entry) / Math.max(entry, 0.01)) * 100);
+        const exitPctLabel = `${exitDiffPct >= 0 ? "+" : ""}${exitDiffPct.toFixed(1)}% מול שער כניסה`;
 
         const spanRange = Math.max(calcTarget - stopLoss, 0.01);
         const posInRangePct = Math.max(0, Math.min(100, ((currPrice - stopLoss) / spanRange) * 100));
-        const fillClass = scorePct >= 65 ? "fill-ok" : (scorePct >= 48 ? "fill-warn" : "fill-bad");
+        const fillClass = isNoEntry ? "fill-bad" : (scorePct >= 65 ? "fill-ok" : "fill-warn");
+
+        const newsObj = r.news || {};
+        const newsSummary = newsObj.summaryHe || "ללא ידיעות";
+        const topHeadline = (newsObj.items && newsObj.items[0] && newsObj.items[0].title) ? newsObj.items[0].title : "";
+
+        const noEntryBannerHtml = isNoEntry ? `
+          <div class="no-entry-banner">
+            <div class="no-entry-big">לא להיכנס</div>
+            <div class="no-entry-sub">${r.waitInstruction || `להמתין שירד לשער $${entry.toFixed(2)} ואז להיכנס`}</div>
+          </div>
+        ` : "";
 
         return `
           <div class="item">
             <div class="item-head">
               <div>
                 <div class="ticker-title">${r.ticker} <span class="badge">${sentLabel}</span></div>
-                <div class="meta">${r.gateVerdict || "מאושר לבחינת כניסה"}</div>
+                <div class="meta">${r.gateVerdict || ""}</div>
               </div>
               <div class="price-now">
                 $${currPrice.toFixed(2)}
@@ -407,9 +447,11 @@
               </div>
             </div>
 
+            ${noEntryBannerHtml}
+
             <div class="bar-block">
               <div class="bar-labels">
-                <span>ציון: ${scorePct.toFixed(0)}%</span>
+                <span>ציון 66 בדיקות: ${scorePct.toFixed(0)}%</span>
                 <span>מיקום ביעד: ${posInRangePct.toFixed(0)}%</span>
               </div>
               <div class="progress-track">
@@ -423,18 +465,23 @@
 
             <div class="io-grid">
               <div class="entry-box">
-                <div class="box-label">שער כניסה</div>
+                <div class="box-label">${isNoEntry ? "שער כניסה להמתנה" : "שער כניסה"}</div>
                 <div class="box-val">$${entry.toFixed(2)}</div>
-                <div class="box-pct pos">${entryPctLabel}</div>
+                <div class="box-pct ${isNoEntry ? "warn" : "pos"}">${entryPctLabel}</div>
                 <div class="meta">${r.entryType || ""}</div>
               </div>
 
               <div class="exit-box">
-                <div class="box-label">יציאה דינמית (${r.exitAction || "יעד"})</div>
+                <div class="box-label">שער יציאה (${r.exitAction || "יעד"})</div>
                 <div class="box-val">$${recExit.toFixed(2)}</div>
                 <div class="box-pct warn">${exitPctLabel}</div>
                 <div class="meta">יחס 1:${r.rrRatio || "-"}</div>
               </div>
+            </div>
+
+            <div class="news-box">
+              <div><b>ידיעות ברשת:</b> ${newsSummary}</div>
+              ${topHeadline ? `<div class="news-title">${topHeadline}</div>` : ""}
             </div>
 
             <div class="sub-levels">
@@ -488,10 +535,14 @@
       container.innerHTML = watchlist.map(t => {
         const found = (scanData.results || []).find(r => r.ticker === t);
         const p = found ? Number(found.price) : null;
-        const exitInfo = found ? ` | כניסה: <b>$${Number(found.entry).toFixed(2)}</b> | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b>` : "";
+        const actionTxt = found
+          ? (String(found.gateVerdict || "").includes("לא להיכנס")
+              ? ` | <span class="neg">לא להיכנס</span> — ${found.waitInstruction || ""}`
+              : ` | כניסה: <b>$${Number(found.entry).toFixed(2)}</b> | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b>`)
+          : "";
         return `
           <div class="list-row">
-            <div><b>${t}</b> ${p ? `— $${p.toFixed(2)}${exitInfo}` : "(אין נתון עדכני בסריקה האחרונה)"}</div>
+            <div><b>${t}</b> ${p ? `— $${p.toFixed(2)}${actionTxt}` : "(אין נתון עדכני בסריקה האחרונה)"}</div>
             <button class="btn secondary" onclick="removeFromWatchlist('${t}')">הסר</button>
           </div>
         `;
