@@ -105,7 +105,7 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(295px, 1fr));
       gap: 12px;
       margin-top: 12px;
     }
@@ -348,6 +348,7 @@
       grid.innerHTML = items.map(r => {
         const currPrice = Number(r.price || 0);
         const breakout = Number(r.breakoutLevel || currPrice);
+        const support = Number(r.supportLevel || r.stopLoss || 0);
         const entry = Number(r.entry || currPrice);
         const stopLoss = Number(r.stopLoss || 0);
         const calcTarget = (entry * (1 + targetPct / 100)).toFixed(2);
@@ -355,7 +356,13 @@
         const chg = Number(r.changePct || 0);
         const chgClass = chg >= 0 ? "pos" : "neg";
         const sentLabel = r.sentiment?.label || "מעורב";
-        const gapTxt = Number(r.gapToEntryPct || 0) > 0 ? ` (+${r.gapToEntryPct}% מעל המחיר כעת)` : "";
+
+        const deltaPct = Number(r.deltaToEntryPct ?? (((entry - currPrice) / Math.max(currPrice, 0.01)) * 100));
+        const deltaTxt = Math.abs(deltaPct) < 0.05
+          ? " (זהה למחיר הנוכחי)"
+          : (deltaPct < 0 ? ` (${deltaPct.toFixed(2)}% מתחת למחיר כעת — תמיכה)` : ` (+${deltaPct.toFixed(2)}% מעל המחיר כעת)`);
+
+        const snap = r.indicatorsSnapshot || {};
 
         return `
           <div class="item">
@@ -364,11 +371,12 @@
               <span class="badge">${r.scorePct}% (${r.bullCount}/50)</span>
             </div>
             <div class="meta">שינוי יומי: <span class="${chgClass}">${chg >= 0 ? "+" : ""}${chg}%</span> | סנטימנט: <b>${sentLabel}</b></div>
+            <div class="meta">RSI: <b>${snap.rsi14 ?? "-"}</b> | נפח: <b>x${snap.volRatio ?? "-"}</b> | ATR: <b>${snap.atrPct ?? "-"}%</b></div>
 
             <div class="levels-box">
-              <div>נקודת פריצה: <b>$${breakout.toFixed(2)}</b> | תמיכה: <b>$${Number(r.supportLevel || stopLoss).toFixed(2)}</b></div>
-              <div>שער כניסה: <b>$${entry.toFixed(2)}</b>${gapTxt}</div>
-              <div class="meta">${r.entryType || ""}</div>
+              <div>שיא פריצה: <b>$${breakout.toFixed(2)}</b> | תמיכה: <b>$${support.toFixed(2)}</b></div>
+              <div>שער כניסה: <b>$${entry.toFixed(2)}</b>${deltaTxt}</div>
+              <div class="meta">${r.entryType || ""} — ${r.entryNote || ""}</div>
             </div>
 
             <div class="exit-box">
@@ -400,10 +408,12 @@
       const cats = sent.categories || {};
       const catHtml = Object.entries(cats).map(([k, v]) => `<span class="badge">${k}: ${v}</span>`).join(" ");
       const agentsList = item.agents || [];
+      const snap = item.indicatorsSnapshot || {};
 
       container.innerHTML = `
         <div class="levels-box">
           <div><b>סנטימנט מניה (${item.ticker}):</b> ${sent.description || sent.label || "-"}</div>
+          <div class="meta" style="margin-top:4px;">EMA9: $${snap.ema9 ?? "-"} | EMA21: $${snap.ema21 ?? "-"} | SMA20: $${snap.sma20 ?? "-"} | SMA50: $${snap.sma50 ?? "-"} | MACD Hist: ${snap.macdHist ?? "-"}</div>
           <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">${catHtml}</div>
         </div>
         <div class="exit-box">
