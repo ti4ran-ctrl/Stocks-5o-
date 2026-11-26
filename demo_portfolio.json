@@ -1,0 +1,50 @@
+{
+  "open_positions": [
+    {
+      "ticker": "HD",
+      "entry": 361.26,
+      "stop_loss": 349.45,
+      "target_price": 397.39,
+      "target_pct": 10.0,
+      "score": 0.898,
+      "opened_at": "26/11 18:52 UTC"
+    },
+    {
+      "ticker": "SPOT",
+      "entry": 616.46,
+      "stop_loss": 590.77,
+      "target_price": 678.11,
+      "target_pct": 10.0,
+      "score": 0.858,
+      "opened_at": "26/11 18:52 UTC"
+    },
+    {
+      "ticker": "SBUX",
+      "entry": 107.74,
+      "stop_loss": 103.7,
+      "target_price": 118.51,
+      "target_pct": 10.0,
+      "score": 0.845,
+      "opened_at": "26/11 18:52 UTC"
+    },
+    {
+      "ticker": "WMT",
+      "entry": 131.94,
+      "stop_loss": 128.42,
+      "target_price": 145.13,
+      "target_pct": 10.0,
+      "score": 0.833,
+      "opened_at": "26/11 18:52 UTC"
+    },
+    {
+      "ticker": "AAPL",
+      "entry": 355.58,
+      "stop_loss": 345.55,
+      "target_price": 391.14,
+      "target_pct": 10.0,
+      "score": 0.832,
+      "opened_at": "26/11 18:52 UTC"
+    }
+  ],
+  "closed_positions": []
+}
