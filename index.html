@@ -6,14 +6,17 @@
   <title>מעקב מניות ותוצאות סריקה</title>
   <style>
     :root {
-      --bg: #f6f7f9;
+      --bg: #f4f6f8;
       --card: #ffffff;
-      --text: #14171a;
-      --muted: #5b6570;
-      --line: #e5e8eb;
+      --text: #0f172a;
+      --muted: #556070;
+      --line: #e2e8f0;
       --accent: #0f766e;
       --accent-soft: #ecfdf5;
-      --warn-soft: #fffbeb;
+      --entry-bg: #f0fdf4;
+      --entry-line: #bbf7d0;
+      --exit-bg: #fffbeb;
+      --exit-line: #fde68a;
       --ok: #15803d;
       --warn: #b45309;
       --bad: #b91c1c;
@@ -27,9 +30,9 @@
       line-height: 1.5;
     }
     .wrap {
-      max-width: 960px;
+      max-width: 980px;
       margin: 0 auto;
-      padding: 18px 14px 54px;
+      padding: 18px 14px 60px;
     }
     .top {
       display: flex;
@@ -39,12 +42,13 @@
       gap: 10px;
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 14px 16px;
       margin-bottom: 14px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
-    .top h1 { margin: 0; font-size: 1.2rem; }
-    .meta { font-size: 0.85rem; color: var(--muted); }
+    .top h1 { margin: 0; font-size: 1.22rem; font-weight: 800; }
+    .meta { font-size: 0.84rem; color: var(--muted); }
     .tabs {
       display: flex;
       gap: 8px;
@@ -57,8 +61,8 @@
       background: var(--card);
       color: var(--text);
       padding: 9px 14px;
-      border-radius: 10px;
-      font-weight: 600;
+      border-radius: 11px;
+      font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
     }
@@ -70,9 +74,10 @@
     .card {
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 16px;
       margin-bottom: 14px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
     .row {
       display: flex;
@@ -80,10 +85,10 @@
       gap: 10px;
       align-items: end;
     }
-    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+    label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
     input, select {
       border: 1px solid var(--line);
-      border-radius: 9px;
+      border-radius: 10px;
       padding: 9px 11px;
       font-size: 0.95rem;
       background: #fff;
@@ -94,8 +99,8 @@
       background: var(--accent);
       color: #fff;
       padding: 9px 13px;
-      border-radius: 9px;
-      font-weight: 600;
+      border-radius: 10px;
+      font-weight: 700;
       cursor: pointer;
     }
     button.btn.secondary {
@@ -105,46 +110,112 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(295px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(305px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
     }
     .item {
       border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 13px;
-      background: #fcfcfd;
+      border-radius: 16px;
+      padding: 15px;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
     .item-head {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      font-weight: 700;
-      margin-bottom: 6px;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .ticker-title {
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+    .price-now {
+      font-size: 1.08rem;
+      font-weight: 800;
+      text-align: left;
     }
     .badge {
       background: var(--accent-soft);
       color: var(--accent);
-      padding: 2px 8px;
+      padding: 3px 9px;
       border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 700;
+      font-size: 0.78rem;
+      font-weight: 800;
     }
-    .levels-box {
+    .bar-block {
       background: #f8fafc;
       border: 1px solid var(--line);
-      border-radius: 9px;
-      padding: 8px 10px;
-      margin: 8px 0;
-      font-size: 0.84rem;
+      border-radius: 11px;
+      padding: 9px 11px;
+    }
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+    .fill-ok { background: linear-gradient(90deg, #16a34a, #0f766e); }
+    .fill-warn { background: linear-gradient(90deg, #f59e0b, #d97706); }
+    .fill-bad { background: linear-gradient(90deg, #ef4444, #b91c1c); }
+
+    .io-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .entry-box {
+      background: var(--entry-bg);
+      border: 1px solid var(--entry-line);
+      border-radius: 11px;
+      padding: 9px 10px;
     }
     .exit-box {
-      background: var(--warn-soft);
-      border: 1px solid #fde68a;
-      border-radius: 9px;
-      padding: 8px 10px;
-      margin: 8px 0;
-      font-size: 0.84rem;
+      background: var(--exit-bg);
+      border: 1px solid var(--exit-line);
+      border-radius: 11px;
+      padding: 9px 10px;
+    }
+    .box-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .box-val {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin: 2px 0;
+    }
+    .box-pct {
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .sub-levels {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding-top: 2px;
     }
     .pos { color: var(--ok); font-weight: 700; }
     .warn { color: var(--warn); font-weight: 700; }
@@ -292,11 +363,6 @@
       renderBotDemo();
     }
 
-    function getLivePrice(ticker) {
-      const found = (scanData.results || []).find(r => r.ticker === ticker);
-      return found ? Number(found.price) : null;
-    }
-
     function matchVerdictFilter(verdictText, filterVal) {
       const v = String(verdictText || "");
       if (filterVal === "ALL") return true;
@@ -329,42 +395,73 @@
         const support = Number(r.supportLevel || r.stopLoss || 0);
         const entry = Number(r.entry || currPrice);
         const stopLoss = Number(r.stopLoss || 0);
-        const calcTarget = (entry * (1 + targetPct / 100)).toFixed(2);
+        const calcTarget = Number((entry * (1 + targetPct / 100)).toFixed(2));
         const recExit = Number(r.recommendedExit || calcTarget);
         const chg = Number(r.changePct || 0);
         const chgClass = chg >= 0 ? "pos" : "neg";
         const sentLabel = r.sentiment?.label || "מעורב";
-        const verdict = r.gateVerdict || "מאושר לבחינת כניסה";
-        const verdictClass = verdict.includes("מאושר") ? "pos" : (verdict.includes("הימנע") || verdict.includes("המתן") ? "neg" : "warn");
+        const scorePct = Math.max(0, Math.min(100, Number(r.scorePct || 0)));
 
-        const deltaPct = Number(r.deltaToEntryPct ?? (((entry - currPrice) / Math.max(currPrice, 0.01)) * 100));
-        const deltaTxt = Math.abs(deltaPct) < 0.05
-          ? " (זהה למחיר הנוכחי)"
-          : (deltaPct < 0 ? ` (${deltaPct.toFixed(2)}% מתחת למחיר כעת — תמיכה)` : ` (+${deltaPct.toFixed(2)}% מעל המחיר כעת)`);
+        const deltaEntryPct = Number(r.deltaToEntryPct ?? (((entry - currPrice) / Math.max(currPrice, 0.01)) * 100));
+        const entryPctLabel = Math.abs(deltaEntryPct) < 0.05
+          ? "0.0% מהמחיר הנוכחי"
+          : (deltaEntryPct < 0 ? `${deltaEntryPct.toFixed(1)}% מתחת לעכשיו` : `+${deltaEntryPct.toFixed(1)}% מעל לעכשיו`);
+        const entryPctClass = deltaEntryPct <= 0.1 ? "pos" : "warn";
+
+        const exitDiffPct = (((recExit - currPrice) / Math.max(currPrice, 0.01)) * 100);
+        const exitPctLabel = `${exitDiffPct >= 0 ? "+" : ""}${exitDiffPct.toFixed(1)}% מול עכשיו (יעד +${targetPct}%)`;
+
+        const spanRange = Math.max(calcTarget - stopLoss, 0.01);
+        const posInRangePct = Math.max(0, Math.min(100, ((currPrice - stopLoss) / spanRange) * 100));
+        const fillClass = scorePct >= 65 ? "fill-ok" : (scorePct >= 48 ? "fill-warn" : "fill-bad");
 
         return `
           <div class="item">
             <div class="item-head">
-              <span>${r.ticker} — עכשיו $${currPrice.toFixed(2)}</span>
-              <span class="badge">ציון ${r.scorePct}%</span>
-            </div>
-            <div class="meta">שינוי יומי: <span class="${chgClass}">${chg >= 0 ? "+" : ""}${chg}%</span> | סנטימנט: <b>${sentLabel}</b></div>
-            <div class="meta">תוצאת בדיקה: <span class="${verdictClass}">${verdict}</span></div>
-
-            <div class="levels-box">
-              <div>שיא פריצה: <b>$${breakout.toFixed(2)}</b> | תמיכה: <b>$${support.toFixed(2)}</b></div>
-              <div>שער כניסה: <b>$${entry.toFixed(2)}</b>${deltaTxt}</div>
-              <div class="meta">${r.entryType || ""} — ${r.entryNote || ""}</div>
+              <div>
+                <div class="ticker-title">${r.ticker} <span class="badge">${sentLabel}</span></div>
+                <div class="meta">${r.gateVerdict || "מאושר לבחינת כניסה"}</div>
+              </div>
+              <div class="price-now">
+                $${currPrice.toFixed(2)}
+                <div class="meta ${chgClass}">${chg >= 0 ? "+" : ""}${chg.toFixed(1)}%</div>
+              </div>
             </div>
 
-            <div class="exit-box">
-              <div>יציאה מומלצת: <b class="warn">${r.exitAction || "יעד/סטופ"}</b> ב-<b>$${recExit.toFixed(2)}</b></div>
-              <div>יעד (+${targetPct}%): <b>$${calcTarget}</b> | סטופ: <b>$${stopLoss.toFixed(2)}</b> | יחס 1:${r.rrRatio || "-"}</div>
-              <div class="meta">${r.exitReason || ""}</div>
+            <div class="bar-block">
+              <div class="bar-labels">
+                <span>ציון סוכנים: ${scorePct.toFixed(0)}%</span>
+                <span>מיקום בטווח יעד: ${posInRangePct.toFixed(0)}%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill ${fillClass}" style="width:${scorePct.toFixed(0)}%"></div>
+              </div>
+              <div class="sub-levels" style="margin-top:6px;">
+                <span>סטופ: <b>$${stopLoss.toFixed(2)}</b> (-${Number(r.stopPct || 0).toFixed(1)}%)</span>
+                <span>יעד: <b>$${calcTarget.toFixed(2)}</b> (+${targetPct}%)</span>
+              </div>
             </div>
 
-            <div style="margin-top:10px;">
-              <button class="btn secondary" onclick="quickWatch('${r.ticker}')">+ הוסף למעקב</button>
+            <div class="io-grid">
+              <div class="entry-box">
+                <div class="box-label">שער כניסה</div>
+                <div class="box-val">$${entry.toFixed(2)}</div>
+                <div class="box-pct ${entryPctClass}">${entryPctLabel}</div>
+                <div class="meta">${r.entryType || ""}</div>
+              </div>
+
+              <div class="exit-box">
+                <div class="box-label">שער יציאה (${r.exitAction || "יעד"})</div>
+                <div class="box-val">$${recExit.toFixed(2)}</div>
+                <div class="box-pct warn">${exitPctLabel}</div>
+                <div class="meta">יחס 1:${r.rrRatio || "-"}</div>
+              </div>
+            </div>
+
+            <div class="sub-levels">
+              <span>פריצה: <b>$${breakout.toFixed(2)}</b></span>
+              <span>תמיכה: <b>$${support.toFixed(2)}</b></span>
+              <button class="btn secondary" style="padding:5px 10px;font-size:0.78rem;" onclick="quickWatch('${r.ticker}')">+ למעקב</button>
             </div>
           </div>
         `;
@@ -412,7 +509,7 @@
       container.innerHTML = watchlist.map(t => {
         const found = (scanData.results || []).find(r => r.ticker === t);
         const p = found ? Number(found.price) : null;
-        const exitInfo = found ? ` | יציאה: <b>${found.exitAction}</b> ($${Number(found.recommendedExit || found.targetPrice).toFixed(2)})` : "";
+        const exitInfo = found ? ` | כניסה: <b>$${Number(found.entry).toFixed(2)}</b> | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b> (${found.exitAction})` : "";
         return `
           <div class="list-row">
             <div><b>${t}</b> ${p ? `— $${p.toFixed(2)}${exitInfo}` : "(אין נתון עדכני בסריקה האחרונה)"}</div>
@@ -476,12 +573,12 @@
         totalPnl += pnl;
 
         const exitHint = found && tr.sellPrice === null
-          ? ` | איתות יציאה: <b>${found.exitAction}</b> ($${Number(found.recommendedExit || found.targetPrice).toFixed(2)})`
+          ? ` | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b> (${found.exitAction})`
           : "";
 
         const statusText = tr.sellPrice !== null
           ? `נמכר ב-$${tr.sellPrice.toFixed(2)}`
-          : (live !== null ? `פתוח (מחיר נוכחי $${live.toFixed(2)}${exitHint})` : "פתוח (ממתין למחיר)");
+          : (live !== null ? `פתוח (עכשיו $${live.toFixed(2)}${exitHint})` : "פתוח (ממתין למחיר)");
 
         return `
           <div class="list-row">
