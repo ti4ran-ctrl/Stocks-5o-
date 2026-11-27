@@ -533,7 +533,6 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     max_sum = sum(c["weight"] for c in scored) or 1.0
     score_ratio = weighted_sum / max_sum
 
-    # סיווג אוטומטי של מבנה השוק למניה (מגמת עלייה/פריצה לעומת בסיס לאחר ירידה)
     in_uptrend_structure = (last_close >= ema_20 * 0.995) and (ret_20d >= -0.02) and (macd_hist >= -0.05 or rsi >= 48)
     in_base_after_drop = (last_close < ema_20) or (ret_20d < -0.02)
 
@@ -549,6 +548,8 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
         "levelsRaw": {
             "last_close": last_close,
             "prev_close": prev_close,
+            "last_open": last_open,
+            "last_low": last_low,
             "ret_1d": ret_1d,
             "ret_5d": ret_5d,
             "ret_20d": ret_20d,
@@ -587,40 +588,40 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
     bb_upper = r["bb_upper"]
     fib_618 = r["fib_618"]
     vwap_20 = r["vwap_20"]
+    last_low = r["last_low"]
     atr = r["atr"]
     rsi = r["rsi"]
-    macd_hist = r["macd_hist"]
     vol_ratio = r["vol_ratio"]
     news_tone = r.get("news_tone", "NONE")
 
-    # שער פריצה אמיתי מעל התנגדות קרובה
-    res_candidates = [x for x in [high_10 * 1.004, high_20 * 1.004, bb_upper] if x > last_close * 1.003]
-    breakout_level = round(min(res_candidates), 2) if res_candidates else round(last_close * (1.0 + max(target_pct * 0.5, 0.025)), 2)
+    # שער פריצה אמיתי מעל התנגדות / שיא קרוב
+    res_candidates = [x for x in [high_10 * 1.005, high_20 * 1.005, bb_upper] if x > last_close * 1.004]
+    breakout_level = round(min(res_candidates), 2) if res_candidates else round(last_close * (1.0 + max(target_pct * 0.55, 0.025)), 2)
 
-    # תמיכה/בסיס קרוב
-    sup_candidates = [x for x in [vwap_20, ema_20, sma_20, low_10, fib_618, low_20] if 0 < x < last_close * 0.992]
-    support_level = round(max(sup_candidates), 2) if sup_candidates else round(max(0.01, last_close * 0.97), 2)
+    # רמות תמיכה/מבנה קרובות לחישוב שער כניסה מובחן (לא "העתק-הדבק" של המחיר הנוכחי)
+    sup_candidates = [x for x in [vwap_20, ema_20, sma_20, fib_618, low_10, last_low] if 0 < x < last_close * 0.996]
+    support_level = round(max(sup_candidates), 2) if sup_candidates else round(max(0.01, last_close * 0.975), 2)
 
     has_bad_structure = (eval_66["failedCount"] >= 2) or (news_tone == "NEGATIVE") or (eval_66["scorePct"] < 55)
 
-    # מקרה 1: מניה שירדה/מתבססת ולכן נכון לחכות לשער פריצה אחרי התבססות (ולא להיכנס לפני פריצה)
-    if not has_bad_structure and eval_66["inBaseAfterDrop"] and (macd_hist > r.get("macd_hist", 0) * 0 or rsi >= 40):
-        entry_price = round(max(breakout_level, last_close * 1.012), 2)
+    # מקרה 1: מניה שירדה/מתבססת ולכן נכון לחכות לשער פריצה אחרי התבססות
+    if not has_bad_structure and eval_66["inBaseAfterDrop"] and rsi >= 38:
+        entry_price = round(max(breakout_level, last_close * 1.015), 2)
         gate_verdict = "המתן לפריצה בשער"
-        entry_type = f"קנייה מאושרת רק בפריצת ${entry_price:.2f}"
+        entry_type = f"קנייה רק בפריצת ${entry_price:.2f}"
         wait_instruction = f"להמתין להתבססות ולפריצה מעל שער ${entry_price:.2f} ואז להיכנס"
         target_price = round(max(entry_price * (1.0 + target_pct), entry_price + max(atr * 1.8, entry_price * target_pct)), 2)
         max_risk_pct = min(max(target_pct / 1.5, 0.02), target_pct * 0.7)
-        stop_loss = round(max(0.01, min(entry_price * (1.0 - max_risk_pct), max(last_close * 0.98, support_level * 0.99))), 2)
+        stop_loss = round(max(0.01, min(entry_price * (1.0 - max_risk_pct), max(last_close * 0.975, support_level * 0.99))), 2)
         if stop_loss >= entry_price:
             stop_loss = round(max(0.01, entry_price * 0.965), 2)
         recommended_exit = target_price
-        exit_action = "מימוש ביעד / סטופ"
+        exit_action = "יעד פריצה / סטופ"
         exit_reason = f"לאחר פריצה ב-${entry_price:.2f}: יעד ${target_price:.2f} | סטופ ${stop_loss:.2f}"
 
     # מקרה 2: מגמה שלילית / חולשה / ידיעות שליליות -> לא להיכנס, להמתין שירד לשער X
     elif has_bad_structure or (last_close < ema_20 and r["ret_1d"] < -0.015):
-        wait_candidates = [x for x in [support_level, low_10, fib_618, last_close * 0.97] if 0 < x < last_close * 0.995]
+        wait_candidates = [x for x in [support_level, low_10, fib_618, last_close * 0.97] if 0 < x < last_close * 0.994]
         entry_price = round(max(wait_candidates), 2) if wait_candidates else round(max(0.01, last_close * 0.97), 2)
         if entry_price >= last_close:
             entry_price = round(max(0.01, last_close * 0.972), 2)
@@ -634,11 +635,20 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
         exit_action = "המתן לשער כניסה"
         exit_reason = f"בכניסה ב-${entry_price:.2f}: יעד ${target_price:.2f} | סטופ ${stop_loss:.2f}"
 
-    # מקרה 3: מניה במגמה חיובית ואינדיקטורים תומכים -> כניסה מידית כדי לא לפספס מהלך עלייה קרוב
+    # מקרה 3: מניה במגמה חיובית — שער כניסה מדויק לפי מבנה (פריצה מאושרת או אזור תמיכה/אישור קרוב, לא מחיר השוק העיוור)
     else:
-        entry_price = round(last_close, 2)
+        if vol_ratio >= 1.25 and last_close >= high_10 * 0.995:
+            entry_price = round(max(breakout_level, last_close * 1.006), 2)
+            entry_type = f"כניסת פריצה מאושרת (${entry_price:.2f})"
+        else:
+            zone_floor = max(0.01, last_close - min(atr * 0.45, last_close * 0.018))
+            zone_cand = [x for x in [support_level, zone_floor] if 0 < x < last_close * 0.998]
+            entry_price = round(max(zone_cand), 2) if zone_cand else round(max(0.01, last_close * 0.99), 2)
+            if abs(entry_price - last_close) < 0.02:
+                entry_price = round(max(0.01, last_close * 0.992), 2)
+            entry_type = f"שער כניסה מובחן (תמיכה/מבנה ${entry_price:.2f})"
+
         gate_verdict = "מאושר לכניסה"
-        entry_type = "כניסה במהירות/מומנטום (ללא המתנה לנסיגה)"
         wait_instruction = ""
         target_price = round(max(entry_price * (1.0 + target_pct), breakout_level if breakout_level > entry_price * (1.0 + target_pct * 0.75) else entry_price * (1.0 + target_pct)), 2)
         max_risk_pct = min(max(target_pct / 1.5, 0.015), target_pct * 0.7)
@@ -701,7 +711,8 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
 
 
 def load_demo_portfolio(initial_capital: float) -> dict:
-    if os.path.exists(DEMO_FILE):
+    reset_flag = os.getenv("RESET_DEMO_PORTFOLIO", "").strip().lower() in ("1", "true", "yes")
+    if not reset_flag and os.path.exists(DEMO_FILE):
         try:
             with open(DEMO_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
@@ -736,8 +747,22 @@ def update_demo_portfolio(
     now_str = datetime.now(timezone.utc).strftime("%d/%m %H:%M UTC")
     status_lines = []
 
+    remove_raw = os.getenv("REMOVE_DEMO_TICKERS", "").strip()
+    remove_set = {t.strip().upper() for t in remove_raw.split(",") if t.strip()}
+
     init_cap = float(portfolio.get("initial_capital", initial_capital) or initial_capital)
     cash = float(portfolio.get("cash", init_cap))
+
+    if remove_set:
+        kept = []
+        for pos in portfolio["open_positions"]:
+            if pos["ticker"].upper() in remove_set:
+                refund = round(float(pos.get("allocated", float(pos.get("entry", 0)) * float(pos.get("shares", 0)))), 2)
+                cash = round(cash + refund, 2)
+                status_lines.append(f"🗑️ הוסרה <b>{pos['ticker']}</b> והוחזר ${refund:,.0f} למזומן")
+            else:
+                kept.append(pos)
+        portfolio["open_positions"] = kept
 
     if demo_mode in ("check", "both"):
         still_open = []
@@ -817,13 +842,14 @@ def update_demo_portfolio(
         for t in candidates:
             if len(portfolio["open_positions"]) >= MAX_OPEN_POSITIONS:
                 break
-            if t in open_tickers:
+            if t in open_tickers or t in remove_set:
                 continue
             pick = eval_map.get(t)
             if not pick or pick.get("gateVerdict") != "מאושר לכניסה":
                 continue
 
             entry_p = float(pick["entry"])
+            curr_p = float(pick["price"])
             if entry_p <= 0 or cash < min(250.0, per_trade_budget * 0.5):
                 continue
 
@@ -840,15 +866,15 @@ def update_demo_portfolio(
                 "ticker": t,
                 "source": source_type,
                 "entry": round(entry_p, 2),
-                "current_price": round(float(pick["price"]), 2),
+                "current_price": round(curr_p, 2),
                 "shares": shares,
                 "allocated": actual_cost,
                 "stop_loss": round(float(pick["stopLoss"]), 2),
                 "target_price": round(float(pick["targetPrice"]), 2),
                 "exit_price_target": round(float(pick["recommendedExit"]), 2),
                 "exit_action": pick.get("exitAction", "יעד רווח / סטופ"),
-                "unrealized_dollar": round((float(pick["price"]) - entry_p) * shares, 2),
-                "unrealized_pct": round(((float(pick["price"]) - entry_p) / max(entry_p, 0.01)) * 100, 2),
+                "unrealized_dollar": round((curr_p - entry_p) * shares, 2),
+                "unrealized_pct": round(((curr_p - entry_p) / max(entry_p, 0.01)) * 100, 2),
                 "score": pick["weightedScore"],
                 "opened_at": now_str,
             }
