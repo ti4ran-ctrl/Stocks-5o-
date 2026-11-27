@@ -121,6 +121,11 @@
       color: var(--accent);
       border: 1px solid #a7f3d0;
     }
+    button.btn.danger {
+      background: var(--stop-bg);
+      color: var(--bad);
+      border: 1px solid var(--stop-line);
+    }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(305px, 1fr));
@@ -159,16 +164,8 @@
       border-radius: 12px;
       padding: 10px 12px;
     }
-    .no-entry-big {
-      font-size: 1.15rem;
-      font-weight: 900;
-    }
-    .no-entry-sub {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-top: 2px;
-    }
+    .no-entry-big { font-size: 1.15rem; font-weight: 900; }
+    .no-entry-sub { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-top: 2px; }
     .bar-block {
       background: #f8fafc;
       border: 1px solid var(--line);
@@ -189,18 +186,11 @@
       border-radius: 999px;
       overflow: hidden;
     }
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-    }
+    .progress-fill { height: 100%; border-radius: 999px; }
     .fill-ok { background: linear-gradient(90deg, #16a34a, #0f766e); }
     .fill-warn { background: linear-gradient(90deg, #f59e0b, #d97706); }
     .fill-bad { background: linear-gradient(90deg, #ef4444, #b91c1c); }
-    .io-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
+    .io-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .entry-box {
       background: var(--entry-bg);
       border: 1px solid var(--entry-line);
@@ -307,6 +297,15 @@
     </section>
 
     <section id="tab-bot-demo" class="card hidden">
+      <div class="row" style="margin-bottom:14px;">
+        <div>
+          <label for="botInitCapInput">הון התחלתי לתיק האוטומטי ($)</label>
+          <input id="botInitCapInput" type="number" min="100" step="100" value="10000" style="width:140px" />
+        </div>
+        <button class="btn danger" onclick="resetBotPortfolio()">אפס תיק אוטומטי</button>
+        <button class="btn secondary" onclick="clearBotOverrides()">בטל איפוס/הסרות מקומיות</button>
+      </div>
+      <div class="meta" id="botOverrideNote" style="margin-bottom:10px;"></div>
       <div id="botDemoContent"></div>
     </section>
 
@@ -357,6 +356,9 @@
     let myCapital = Number(localStorage.getItem("my_demo_capital") || 10000);
     let myTrades = JSON.parse(localStorage.getItem("my_demo_trades") || "[]");
 
+    let botRemovedTickers = JSON.parse(localStorage.getItem("bot_removed_tickers") || "[]");
+    let botResetCapital = localStorage.getItem("bot_reset_capital") ? Number(localStorage.getItem("bot_reset_capital")) : null;
+
     document.getElementById("myCapitalInput").value = myCapital;
 
     function switchTab(tabName) {
@@ -364,6 +366,19 @@
       ["scan", "bot-demo", "watchlist", "my-demo"].forEach(id => {
         document.getElementById("tab-" + id).classList.toggle("hidden", id !== tabName);
       });
+    }
+
+    function formatUpdatedTime(utcStr) {
+      if (!utcStr) return "לא ידוע";
+      try {
+        const iso = utcStr.includes("T") ? utcStr : utcStr.replace(" ", "T") + ":00Z";
+        const d = new Date(iso);
+        if (!isNaN(d.getTime())) {
+          const ilStr = d.toLocaleString("he-IL", { timeZone: "Asia/Jerusalem", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+          return `${ilStr} (שעון ישראל) | ${utcStr}`;
+        }
+      } catch (_) {}
+      return utcStr;
     }
 
     async function loadSyncedData() {
@@ -375,7 +390,7 @@
         ]);
         if (scanRes.ok) {
           scanData = await scanRes.json();
-          statusEl.textContent = `מסונכרן עם Yahoo Finance וידיעות ברשת | עודכן: ${scanData.updatedAt || "לא ידוע"} (${scanData.results?.length || 0} מניות)`;
+          statusEl.textContent = `מסונכרן עם Yahoo Finance וידיעות ברשת | עדכון אחרון: ${formatUpdatedTime(scanData.updatedAt)} (${scanData.results?.length || 0} מניות)`;
         } else {
           statusEl.textContent = "ממתין להרצת סריקה ראשונה ב-GitHub Actions (latest_scan.json)";
         }
@@ -444,8 +459,6 @@
         const exitDiffPct = (((recExit - entry) / Math.max(entry, 0.01)) * 100);
         const exitPctLabel = `${exitDiffPct >= 0 ? "+" : ""}${exitDiffPct.toFixed(1)}% מול שער כניסה`;
 
-        const spanRange = Math.max(targetPrice - stopLoss, 0.01);
-        const posInRangePct = Math.max(0, Math.min(100, ((currPrice - stopLoss) / spanRange) * 100));
         const fillClass = isNoEntry ? "fill-bad" : (isBreakoutWait ? "fill-warn" : (scorePct >= 65 ? "fill-ok" : "fill-warn"));
 
         const newsObj = r.news || {};
@@ -522,6 +535,33 @@
           </div>
         `;
       }).join("");
+    }
+
+    function removeBotPosition(ticker) {
+      const t = String(ticker || "").toUpperCase();
+      if (!t) return;
+      if (!botRemovedTickers.includes(t)) {
+        botRemovedTickers.push(t);
+        localStorage.setItem("bot_removed_tickers", JSON.stringify(botRemovedTickers));
+      }
+      renderBotDemo();
+    }
+
+    function resetBotPortfolio() {
+      const cap = Math.max(100, Number(document.getElementById("botInitCapInput").value || 10000));
+      botResetCapital = cap;
+      botRemovedTickers = [];
+      localStorage.setItem("bot_reset_capital", String(cap));
+      localStorage.setItem("bot_removed_tickers", "[]");
+      renderBotDemo();
+    }
+
+    function clearBotOverrides() {
+      botResetCapital = null;
+      botRemovedTickers = [];
+      localStorage.removeItem("bot_reset_capital");
+      localStorage.removeItem("bot_removed_tickers");
+      renderBotDemo();
     }
 
     function quickWatch(ticker) {
@@ -660,32 +700,52 @@
     }
 
     function renderBotDemo() {
-      const openList = botPortfolio.open_positions || [];
-      const closedList = botPortfolio.closed_positions || [];
-      const sum = botPortfolio.summary || {};
+      const noteEl = document.getElementById("botOverrideNote");
+      const rawOpen = botResetCapital !== null ? [] : (botPortfolio.open_positions || []);
+      const rawClosed = botResetCapital !== null ? [] : (botPortfolio.closed_positions || []);
 
-      const initCap = Number(sum.initial_capital ?? botPortfolio.initial_capital ?? 10000);
-      const cash = Number(sum.cash ?? botPortfolio.cash ?? initCap);
+      const openList = rawOpen.filter(p => !botRemovedTickers.includes(String(p.ticker || "").toUpperCase()));
+      const closedList = rawClosed.filter(c => !botRemovedTickers.includes(String(c.ticker || "").toUpperCase()));
+
+      const sum = botPortfolio.summary || {};
+      const initCap = botResetCapital !== null ? botResetCapital : Number(sum.initial_capital ?? botPortfolio.initial_capital ?? 10000);
+      document.getElementById("botInitCapInput").value = initCap;
+
+      const noteParts = [];
+      if (botResetCapital !== null) noteParts.push(`תיק אופס להון התחלתי של $${initCap.toLocaleString()}`);
+      if (botRemovedTickers.length) noteParts.push(`הוסרו מניות: ${botRemovedTickers.join(", ")}`);
+      noteParts.push(`לסנכרון קבוע ב-GitHub Actions: ניתן להגדיר Secrets בשם RESET_DEMO_PORTFOLIO=true או REMOVE_DEMO_TICKERS`);
+      noteEl.textContent = noteParts.join(" • ");
 
       let calcOpenVal = 0;
       let calcOpenPnl = 0;
+      let calcAllocated = 0;
+
       const enrichedOpen = openList.map(p => {
         const liveItem = (scanData.results || []).find(r => r.ticker === p.ticker);
         const curr = liveItem ? Number(liveItem.price) : Number(p.current_price || p.entry);
         const entry = Number(p.entry || curr);
         const shares = Number(p.shares || (Number(p.allocated || 1500) / Math.max(entry, 0.01)));
+        const alloc = shares * entry;
         const pnlDollar = (curr - entry) * shares;
         const pnlPct = ((curr - entry) / Math.max(entry, 0.01)) * 100;
         const dynExit = liveItem ? Number(liveItem.recommendedExit || p.exit_price_target || p.target_price) : Number(p.exit_price_target || p.target_price);
         calcOpenVal += curr * shares;
         calcOpenPnl += pnlDollar;
-        return { ...p, curr, entry, shares, pnlDollar, pnlPct, dynExit };
+        calcAllocated += alloc;
+        return { ...p, curr, entry, shares, alloc, pnlDollar, pnlPct, dynExit };
       });
 
       const realizedPnl = closedList.reduce((acc, c) => acc + Number(c.pnl_dollar || 0), 0);
-      const totalEquity = Number(sum.total_equity ?? (cash + calcOpenVal));
-      const totalPnlDollar = Number(sum.total_pnl_dollar ?? (totalEquity - initCap));
-      const totalPnlPct = Number(sum.total_pnl_pct ?? ((totalPnlDollar / Math.max(initCap, 1)) * 100));
+      const hasOverrides = (botResetCapital !== null) || (botRemovedTickers.length > 0);
+      const cash = hasOverrides
+        ? Math.max(0, initCap - calcAllocated + realizedPnl)
+        : Number(sum.cash ?? botPortfolio.cash ?? Math.max(0, initCap - calcAllocated));
+      const totalEquity = hasOverrides
+        ? (cash + calcOpenVal)
+        : Number(sum.total_equity ?? (cash + calcOpenVal));
+      const totalPnlDollar = totalEquity - initCap;
+      const totalPnlPct = (totalPnlDollar / Math.max(initCap, 1)) * 100;
       const wins = closedList.filter(c => c.result === "WIN").length;
       const winRate = closedList.length ? ((wins / closedList.length) * 100).toFixed(1) : "0.0";
 
@@ -722,6 +782,7 @@
             </div>
             <div style="text-align:left;">
               <div class="${p.pnlDollar >= 0 ? "pos" : "neg"}">${p.pnlDollar >= 0 ? "+" : ""}$${p.pnlDollar.toFixed(2)} (${p.pnlPct >= 0 ? "+" : ""}${p.pnlPct.toFixed(1)}%)</div>
+              <button class="btn danger" style="margin-top:4px;padding:4px 9px;font-size:0.76rem;" onclick="removeBotPosition('${p.ticker}')">הסר מניה</button>
             </div>
           </div>
         `).join("");
