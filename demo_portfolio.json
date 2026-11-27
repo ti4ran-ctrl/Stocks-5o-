@@ -11,7 +11,7 @@
       "exit_price_target": 397.39,
       "exit_action": "המתן לירידה ל-$350.87",
       "shares": 4.1521,
-      "allocated": 1500.0,
+      "allocated": 1499.99,
       "current_price": 361.26,
       "unrealized_dollar": 0.0,
       "unrealized_pct": 0.0
@@ -27,7 +27,7 @@
       "exit_price_target": 678.11,
       "exit_action": "המתן לירידה ל-$600.39",
       "shares": 2.4332,
-      "allocated": 1500.0,
+      "allocated": 1499.97,
       "current_price": 616.46,
       "unrealized_dollar": 0.0,
       "unrealized_pct": 0.0
@@ -75,7 +75,7 @@
       "exit_price_target": 391.14,
       "exit_action": "יעד רווח / סטופ",
       "shares": 4.2185,
-      "allocated": 1500.0,
+      "allocated": 1500.01,
       "current_price": 355.58,
       "unrealized_dollar": 0.0,
       "unrealized_pct": 0.0
