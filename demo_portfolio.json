@@ -14,7 +14,10 @@
       "allocated": 1499.99,
       "current_price": 361.26,
       "unrealized_dollar": 0.0,
-      "unrealized_pct": 0.0
+      "unrealized_pct": 0.0,
+      "action_num": 1,
+      "chosen_entry": 361.26,
+      "chosen_exit": 397.39
     },
     {
       "ticker": "SPOT",
@@ -30,7 +33,10 @@
       "allocated": 1499.97,
       "current_price": 616.46,
       "unrealized_dollar": 0.0,
-      "unrealized_pct": 0.0
+      "unrealized_pct": 0.0,
+      "action_num": 2,
+      "chosen_entry": 616.46,
+      "chosen_exit": 678.11
     },
     {
       "ticker": "SBUX",
@@ -46,7 +52,10 @@
       "allocated": 1500.0,
       "current_price": 107.74,
       "unrealized_dollar": 0.0,
-      "unrealized_pct": 0.0
+      "unrealized_pct": 0.0,
+      "action_num": 3,
+      "chosen_entry": 107.74,
+      "chosen_exit": 118.51
     },
     {
       "ticker": "WMT",
@@ -62,7 +71,10 @@
       "allocated": 1500.0,
       "current_price": 131.94,
       "unrealized_dollar": 0.0,
-      "unrealized_pct": 0.0
+      "unrealized_pct": 0.0,
+      "action_num": 4,
+      "chosen_entry": 131.94,
+      "chosen_exit": 145.13
     },
     {
       "ticker": "AAPL",
@@ -78,7 +90,10 @@
       "allocated": 1500.01,
       "current_price": 355.58,
       "unrealized_dollar": 0.0,
-      "unrealized_pct": 0.0
+      "unrealized_pct": 0.0,
+      "action_num": 5,
+      "chosen_entry": 355.58,
+      "chosen_exit": 391.14
     },
     {
       "ticker": "LI",
@@ -90,13 +105,16 @@
       "target_pct": 6.0,
       "score": 0.847,
       "opened_at": "26/11 19:45 UTC",
-      "exit_price_target": 12.33,
+      "exit_price_target": 12.41,
       "exit_action": "יעד רווח / סטופ",
       "shares": 128.9768,
       "allocated": 1500.0,
       "current_price": 11.88,
       "unrealized_dollar": 32.24,
-      "unrealized_pct": 2.15
+      "unrealized_pct": 2.15,
+      "action_num": 6,
+      "chosen_entry": 11.63,
+      "chosen_exit": 12.41
     }
   ],
   "closed_positions": [
@@ -128,5 +146,7 @@
     "unrealized_pnl_dollar": 32.24,
     "total_pnl_dollar": 9032.21,
     "total_pnl_pct": 90.32
-  }
+  },
+  "pending_orders": [],
+  "next_action_num": 7
 }
