@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-11-27 08:56 UTC",
-  "source": "Yahoo Finance + News RSS — Trend, Breakout & Profit Filter Engine",
+  "updatedAt": "2026-11-27 18:43 UTC",
+  "source": "Yahoo Finance + SEC EDGAR (13F / Form 4) + News RSS",
   "mode": "auto",
   "targetPct": 6.0,
   "scannedCount": 22,
@@ -36,60 +36,76 @@
         "tone": "MIXED",
         "summaryHe": "ידיעות מעורבות (6 כותרות)",
         "posHits": 1,
-        "negHits": 0,
+        "negHits": 1,
         "items": [
+          {
+            "title": "Ja Rule explains how AI can 'make your art even greater'",
+            "link": "https://finance.yahoo.com/markets/article/ja-rule-explains-how-ai-can-make-your-art-even-greater-170725314.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:07:25 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "HubSpot, AST SpaceMobile downgraded: Wall Street's top analyst calls",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/hubspot-ast-spacemobile-downgraded-wall-143518350.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 14:35:18 +0000",
+            "tone": "NEGATIVE"
+          },
+          {
+            "title": "Why Is Spotify Stock Gaining Today?",
+            "link": "https://investorshub.advfn.com/market-news/article/40800/why-is-spotify-stock-gaining-today?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 12:00:32 +0000",
+            "tone": "POSITIVE"
+          },
           {
             "title": "Investors Heavily Search Spotify Technology (SPOT): Here is What You Need to Know",
             "link": "https://finance.yahoo.com/markets/stocks/articles/investors-heavily-search-spotify-technology-130004713.html?.tsrc=rss",
             "published": "Thu, 26 Nov 2026 13:00:04 +0000",
             "tone": "NEUTRAL"
-          },
-          {
-            "title": "Ja Rule's AI plan: Squeeze new revenue from old albums",
-            "link": "https://finance.yahoo.com/video/ja-rules-ai-plan-squeeze-120000161.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 12:00:00 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Ja Rule invests like Warren Buffett. Here's what he bought",
-            "link": "https://finance.yahoo.com/video/ja-rule-invests-warren-buffett-110000964.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 11:00:00 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Spotify Restores Service After Outage Hits Thousands",
-            "link": "https://finance.yahoo.com/media-advertising/articles/spotify-restores-outage-hits-thousands-160922885.html?.tsrc=rss",
-            "published": "Tue, 24 Nov 2026 16:09:22 +0000",
-            "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 616.46,
-      "changePct": 2.79,
-      "bullCount": 58,
-      "bearCount": 1,
-      "scorePct": 93.4,
-      "weightedScore": 0.934,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001639920",
+        "recentFilingsCount": 392,
+        "recentForm4Count": 48,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "Spot Trading L.L.C  (CIK 0001511566) (2015-11-03)",
+          "Spot Trading L.L.C  (CIK 0001511566) (2014-05-13)",
+          "Spot Trading L.L.C  (CIK 0001511566) (2013-11-08)",
+          "SPOT TRADING L.L.C.  (CIK 0001088412) (2017-07-27)"
+        ],
+        "summaryHe": "48 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 620.38,
+      "changePct": 0.64,
+      "bullCount": 57,
+      "bearCount": 0,
+      "scorePct": 92.9,
+      "weightedScore": 0.929,
       "gateVerdict": "מאושר לכניסה",
       "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 1.71 | יעד אנליסטים: $634.49",
+      "institutionalSummary": "48 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 58,
-        "warned": 5,
-        "failed": 1
+        "passed": 57,
+        "warned": 7,
+        "failed": 0
       },
-      "breakoutLevel": 622.16,
-      "supportLevel": 600.39,
-      "entry": 622.16,
-      "entryType": "כניסת פריצה מאושרת ($622.16)",
-      "deltaToEntryPct": 0.92,
-      "stopLoss": 597.27,
+      "breakoutLevel": 625.29,
+      "supportLevel": 616.41,
+      "entry": 616.41,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $616.41)",
+      "deltaToEntryPct": -0.64,
+      "stopLoss": 591.75,
       "stopPct": 4.0,
-      "targetPrice": 659.49,
+      "targetPrice": 653.39,
       "targetPct": 6.0,
-      "recommendedExit": 659.49,
+      "recommendedExit": 653.39,
       "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $659.49 | סטופ $597.27",
+      "exitReason": "יעד $653.39 | סטופ $591.75",
       "rrRatio": 1.5,
       "sentiment": {
         "code": "BULLISH",
@@ -100,64 +116,80 @@
       "ticker": "AAPL",
       "news": {
         "count": 6,
-        "tone": "MIXED",
-        "summaryHe": "ידיעות מעורבות (6 כותרות)",
-        "posHits": 0,
+        "tone": "POSITIVE",
+        "summaryHe": "ידיעות חיוביות (2 מול 0)",
+        "posHits": 2,
         "negHits": 0,
         "items": [
           {
-            "title": "Apple (AAPL) Has Found a New AI Opportunity That Has Little to Do With the iPhone",
-            "link": "https://finance.yahoo.com/technology/ai/articles/apple-aapl-found-ai-opportunity-031905510.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 03:19:05 +0000",
+            "title": "Apple gains smartphone share as memory crunch squeezes budget Android phones",
+            "link": "https://finance.yahoo.com/technology/article/apple-gains-smartphone-share-as-memory-crunch-squeezes-budget-android-phones-134124966.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 13:41:24 +0000",
+            "tone": "POSITIVE"
+          },
+          {
+            "title": "New $799 smart glasses challenge Apple, but with a major catch",
+            "link": "https://www.thestreet.com/technology/new-orrorin-799-smart-glasses-challenge-apple-but-dont-offer-all-features?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:17:00 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Target cut its Apple Black Friday discount in half",
-            "link": "https://www.thestreet.com/retail/target-cut-its-apple-black-friday-discount-in-half?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 03:17:00 +0000",
+            "title": "Apple Stock Isn’t Just an Anti-AI Haven. It’s an All-Purpose Winner.",
+            "link": "https://finance.yahoo.com/m/253b5457-75bb-3a4e-9004-f3214100cc8d/apple-stock-isn%E2%80%99t-just-an.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 15:18:00 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Apple Enters the AI Agent Race as It Takes on OpenAI, Anthropic, and Meta. What That Means for AAPL Stock.",
-            "link": "https://www.barchart.com/story/news/9022924/apple-enters-the-ai-agent-race-as-it-takes-on-openai-anthropic-and-meta-what-that-means-for-aapl-stock?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 19:30:03 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Apple Stocks Rise as AI Selloff Spares the iPhone Maker",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/apple-stocks-rise-ai-selloff-190038273.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 19:00:38 +0000",
+            "title": "PROPEL Center Names University of Arkansas at Pine Bluff Winner of the Future of XYZ HBCU Innovation Challenge at AfroTech",
+            "link": "https://finance.yahoo.com/small-business/articles/propel-center-names-university-arkansas-134300118.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 13:43:00 +0000",
             "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 355.58,
-      "changePct": 0.43,
-      "bullCount": 58,
-      "bearCount": 0,
-      "scorePct": 93.0,
-      "weightedScore": 0.93,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0000320193",
+        "recentFilingsCount": 1008,
+        "recentForm4Count": 35,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "Live Oak Investment Partners  (CIK 0001822262) (2024-11-05)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2024-07-16)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2023-05-03)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2023-10-31)"
+        ],
+        "summaryHe": "35 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 358.54,
+      "changePct": 0.83,
+      "bullCount": 56,
+      "bearCount": 1,
+      "scorePct": 90.5,
+      "weightedScore": 0.905,
       "gateVerdict": "מאושר לכניסה",
       "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 2.18 | יעד אנליסטים: $345.63",
+      "institutionalSummary": "35 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 58,
-        "warned": 7,
-        "failed": 0
+        "passed": 56,
+        "warned": 8,
+        "failed": 1
       },
-      "breakoutLevel": 361.41,
-      "supportLevel": 348.96,
-      "entry": 351.97,
-      "entryType": "שער כניסה מובחן (תמיכה/מבנה $351.97)",
-      "deltaToEntryPct": -1.02,
-      "stopLoss": 346.17,
-      "stopPct": 1.6,
-      "targetPrice": 373.09,
+      "breakoutLevel": 362.63,
+      "supportLevel": 355.64,
+      "entry": 355.64,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $355.64)",
+      "deltaToEntryPct": -0.81,
+      "stopLoss": 341.41,
+      "stopPct": 4.0,
+      "targetPrice": 376.98,
       "targetPct": 6.0,
-      "recommendedExit": 373.09,
+      "recommendedExit": 376.98,
       "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $373.09 | סטופ $346.17",
-      "rrRatio": 3.64,
+      "exitReason": "יעד $376.98 | סטופ $341.41",
+      "rrRatio": 1.5,
       "sentiment": {
         "code": "BULLISH",
         "label": "שורי"
@@ -173,88 +205,21 @@
         "negHits": 0,
         "items": [
           {
-            "title": "When Walmart, Target, Costco, and other major retailers open on Black Friday",
-            "link": "https://www.thestreet.com/retail/when-walmart-target-costco-and-other-major-retailers-open-on-black-friday?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 00:37:00 +0000",
+            "title": "Wall Street Gravitates To Reliable Retailer Costco In Rocky Market. But This Test Looms.",
+            "link": "https://finance.yahoo.com/m/7a4a70d2-82a7-313f-b7bb-a323a8e6795c/wall-street-gravitates-to.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:14:58 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Costco sells something consumers want even if they don't need it",
-            "link": "https://www.thestreet.com/retail/costco-borrows-a-starbucks-trick-as-shoppers-cut-back?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 18:47:00 +0000",
+            "title": "12 Big Funds Bought Costco Wholesale Last Quarter, While 7 Sold. Who’s Right?",
+            "link": "https://www.tikr.com/blog/12-big-funds-bought-costco-wholesale-last-quarter-while-7-sold-whos-right?ref=yahoofinance&tlnk=yf-261127-8v84xf62&.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 13:35:31 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "BJ’s joins Costco, Sam’s Club in Thanksgiving Day store closings",
-            "link": "https://www.thestreet.com/retail/bjs-wholesale-club-thanksgiving-2026-black-friday-hours?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 16:29:00 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Costco vs. Dollar General: Which Discount Retailer Is a Better Bet Now?",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/costco-vs-dollar-general-discount-133800362.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 13:38:00 +0000",
-            "tone": "NEUTRAL"
-          }
-        ]
-      },
-      "price": 1086.81,
-      "changePct": -0.45,
-      "bullCount": 54,
-      "bearCount": 0,
-      "scorePct": 89.8,
-      "weightedScore": 0.898,
-      "gateVerdict": "מאושר לכניסה",
-      "waitInstruction": "",
-      "checksSummary": {
-        "total": 66,
-        "passed": 54,
-        "warned": 10,
-        "failed": 0
-      },
-      "breakoutLevel": 1100.22,
-      "supportLevel": 1047.17,
-      "entry": 1078.74,
-      "entryType": "שער כניסה מובחן (תמיכה/מבנה $1078.74)",
-      "deltaToEntryPct": -0.74,
-      "stopLoss": 1038.79,
-      "stopPct": 3.7,
-      "targetPrice": 1143.46,
-      "targetPct": 6.0,
-      "recommendedExit": 1143.46,
-      "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $1143.46 | סטופ $1038.79",
-      "rrRatio": 1.62,
-      "sentiment": {
-        "code": "BULLISH",
-        "label": "שורי"
-      }
-    },
-    {
-      "ticker": "TGT",
-      "news": {
-        "count": 6,
-        "tone": "MIXED",
-        "summaryHe": "ידיעות מעורבות (6 כותרות)",
-        "posHits": 0,
-        "negHits": 0,
-        "items": [
-          {
-            "title": "Target cut its Apple Black Friday discount in half",
-            "link": "https://www.thestreet.com/retail/target-cut-its-apple-black-friday-discount-in-half?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 03:17:00 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Best Buy, Target, Kohl’s bring back classic Black Friday tradition",
-            "link": "https://www.thestreet.com/retail/best-buy-target-and-kohls-try-to-bring-black-friday-back-to-stores?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 02:20:29 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Target, Kohl’s and JCPenney use Black Friday freebies to lure shoppers",
-            "link": "https://www.thestreet.com/retail/black-friday-deals-freebies-2026?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 02:07:25 +0000",
+            "title": "ETFs Bought $98.7 Million of Costco (COST) on Wednesday",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/etfs-bought-98-7-million-110118142.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 11:01:18 +0000",
             "tone": "NEUTRAL"
           },
           {
@@ -265,234 +230,49 @@
           }
         ]
       },
-      "price": 172.22,
-      "changePct": -2.18,
-      "bullCount": 54,
-      "bearCount": 0,
-      "scorePct": 89.8,
-      "weightedScore": 0.898,
-      "gateVerdict": "מאושר לכניסה",
-      "waitInstruction": "",
-      "checksSummary": {
-        "total": 66,
-        "passed": 54,
-        "warned": 10,
-        "failed": 0
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0000909832",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 33,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "TOCQUEVILLE ASSET MANAGEMENT LP  (CIK 0000883961) (2009-02-03)",
+          "TOCQUEVILLE ASSET MANAGEMENT LP  (CIK 0000883961) (2010-04-30)",
+          "TOCQUEVILLE ASSET MANAGEMENT LP  (CIK 0000883961) (2009-10-30)",
+          "TOCQUEVILLE ASSET MANAGEMENT LP  (CIK 0000883961) (2009-12-16)"
+        ],
+        "summaryHe": "33 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
       },
-      "breakoutLevel": 174.6,
-      "supportLevel": 170.36,
-      "entry": 170.36,
-      "entryType": "שער כניסה מובחן (תמיכה/מבנה $170.36)",
-      "deltaToEntryPct": -1.08,
-      "stopLoss": 163.55,
-      "stopPct": 4.0,
-      "targetPrice": 180.58,
-      "targetPct": 6.0,
-      "recommendedExit": 180.58,
-      "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $180.58 | סטופ $163.55",
-      "rrRatio": 1.5,
-      "sentiment": {
-        "code": "BULLISH",
-        "label": "שורי"
-      }
-    },
-    {
-      "ticker": "SBUX",
-      "news": {
-        "count": 6,
-        "tone": "MIXED",
-        "summaryHe": "ידיעות מעורבות (6 כותרות)",
-        "posHits": 0,
-        "negHits": 0,
-        "items": [
-          {
-            "title": "Tim Hortons Could Follow Starbucks With Major China Move",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/tim-hortons-could-starbucks-major-163132268.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 16:31:32 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Starbucks selects banks to sale Japanese business – report",
-            "link": "https://www.verdictfoodservice.com/news/starbucks-selects-banks-to-sale-japanese-business-report/?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 14:27:39 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Starbucks Thanksgiving hours",
-            "link": "https://www.thestreet.com/restaurants/starbucks-open-on-thanksgiving?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 12:00:00 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "This Is One Of Starbucks' Biggest Markets. So Why's It Up For Sale?",
-            "link": "https://finance.yahoo.com/m/e9baf2f4-aaa1-338f-8a8a-282ed072706c/this-is-one-of-starbucks%27.html?.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 18:27:47 +0000",
-            "tone": "NEUTRAL"
-          }
-        ]
-      },
-      "price": 107.74,
-      "changePct": 1.28,
-      "bullCount": 49,
-      "bearCount": 0,
-      "scorePct": 89.0,
-      "weightedScore": 0.89,
-      "gateVerdict": "מאושר לכניסה",
-      "waitInstruction": "",
-      "checksSummary": {
-        "total": 66,
-        "passed": 49,
-        "warned": 10,
-        "failed": 0
-      },
-      "breakoutLevel": 110.7,
-      "supportLevel": 106.45,
-      "entry": 106.45,
-      "entryType": "שער כניסה מובחן (תמיכה/מבנה $106.45)",
-      "deltaToEntryPct": -1.2,
-      "stopLoss": 102.19,
-      "stopPct": 4.0,
-      "targetPrice": 112.84,
-      "targetPct": 6.0,
-      "recommendedExit": 112.84,
-      "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $112.84 | סטופ $102.19",
-      "rrRatio": 1.5,
-      "sentiment": {
-        "code": "BULLISH",
-        "label": "שורי"
-      }
-    },
-    {
-      "ticker": "WMT",
-      "news": {
-        "count": 6,
-        "tone": "MIXED",
-        "summaryHe": "ידיעות מעורבות (6 כותרות)",
-        "posHits": 1,
-        "negHits": 0,
-        "items": [
-          {
-            "title": "PhonePe resumes IPO plans with $15bn valuation target- report",
-            "link": "https://www.electronicpaymentsinternational.com/news/phonepe-resumes-ipo-plans-with-15bn-valuation-target-report/?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 07:40:36 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Forget Walmart: Nike Has More to Lose From Vietnam’s Proposed Tariff of Up to 35%",
-            "link": "https://www.tikr.com/blog/forget-walmart-nike-has-more-to-lose-from-vietnams-proposed-tariff-of-up-to-35?ref=yahoofinance&tlnk=yf-261126-xh7cp5rc&.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 02:22:10 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Walmart (WMT) Stock Gets Fair Value Boost After Q3 Price Target Increases",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/walmart-wmt-stock-gets-fair-021542452.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 02:15:42 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "When Walmart, Target, Costco, and other major retailers open on Black Friday",
-            "link": "https://www.thestreet.com/retail/when-walmart-target-costco-and-other-major-retailers-open-on-black-friday?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 00:37:00 +0000",
-            "tone": "NEUTRAL"
-          }
-        ]
-      },
-      "price": 131.94,
-      "changePct": -0.28,
-      "bullCount": 53,
-      "bearCount": 0,
-      "scorePct": 88.8,
-      "weightedScore": 0.888,
-      "gateVerdict": "מאושר לכניסה",
-      "waitInstruction": "",
-      "checksSummary": {
-        "total": 66,
-        "passed": 53,
-        "warned": 11,
-        "failed": 0
-      },
-      "breakoutLevel": 133.08,
-      "supportLevel": 131.21,
-      "entry": 131.21,
-      "entryType": "שער כניסה מובחן (תמיכה/מבנה $131.21)",
-      "deltaToEntryPct": -0.55,
-      "stopLoss": 125.96,
-      "stopPct": 4.0,
-      "targetPrice": 139.08,
-      "targetPct": 6.0,
-      "recommendedExit": 139.08,
-      "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $139.08 | סטופ $125.96",
-      "rrRatio": 1.5,
-      "sentiment": {
-        "code": "BULLISH",
-        "label": "שורי"
-      }
-    },
-    {
-      "ticker": "HD",
-      "news": {
-        "count": 6,
-        "tone": "MIXED",
-        "summaryHe": "ידיעות מעורבות (6 כותרות)",
-        "posHits": 1,
-        "negHits": 0,
-        "items": [
-          {
-            "title": "Home Depot shoppers can now dodge a classic cart disaster",
-            "link": "https://www.thestreet.com/investing/stocks/home-depot-shoppers-can-now-dodge-a-classic-cart-disaster?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 00:00:00 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Home Depot (HD) Stock Looks Fully Valued On Future Cash Flow",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/home-depot-hd-stock-looks-051458550.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 05:14:58 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Why Home Depot’s Earnings Made Jim Cramer More Bullish on the Stock",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/why-home-depot-earnings-made-185010833.html?.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 18:50:10 +0000",
-            "tone": "POSITIVE"
-          },
-          {
-            "title": "11 Big Funds Bought Home Depot Last Quarter, While 13 Sold. Who’s Right?",
-            "link": "https://www.tikr.com/blog/11-big-funds-bought-home-depot-last-quarter-while-13-sold-whos-right?ref=yahoofinance&tlnk=yf-261125-vm4cw6p7&.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 18:22:43 +0000",
-            "tone": "NEUTRAL"
-          }
-        ]
-      },
-      "price": 361.26,
-      "changePct": 2.14,
-      "bullCount": 53,
+      "price": 1097.81,
+      "changePct": 1.01,
+      "bullCount": 55,
       "bearCount": 1,
-      "scorePct": 88.3,
-      "weightedScore": 0.883,
+      "scorePct": 90.3,
+      "weightedScore": 0.903,
       "gateVerdict": "מאושר לכניסה",
       "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 2.00 | יעד אנליסטים: $1083.69",
+      "institutionalSummary": "33 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 53,
-        "warned": 10,
+        "passed": 55,
+        "warned": 8,
         "failed": 1
       },
-      "breakoutLevel": 364.25,
-      "supportLevel": 350.7,
-      "entry": 364.25,
-      "entryType": "כניסת פריצה מאושרת ($364.25)",
-      "deltaToEntryPct": 0.83,
-      "stopLoss": 349.68,
-      "stopPct": 4.0,
-      "targetPrice": 386.11,
+      "breakoutLevel": 1103.49,
+      "supportLevel": 1086.04,
+      "entry": 1089.96,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $1089.96)",
+      "deltaToEntryPct": -0.72,
+      "stopLoss": 1076.88,
+      "stopPct": 1.2,
+      "targetPrice": 1155.36,
       "targetPct": 6.0,
-      "recommendedExit": 386.11,
+      "recommendedExit": 1155.36,
       "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $386.11 | סטופ $349.68",
-      "rrRatio": 1.5,
+      "exitReason": "יעד $1155.36 | סטופ $1076.88",
+      "rrRatio": 5.0,
       "sentiment": {
         "code": "BULLISH",
         "label": "שורי"
@@ -502,67 +282,83 @@
       "ticker": "META",
       "news": {
         "count": 6,
-        "tone": "MIXED",
-        "summaryHe": "ידיעות מעורבות (6 כותרות)",
-        "posHits": 1,
-        "negHits": 2,
+        "tone": "POSITIVE",
+        "summaryHe": "ידיעות חיוביות (2 מול 0)",
+        "posHits": 2,
+        "negHits": 0,
         "items": [
           {
-            "title": "Michael Burry Shares Stark Warning About AI Boom, as Nvidia, Oracle and Meta Face Surging Debt Insurance Costs",
-            "link": "https://finance.yahoo.com/technology/ai/articles/michael-burry-shares-stark-warning-063128312.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 06:31:28 +0000",
-            "tone": "NEGATIVE"
+            "title": "What Is Meta Platforms (META) Up Against With Australia And EU AI Rules?",
+            "link": "https://finance.yahoo.com/technology/ai/articles/meta-platforms-meta-against-australia-171148667.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:11:48 +0000",
+            "tone": "POSITIVE"
           },
           {
-            "title": "George Soros and 64 Other Big Funds Bought Meta Last Quarter. David Tepper and 33 Others Sold. Who’s Right?",
-            "link": "https://www.tikr.com/blog/george-soros-and-64-other-big-funds-bought-meta-last-quarter-david-tepper-and-33-others-sold-whos-right?ref=yahoofinance&tlnk=yf-261126-jj5cfjgh&.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 18:09:59 +0000",
+            "title": "Meta, Anthropic in Talks to Build AI Data Centers in Japan",
+            "link": "https://finance.yahoo.com/technology/ai/articles/meta-anthropic-talks-build-ai-170949948.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:09:49 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Meta Faces India Lawsuit Over 5.4 Million Content Restrictions",
-            "link": "https://finance.yahoo.com/technology/articles/meta-faces-india-lawsuit-over-180217910.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 18:02:17 +0000",
-            "tone": "NEGATIVE"
+            "title": "Tech Stock Sell-Off: Down 23%, Is Meta a Buy Now?",
+            "link": "https://www.fool.com/investing/2026/11/27/tech-stock-sell-off-down-23-is-meta-a-buy-now/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 16:43:01 +0000",
+            "tone": "NEUTRAL"
           },
           {
-            "title": "Meta Platforms Stocks Jump 3.4% on Reported Amazon Talks Over Muse AI Agent",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/meta-platforms-stocks-jump-3-172338883.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 17:23:38 +0000",
+            "title": "Amazon.com (AMZN) Is Negotiating Muse AI Access To Its Shopping Platform",
+            "link": "https://finance.yahoo.com/technology/ai/articles/amazon-com-amzn-negotiating-muse-161256193.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 16:12:56 +0000",
             "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 609.89,
-      "changePct": 3.4,
-      "bullCount": 53,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001326801",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 24,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "Carroll Investors, Inc  (CIK 0001911400) (2022-04-28)",
+          "Carroll Investors, Inc  (CIK 0001911400) (2022-02-16)",
+          "Adams Wealth Management  (CIK 0001803084) (2023-02-17)",
+          "Adams Wealth Management  (CIK 0001803084) (2022-11-10)"
+        ],
+        "summaryHe": "24 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 628.96,
+      "changePct": 3.13,
+      "bullCount": 55,
       "bearCount": 0,
-      "scorePct": 88.0,
-      "weightedScore": 0.88,
-      "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $651.69 ואז להיכנס",
+      "scorePct": 90.0,
+      "weightedScore": 0.9,
+      "gateVerdict": "מאושר לכניסה",
+      "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 1.42 | יעד אנליסטים: $842.54",
+      "institutionalSummary": "24 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 53,
-        "warned": 12,
+        "passed": 55,
+        "warned": 10,
         "failed": 0
       },
-      "breakoutLevel": 651.69,
-      "supportLevel": 567.75,
-      "entry": 651.69,
-      "entryType": "קנייה רק בפריצת $651.69",
-      "deltaToEntryPct": 6.85,
-      "stopLoss": 594.64,
-      "stopPct": 8.8,
-      "targetPrice": 695.46,
-      "targetPct": 6.7,
-      "recommendedExit": 695.46,
-      "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$651.69: יעד $695.46 | סטופ $594.64",
-      "rrRatio": 0.77,
+      "breakoutLevel": 647.13,
+      "supportLevel": 620.8,
+      "entry": 620.8,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $620.80)",
+      "deltaToEntryPct": -1.3,
+      "stopLoss": 595.97,
+      "stopPct": 4.0,
+      "targetPrice": 658.05,
+      "targetPct": 6.0,
+      "recommendedExit": 658.05,
+      "exitAction": "יעד רווח / סטופ",
+      "exitReason": "יעד $658.05 | סטופ $595.97",
+      "rrRatio": 1.5,
       "sentiment": {
-        "code": "NEUTRAL",
-        "label": "המתנה לפריצה"
+        "code": "BULLISH",
+        "label": "שורי"
       }
     },
     {
@@ -574,6 +370,12 @@
         "posHits": 2,
         "negHits": 0,
         "items": [
+          {
+            "title": "Airbnb CEO Brian Chesky says staff call him a ‘control freak’—but that he learned it from Apple’s Steve Jobs",
+            "link": "https://finance.yahoo.com/small-business/articles/airbnb-ceo-brian-chesky-says-080100881.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 08:01:00 +0000",
+            "tone": "NEUTRAL"
+          },
           {
             "title": "Airbnb vs. Uber Technologies: Which Consumer Stock Is a Better Buy for 2027?",
             "link": "https://www.fool.com/coverage/better-buy/2026/11/24/airbnb-vs-uber-technologies-which-consumer-stock-is-a-better-buy-for-2027/?.tsrc=rss",
@@ -591,112 +393,387 @@
             "link": "https://www.fool.com/coverage/better-buy/2026/11/21/airbnb-vs-doordash-which-stock-is-a-better-buy/?.tsrc=rss",
             "published": "Sat, 21 Nov 2026 19:45:02 +0000",
             "tone": "NEUTRAL"
-          },
-          {
-            "title": "Airbnb’s New $12 Billion Buyback Is Backed by a 35% Free Cash Flow Margin. Here’s What It Means for Shareholders.",
-            "link": "https://www.fool.com/investing/2026/11/21/airbnb-new-usd12-billion-buyback-is-backed-by-a-35-free-cash-flow-margin-what-it-means-for-shareholders/?.tsrc=rss",
-            "published": "Sat, 21 Nov 2026 18:15:15 +0000",
-            "tone": "POSITIVE"
           }
         ]
       },
-      "price": 172.15,
-      "changePct": -0.72,
-      "bullCount": 53,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001559720",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 31,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "BW Gestao de Investimentos Ltda.  (CIK 0001568280) (2023-10-24)",
+          "Wellesley Asset Management  (CIK 0001533551) (2023-11-13)",
+          "Wellesley Asset Management  (CIK 0001533551) (2023-11-13)",
+          "TB Alternative Assets Ltd.  (CIK 0001483503) (2023-10-13)"
+        ],
+        "summaryHe": "31 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 179.16,
+      "changePct": 4.07,
+      "bullCount": 55,
       "bearCount": 0,
-      "scorePct": 88.0,
-      "weightedScore": 0.88,
-      "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $189.94 ואז להיכנס",
+      "scorePct": 90.0,
+      "weightedScore": 0.9,
+      "gateVerdict": "מאושר לכניסה",
+      "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 1.88 | יעד אנליסטים: $205.88",
+      "institutionalSummary": "31 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 53,
-        "warned": 12,
+        "passed": 55,
+        "warned": 10,
         "failed": 0
       },
       "breakoutLevel": 189.94,
-      "supportLevel": 169.12,
-      "entry": 189.94,
-      "entryType": "קנייה רק בפריצת $189.94",
-      "deltaToEntryPct": 10.33,
-      "stopLoss": 167.85,
-      "stopPct": 11.6,
-      "targetPrice": 204.0,
-      "targetPct": 7.4,
-      "recommendedExit": 204.0,
-      "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$189.94: יעד $204.00 | סטופ $167.85",
-      "rrRatio": 0.64,
+      "supportLevel": 177.72,
+      "entry": 177.72,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $177.72)",
+      "deltaToEntryPct": -0.8,
+      "stopLoss": 170.61,
+      "stopPct": 4.0,
+      "targetPrice": 189.94,
+      "targetPct": 6.9,
+      "recommendedExit": 189.94,
+      "exitAction": "יעד רווח / סטופ",
+      "exitReason": "יעד $189.94 | סטופ $170.61",
+      "rrRatio": 1.72,
       "sentiment": {
-        "code": "NEUTRAL",
-        "label": "המתנה לפריצה"
+        "code": "BULLISH",
+        "label": "שורי"
       }
     },
     {
-      "ticker": "UBER",
+      "ticker": "SBUX",
       "news": {
         "count": 6,
         "tone": "MIXED",
         "summaryHe": "ידיעות מעורבות (6 כותרות)",
-        "posHits": 1,
-        "negHits": 2,
+        "posHits": 0,
+        "negHits": 0,
         "items": [
           {
-            "title": "Uber Secures Approximately 87% of Delivery Hero Shares Following End of Additional Acceptance Period",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/uber-secures-approximately-87-delivery-084500592.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 08:45:00 +0000",
-            "tone": "NEGATIVE"
-          },
-          {
-            "title": "Uber’s Driverless Lucid Tests Begin. Lucid’s Robotaxi Order Now Tops Two Years of Deliveries",
-            "link": "https://www.tikr.com/blog/ubers-driverless-lucid-tests-begin-lucids-robotaxi-order-now-tops-two-years-of-deliveries?ref=yahoofinance&tlnk=yf-261126-xq9pc8w2&.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 15:21:15 +0000",
+            "title": "3 ETFs For Owning Starbucks Without The Same Surrounding Risks",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/3-etfs-owning-starbucks-without-121102107.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 12:11:02 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Nvidia is cheap on paper, so why won't the market buy it?",
-            "link": "https://finance.yahoo.com/video/nvidia-is-cheap-on-paper-so-why-wont-the-market-buy-it-192215326.html?.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 19:22:15 +0000",
+            "title": "Tim Hortons Could Follow Starbucks With Major China Move",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/tim-hortons-could-starbucks-major-163132268.html?.tsrc=rss",
+            "published": "Thu, 26 Nov 2026 16:31:32 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Anthony Scaramucci Told Uber’s Founders to ‘Get The Hell Out of My Office’ Before Passing On $500,000 Investment: ‘I Totally Missed It’",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/anthony-scaramucci-told-uber-founders-190006039.html?.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 19:00:06 +0000",
-            "tone": "NEGATIVE"
+            "title": "Starbucks selects banks to sale Japanese business – report",
+            "link": "https://www.verdictfoodservice.com/news/starbucks-selects-banks-to-sale-japanese-business-report/?.tsrc=rss",
+            "published": "Thu, 26 Nov 2026 14:27:39 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Starbucks Thanksgiving hours",
+            "link": "https://www.thestreet.com/restaurants/starbucks-open-on-thanksgiving?.tsrc=rss",
+            "published": "Thu, 26 Nov 2026 12:00:00 +0000",
+            "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 66.35,
-      "changePct": 2.55,
-      "bullCount": 51,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0000829224",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 30,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "Live Oak Investment Partners  (CIK 0001822262) (2024-02-14)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2023-10-31)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2023-05-03)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2023-07-13)"
+        ],
+        "summaryHe": "30 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 108.8,
+      "changePct": 0.98,
+      "bullCount": 49,
       "bearCount": 0,
-      "scorePct": 86.8,
-      "weightedScore": 0.868,
-      "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $71.45 ואז להיכנס",
+      "scorePct": 89.0,
+      "weightedScore": 0.89,
+      "gateVerdict": "מאושר לכניסה",
+      "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 2.33 | יעד אנליסטים: $111.07",
+      "institutionalSummary": "30 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 51,
-        "warned": 13,
+        "passed": 49,
+        "warned": 10,
         "failed": 0
       },
-      "breakoutLevel": 71.45,
-      "supportLevel": 63.57,
-      "entry": 71.45,
-      "entryType": "קנייה רק בפריצת $71.45",
-      "deltaToEntryPct": 7.69,
-      "stopLoss": 64.69,
-      "stopPct": 9.5,
-      "targetPrice": 76.08,
-      "targetPct": 6.5,
-      "recommendedExit": 76.08,
-      "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$71.45: יעד $76.08 | סטופ $64.69",
-      "rrRatio": 0.68,
+      "breakoutLevel": 110.7,
+      "supportLevel": 107.75,
+      "entry": 107.75,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $107.75)",
+      "deltaToEntryPct": -0.97,
+      "stopLoss": 103.44,
+      "stopPct": 4.0,
+      "targetPrice": 114.22,
+      "targetPct": 6.0,
+      "recommendedExit": 114.22,
+      "exitAction": "יעד רווח / סטופ",
+      "exitReason": "יעד $114.22 | סטופ $103.44",
+      "rrRatio": 1.5,
       "sentiment": {
-        "code": "NEUTRAL",
-        "label": "המתנה לפריצה"
+        "code": "BULLISH",
+        "label": "שורי"
+      }
+    },
+    {
+      "ticker": "TGT",
+      "news": {
+        "count": 6,
+        "tone": "POSITIVE",
+        "summaryHe": "ידיעות חיוביות (2 מול 0)",
+        "posHits": 2,
+        "negHits": 0,
+        "items": [
+          {
+            "title": "Target stock technicals amid Black Friday",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/target-stock-technicals-amid-black-155558089.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 15:55:58 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Target’s Former CEO Just Sold $4.4 Million of Stock Heading Into Black Friday",
+            "link": "https://247wallst.com/investing/2026/11/27/targets-former-ceo-just-sold-4-4-million-of-stock-heading-into-black-friday/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 15:08:34 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "3 Retail Dividend Stocks to Watch This Black Friday",
+            "link": "https://247wallst.com/investing/2026/11/27/3-retail-dividend-stocks-to-watch-this-black-friday/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 14:37:52 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Black Friday Deals, Record Online Sales Put These ETFs in Focus",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/black-friday-deals-record-online-120000267.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 12:00:00 +0000",
+            "tone": "POSITIVE"
+          }
+        ]
+      },
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0000027419",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 25,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "NICOLET BANKSHARES INC  (NIC)  (CIK 0001174850) (2022-08-08)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2025-02-06)",
+          "SECURITY BANC CORP  (CIK 0000763956) (2001-10-10)",
+          "1838 INVESTMENT ADVISORS, LP  (CIK 0001077487) (2005-07-20)"
+        ],
+        "summaryHe": "25 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 171.97,
+      "changePct": -0.15,
+      "bullCount": 53,
+      "bearCount": 0,
+      "scorePct": 88.8,
+      "weightedScore": 0.888,
+      "gateVerdict": "מאושר לכניסה",
+      "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 2.49 | יעד אנליסטים: $172.54",
+      "institutionalSummary": "25 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
+      "checksSummary": {
+        "total": 66,
+        "passed": 53,
+        "warned": 11,
+        "failed": 0
+      },
+      "breakoutLevel": 175.28,
+      "supportLevel": 171.15,
+      "entry": 171.15,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $171.15)",
+      "deltaToEntryPct": -0.48,
+      "stopLoss": 164.3,
+      "stopPct": 4.0,
+      "targetPrice": 181.42,
+      "targetPct": 6.0,
+      "recommendedExit": 181.42,
+      "exitAction": "יעד רווח / סטופ",
+      "exitReason": "יעד $181.42 | סטופ $164.30",
+      "rrRatio": 1.5,
+      "sentiment": {
+        "code": "BULLISH",
+        "label": "שורי"
+      }
+    },
+    {
+      "ticker": "WMT",
+      "news": {
+        "count": 6,
+        "tone": "POSITIVE",
+        "summaryHe": "ידיעות חיוביות (4 מול 0)",
+        "posHits": 4,
+        "negHits": 0,
+        "items": [
+          {
+            "title": "How AI is driving record holiday spending",
+            "link": "https://finance.yahoo.com/video/how-ai-is-driving-record-holiday-spending-154808415.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 15:48:08 +0000",
+            "tone": "POSITIVE"
+          },
+          {
+            "title": "Stock Market Midday, Nov. 27: Tech Stocks Recover and Amazon Posts Black Friday Gains",
+            "link": "https://www.fool.com/coverage/stock-market-today/2026/11/27/stock-market-midday-nov-27-tech-stocks-recover-and-amazon-posts-black-friday-gains/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:31:17 +0000",
+            "tone": "POSITIVE"
+          },
+          {
+            "title": "7 Highest Paying Retail Jobs for 2027",
+            "link": "https://moneylion.com/trending/money/highest-paying-retail-jobs-2027?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:00:41 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Walmart technical outlook amid Black Friday",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/walmart-technical-outlook-amid-black-155256189.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 15:52:56 +0000",
+            "tone": "NEUTRAL"
+          }
+        ]
+      },
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0000104169",
+        "recentFilingsCount": 1005,
+        "recentForm4Count": 36,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "ORG Partners LLC  (CIK 0001979372) (2023-11-03)",
+          "ORG Partners LLC  (CIK 0001979372) (2023-11-13)",
+          "OAK HILL PLATINUM PARTNERS LLC  (CIK 0001275565) (2005-02-08)",
+          "SELECT EQUITY GROUP INC  (CIK 0001126116) (2012-05-15)"
+        ],
+        "summaryHe": "36 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 133.13,
+      "changePct": 0.9,
+      "bullCount": 53,
+      "bearCount": 1,
+      "scorePct": 88.3,
+      "weightedScore": 0.883,
+      "gateVerdict": "מאושר לכניסה",
+      "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 1.55 | יעד אנליסטים: $136.80",
+      "institutionalSummary": "36 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
+      "checksSummary": {
+        "total": 66,
+        "passed": 53,
+        "warned": 10,
+        "failed": 1
+      },
+      "breakoutLevel": 133.86,
+      "supportLevel": 131.68,
+      "entry": 131.97,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $131.97)",
+      "deltaToEntryPct": -0.87,
+      "stopLoss": 130.39,
+      "stopPct": 1.2,
+      "targetPrice": 139.89,
+      "targetPct": 6.0,
+      "recommendedExit": 139.89,
+      "exitAction": "יעד רווח / סטופ",
+      "exitReason": "יעד $139.89 | סטופ $130.39",
+      "rrRatio": 5.01,
+      "sentiment": {
+        "code": "BULLISH",
+        "label": "שורי"
+      }
+    },
+    {
+      "ticker": "HD",
+      "news": {
+        "count": 6,
+        "tone": "POSITIVE",
+        "summaryHe": "ידיעות חיוביות (2 מול 0)",
+        "posHits": 2,
+        "negHits": 0,
+        "items": [
+          {
+            "title": "Is Home Depot Stock Outperforming the S&P 500?",
+            "link": "https://www.barchart.com/story/news/9029779/is-home-depot-stock-outperforming-the-s-p-500?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 10:11:26 +0000",
+            "tone": "POSITIVE"
+          },
+          {
+            "title": "Home Depot shoppers can now dodge a classic cart disaster",
+            "link": "https://www.thestreet.com/investing/stocks/home-depot-shoppers-can-now-dodge-a-classic-cart-disaster?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 00:00:00 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Home Depot (HD) Stock Looks Fully Valued On Future Cash Flow",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/home-depot-hd-stock-looks-051458550.html?.tsrc=rss",
+            "published": "Thu, 26 Nov 2026 05:14:58 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Why Home Depot’s Earnings Made Jim Cramer More Bullish on the Stock",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/why-home-depot-earnings-made-185010833.html?.tsrc=rss",
+            "published": "Wed, 25 Nov 2026 18:50:10 +0000",
+            "tone": "POSITIVE"
+          }
+        ]
+      },
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0000354950",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 30,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "ALBERT D MASON INC  (CIK 0001169318) (2004-08-11)",
+          "ALBERT D MASON INC  (CIK 0001169318) (2004-11-05)",
+          "ALBERT D MASON INC  (CIK 0001169318) (2003-11-07)",
+          "ALBERT D MASON INC  (CIK 0001169318) (2004-02-17)"
+        ],
+        "summaryHe": "30 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 361.35,
+      "changePct": 0.02,
+      "bullCount": 52,
+      "bearCount": 1,
+      "scorePct": 87.3,
+      "weightedScore": 0.873,
+      "gateVerdict": "מאושר לכניסה",
+      "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 1.89 | יעד אנליסטים: $375.41",
+      "institutionalSummary": "30 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
+      "checksSummary": {
+        "total": 66,
+        "passed": 52,
+        "warned": 11,
+        "failed": 1
+      },
+      "breakoutLevel": 363.98,
+      "supportLevel": 358.1,
+      "entry": 358.1,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $358.10)",
+      "deltaToEntryPct": -0.9,
+      "stopLoss": 343.78,
+      "stopPct": 4.0,
+      "targetPrice": 379.59,
+      "targetPct": 6.0,
+      "recommendedExit": 379.59,
+      "exitAction": "יעד רווח / סטופ",
+      "exitReason": "יעד $379.59 | סטופ $343.78",
+      "rrRatio": 1.5,
+      "sentiment": {
+        "code": "BULLISH",
+        "label": "שורי"
       }
     },
     {
@@ -708,6 +785,12 @@
         "posHits": 1,
         "negHits": 1,
         "items": [
+          {
+            "title": "For Nike, a comeback is a marathon and not a sprint",
+            "link": "https://www.cnn.com/2026/11/27/business/nike-comeback-turnaround-plan?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 12:00:15 +0000",
+            "tone": "NEUTRAL"
+          },
           {
             "title": "Forget Walmart: Nike Has More to Lose From Vietnam’s Proposed Tariff of Up to 35%",
             "link": "https://www.tikr.com/blog/forget-walmart-nike-has-more-to-lose-from-vietnams-proposed-tariff-of-up-to-35?ref=yahoofinance&tlnk=yf-261126-xh7cp5rc&.tsrc=rss",
@@ -725,45 +808,55 @@
             "link": "https://finance.yahoo.com/markets/stocks/articles/nike-slumped-34-yet-apparel-144519189.html?.tsrc=rss",
             "published": "Thu, 26 Nov 2026 14:45:19 +0000",
             "tone": "POSITIVE"
-          },
-          {
-            "title": "Has NIKE (NKE) Fallen Far Enough to Look Undervalued?",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/nike-nke-fallen-far-enough-221034554.html?.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 22:10:34 +0000",
-            "tone": "NEGATIVE"
           }
         ]
       },
-      "price": 36.66,
-      "changePct": 2.55,
-      "bullCount": 48,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0000320187",
+        "recentFilingsCount": 1001,
+        "recentForm4Count": 36,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "Live Oak Investment Partners  (CIK 0001822262) (2025-02-06)",
+          "STONEBROOK FUND MANAGEMENT LLC  (CIK 0001265386) (2006-11-07)",
+          "RPF Equity Advisors, LLC  (CIK 0001427517) (2009-02-13)",
+          "SELECT EQUITY GROUP INC  (CIK 0001126116) (2007-11-14)"
+        ],
+        "summaryHe": "36 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 37.31,
+      "changePct": 1.76,
+      "bullCount": 49,
       "bearCount": 0,
-      "scorePct": 85.3,
-      "weightedScore": 0.853,
-      "gateVerdict": "מאושר לכניסה",
-      "waitInstruction": "",
+      "scorePct": 86.4,
+      "weightedScore": 0.864,
+      "gateVerdict": "המתן לפריצה בשער",
+      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $40.88 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 2.93 | יעד אנליסטים: $36.50",
+      "institutionalSummary": "36 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 48,
-        "warned": 14,
+        "passed": 49,
+        "warned": 13,
         "failed": 0
       },
       "breakoutLevel": 40.88,
-      "supportLevel": 35.46,
-      "entry": 36.0,
-      "entryType": "שער כניסה מובחן (תמיכה/מבנה $36.00)",
-      "deltaToEntryPct": -1.8,
-      "stopLoss": 35.18,
-      "stopPct": 2.3,
-      "targetPrice": 40.88,
-      "targetPct": 13.6,
-      "recommendedExit": 40.88,
-      "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $40.88 | סטופ $35.18",
-      "rrRatio": 5.95,
+      "supportLevel": 36.69,
+      "entry": 40.88,
+      "entryType": "קנייה רק בפריצת $40.88",
+      "deltaToEntryPct": 9.58,
+      "stopLoss": 36.37,
+      "stopPct": 11.0,
+      "targetPrice": 43.92,
+      "targetPct": 7.4,
+      "recommendedExit": 43.92,
+      "exitAction": "יעד פריצה / סטופ",
+      "exitReason": "לאחר פריצה ב-$40.88: יעד $43.92 | סטופ $36.37",
+      "rrRatio": 0.67,
       "sentiment": {
-        "code": "BULLISH",
-        "label": "שורי"
+        "code": "NEUTRAL",
+        "label": "המתנה לפריצה"
       }
     },
     {
@@ -776,6 +869,18 @@
         "negHits": 0,
         "items": [
           {
+            "title": "The Best 3 Stocks to Buy in December to Hold Into 2027",
+            "link": "https://www.fool.com/investing/2026/11/27/the-best-3-stocks-to-buy-in-december-to-hold-into-2027/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:57:02 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Is Netflix Stock Underperforming the Nasdaq?",
+            "link": "https://www.barchart.com/story/news/9028797/is-netflix-stock-underperforming-the-nasdaq?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 08:51:57 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
             "title": "Here's What Would Prove Me Wrong About Netflix Stock",
             "link": "https://www.fool.com/investing/2026/11/26/here-s-what-would-prove-me-wrong-about-netflix-stock/?.tsrc=rss",
             "published": "Thu, 26 Nov 2026 18:01:02 +0000",
@@ -786,51 +891,221 @@
             "link": "https://finance.yahoo.com/media-advertising/articles/nfls-thanksgiving-boom-raises-stakes-174228885.html?.tsrc=rss",
             "published": "Thu, 26 Nov 2026 17:42:28 +0000",
             "tone": "NEUTRAL"
+          }
+        ]
+      },
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001065280",
+        "recentFilingsCount": 1004,
+        "recentForm4Count": 44,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "Live Oak Investment Partners  (CIK 0001822262) (2024-11-05)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2024-07-16)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2025-02-06)",
+          "GOLDMAN JAY G  (CIK 0001233099) (2004-11-09)"
+        ],
+        "summaryHe": "44 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 60.93,
+      "changePct": 2.56,
+      "bullCount": 51,
+      "bearCount": 0,
+      "scorePct": 86.0,
+      "weightedScore": 0.86,
+      "gateVerdict": "המתן לפריצה בשער",
+      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $64.62 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 1.92 | יעד אנליסטים: $84.55",
+      "institutionalSummary": "44 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
+      "checksSummary": {
+        "total": 66,
+        "passed": 51,
+        "warned": 14,
+        "failed": 0
+      },
+      "breakoutLevel": 64.62,
+      "supportLevel": 59.99,
+      "entry": 64.62,
+      "entryType": "קנייה רק בפריצת $64.62",
+      "deltaToEntryPct": 6.06,
+      "stopLoss": 59.41,
+      "stopPct": 8.1,
+      "targetPrice": 68.5,
+      "targetPct": 6.0,
+      "recommendedExit": 68.5,
+      "exitAction": "יעד פריצה / סטופ",
+      "exitReason": "לאחר פריצה ב-$64.62: יעד $68.50 | סטופ $59.41",
+      "rrRatio": 0.74,
+      "sentiment": {
+        "code": "NEUTRAL",
+        "label": "המתנה לפריצה"
+      }
+    },
+    {
+      "ticker": "UBER",
+      "news": {
+        "count": 6,
+        "tone": "MIXED",
+        "summaryHe": "ידיעות מעורבות (6 כותרות)",
+        "posHits": 1,
+        "negHits": 0,
+        "items": [
+          {
+            "title": "Why Uber Stock Is Moving Today",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/why-uber-stock-moving-today-180127291.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:01:27 +0000",
+            "tone": "NEUTRAL"
           },
           {
-            "title": "Netflix Stock Is Down 36% in 2026. Can Its Disney Partnership Make It a Buy Again?",
-            "link": "https://247wallst.com/investing/2026/11/26/netflix-stock-is-down-36-in-2026-can-its-disney-partnership-make-it-a-buy-again/?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 16:38:57 +0000",
-            "tone": "POSITIVE"
+            "title": "Uber Moves Closer To Delivery Hero Acquisition With 87% Stake",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/uber-moves-closer-delivery-hero-163636526.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 16:36:36 +0000",
+            "tone": "NEUTRAL"
           },
           {
-            "title": "Netflix vs. Apple: Which Streaming Stock Has an Edge Right Now?",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/netflix-vs-apple-streaming-stock-142100099.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 14:21:00 +0000",
+            "title": "Uber takeover bid for Delivery Hero clears key shareholder hurdle",
+            "link": "https://www.proactiveinvestors.com/companies/news/1102590/uber-takeover-bid-for-delivery-hero-clears-key-shareholder-hurdle-1102590.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 15:25:00 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Uber Moves Closer to Massive $14.8 Billion Takeover",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/uber-moves-closer-massive-14-141753945.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 14:17:53 +0000",
             "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 59.41,
-      "changePct": 0.92,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001543151",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 39,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "Liberty Mutual Group Asset Management Inc.  (CIK 0001533497) (2026-11-13)",
+          "MAPLELANE CAPITAL, LLC  (CIK 0001512173) (2023-11-14)",
+          "Liberty Mutual Group Asset Management Inc.  (CIK 0001533497) (2026-08-14)",
+          "Watts Gwilliam & Co., LLC  (CIK 0001657733) (2025-05-13)"
+        ],
+        "summaryHe": "39 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 66.63,
+      "changePct": 0.42,
       "bullCount": 50,
-      "bearCount": 1,
-      "scorePct": 84.5,
-      "weightedScore": 0.845,
-      "gateVerdict": "מאושר לכניסה",
-      "waitInstruction": "",
+      "bearCount": 0,
+      "scorePct": 85.8,
+      "weightedScore": 0.858,
+      "gateVerdict": "המתן לפריצה בשער",
+      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $71.24 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 1.58 | יעד אנליסטים: $98.16",
+      "institutionalSummary": "39 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
         "passed": 50,
         "warned": 14,
-        "failed": 1
+        "failed": 0
       },
-      "breakoutLevel": 64.88,
-      "supportLevel": 57.03,
-      "entry": 58.54,
-      "entryType": "שער כניסה מובחן (תמיכה/מבנה $58.54)",
-      "deltaToEntryPct": -1.46,
-      "stopLoss": 56.57,
-      "stopPct": 3.4,
-      "targetPrice": 64.88,
-      "targetPct": 10.8,
-      "recommendedExit": 64.88,
-      "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $64.88 | סטופ $56.57",
-      "rrRatio": 3.22,
+      "breakoutLevel": 71.24,
+      "supportLevel": 63.29,
+      "entry": 71.24,
+      "entryType": "קנייה רק בפריצת $71.24",
+      "deltaToEntryPct": 6.92,
+      "stopLoss": 64.96,
+      "stopPct": 8.8,
+      "targetPrice": 75.78,
+      "targetPct": 6.4,
+      "recommendedExit": 75.78,
+      "exitAction": "יעד פריצה / סטופ",
+      "exitReason": "לאחר פריצה ב-$71.24: יעד $75.78 | סטופ $64.96",
+      "rrRatio": 0.72,
       "sentiment": {
-        "code": "BULLISH",
-        "label": "שורי"
+        "code": "NEUTRAL",
+        "label": "המתנה לפריצה"
+      }
+    },
+    {
+      "ticker": "AMZN",
+      "news": {
+        "count": 6,
+        "tone": "POSITIVE",
+        "summaryHe": "ידיעות חיוביות (4 מול 2)",
+        "posHits": 4,
+        "negHits": 2,
+        "items": [
+          {
+            "title": "The Best 3 Stocks to Buy in December to Hold Into 2027",
+            "link": "https://www.fool.com/investing/2026/11/27/the-best-3-stocks-to-buy-in-december-to-hold-into-2027/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:57:02 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Stock Market Midday, Nov. 27: Tech Stocks Recover and Amazon Posts Black Friday Gains",
+            "link": "https://www.fool.com/coverage/stock-market-today/2026/11/27/stock-market-midday-nov-27-tech-stocks-recover-and-amazon-posts-black-friday-gains/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:31:17 +0000",
+            "tone": "POSITIVE"
+          },
+          {
+            "title": "Does Amazon's Profit Hang On One Business?",
+            "link": "https://www.trefis.com/stock/amzn/articles/629380/does-amazon-s-profit-hang-on-one-business/2026-11-27?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:31:14 +0000",
+            "tone": "POSITIVE"
+          },
+          {
+            "title": "Sector Update: Tech Stocks Gain Friday Afternoon",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/sector-tech-stocks-gain-friday-172702126.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:27:02 +0000",
+            "tone": "NEUTRAL"
+          }
+        ]
+      },
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001018724",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 28,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "BW Gestao de Investimentos Ltda.  (CIK 0001568280) (2023-02-09)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2024-11-05)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2024-07-16)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2025-02-06)"
+        ],
+        "summaryHe": "28 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 254.12,
+      "changePct": 3.96,
+      "bullCount": 47,
+      "bearCount": 0,
+      "scorePct": 83.5,
+      "weightedScore": 0.835,
+      "gateVerdict": "המתן לפריצה בשער",
+      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $275.37 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 1.32 | יעד אנליסטים: $326.34",
+      "institutionalSummary": "28 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
+      "checksSummary": {
+        "total": 66,
+        "passed": 47,
+        "warned": 16,
+        "failed": 0
+      },
+      "breakoutLevel": 275.37,
+      "supportLevel": 248.45,
+      "entry": 275.37,
+      "entryType": "קנייה רק בפריצת $275.37",
+      "deltaToEntryPct": 8.36,
+      "stopLoss": 247.77,
+      "stopPct": 10.0,
+      "targetPrice": 294.87,
+      "targetPct": 7.1,
+      "recommendedExit": 294.87,
+      "exitAction": "יעד פריצה / סטופ",
+      "exitReason": "לאחר פריצה ב-$275.37: יעד $294.87 | סטופ $247.77",
+      "rrRatio": 0.71,
+      "sentiment": {
+        "code": "NEUTRAL",
+        "label": "המתנה לפריצה"
       }
     },
     {
@@ -838,63 +1113,162 @@
       "news": {
         "count": 6,
         "tone": "POSITIVE",
-        "summaryHe": "ידיעות חיוביות (2 מול 0)",
-        "posHits": 2,
+        "summaryHe": "ידיעות חיוביות (3 מול 0)",
+        "posHits": 3,
         "negHits": 0,
         "items": [
           {
-            "title": "Palantir Stocks Rise 1.5% After Peter Thiel Discloses a $122 Million Share Purchase",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/palantir-stocks-rise-1-5-183642789.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 18:36:42 +0000",
+            "title": "Peter Thiel Takes $122M of Palantir Off the Market",
+            "link": "https://app.moby.co/home/news/news-peter-thiel-takes-122m-of-palantir-off-the-market?utm_source=yahoo_finance&utm_medium=rss&.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:29:33 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Palantir Closed 212 Deals Worth at Least $1 Million. Here’s What That Means for Its Growth",
-            "link": "https://247wallst.com/investing/2026/11/26/palantir-closed-212-deals-worth-at-least-1-million-heres-what-that-means-for-its-growth/?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 16:03:27 +0000",
+            "title": "Palantir Lands Major Defense Deal as European Demand Grows",
+            "link": "https://finance.yahoo.com/technology/articles/palantir-lands-major-defense-deal-175756769.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:57:56 +0000",
             "tone": "POSITIVE"
           },
           {
-            "title": "Michael Burry flips mostly long as tech stocks slide",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/michael-burry-flips-mostly-long-112229765.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 11:22:29 +0000",
+            "title": "The Best 3 Stocks to Buy in December to Hold Into 2027",
+            "link": "https://www.fool.com/investing/2026/11/27/the-best-3-stocks-to-buy-in-december-to-hold-into-2027/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:57:02 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Palantir (PLTR) Sees $45.5 Million in Net ETF Buying on Nov. 24",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/palantir-pltr-sees-45-5-110110910.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 11:01:10 +0000",
+            "title": "Palantir Raised Its 2026 Growth Outlook to 91%. Could the Stock Have More Room to Run?",
+            "link": "https://247wallst.com/investing/2026/11/27/palantir-raised-its-2026-growth-outlook-to-91-could-the-stock-have-more-room-to-run/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:33:36 +0000",
+            "tone": "POSITIVE"
+          }
+        ]
+      },
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001321655",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 33,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "CTC LLC  (CIK 0001445893) (2021-11-16)",
+          "CTC LLC  (CIK 0001445893) (2021-07-20)",
+          "CTC LLC  (CIK 0001445893) (2021-05-07)",
+          "CTC LLC  (CIK 0001445893) (2021-11-16)"
+        ],
+        "summaryHe": "33 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 172.17,
+      "changePct": 5.24,
+      "bullCount": 49,
+      "bearCount": 2,
+      "scorePct": 82.9,
+      "weightedScore": 0.829,
+      "gateVerdict": "לא להיכנס",
+      "waitInstruction": "לא להיכנס — להמתין שירד לשער $169.27 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 1.76 | יעד אנליסטים: $222.90",
+      "institutionalSummary": "33 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
+      "checksSummary": {
+        "total": 66,
+        "passed": 49,
+        "warned": 14,
+        "failed": 2
+      },
+      "breakoutLevel": 173.92,
+      "supportLevel": 169.27,
+      "entry": 169.27,
+      "entryType": "להמתין שירד לשער $169.27 ואז להיכנס",
+      "deltaToEntryPct": -1.68,
+      "stopLoss": 162.5,
+      "stopPct": 4.0,
+      "targetPrice": 179.43,
+      "targetPct": 6.0,
+      "recommendedExit": 179.43,
+      "exitAction": "המתן לשער כניסה",
+      "exitReason": "בכניסה ב-$169.27: יעד $179.43 | סטופ $162.50",
+      "rrRatio": 1.5,
+      "sentiment": {
+        "code": "BEARISH",
+        "label": "דובי/המתנה"
+      }
+    },
+    {
+      "ticker": "GOOGL",
+      "news": {
+        "count": 6,
+        "tone": "MIXED",
+        "summaryHe": "ידיעות מעורבות (6 כותרות)",
+        "posHits": 0,
+        "negHits": 0,
+        "items": [
+          {
+            "title": "PLTR vs. ARM: Which AI-Tech Stock is Better Positioned Now?",
+            "link": "https://finance.yahoo.com/technology/ai/articles/pltr-vs-arm-ai-tech-165200990.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 16:52:00 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "AppLovin vs. Magnite: Which Technology Stock Is a Better Buy for 2027?",
+            "link": "https://www.fool.com/coverage/better-buy/2026/11/27/applovin-vs-magnite-which-technology-stock-is-a-better-buy-for-2027/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:16:14 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "What Does Alphabet (GOOGL) Need To Prove After The Air Force Cloud Breach?",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/does-alphabet-googl-prove-air-181025421.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:10:25 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Franklin Templeton Flags Hidden Risk in S&P 500 Investing",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/franklin-templeton-flags-hidden-risk-180023148.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:00:23 +0000",
             "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 163.59,
-      "changePct": 1.5,
-      "bullCount": 48,
-      "bearCount": 1,
-      "scorePct": 82.5,
-      "weightedScore": 0.825,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001652044",
+        "recentFilingsCount": 1001,
+        "recentForm4Count": 39,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "BW Gestao de Investimentos Ltda.  (CIK 0001568280) (2021-07-26)",
+          "BW Gestao de Investimentos Ltda.  (CIK 0001568280) (2021-11-01)",
+          "BW Gestao de Investimentos Ltda.  (CIK 0001568280) (2022-02-03)",
+          "BW Gestao de Investimentos Ltda.  (CIK 0001568280) (2021-05-03)"
+        ],
+        "summaryHe": "39 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 274.96,
+      "changePct": 0.68,
+      "bullCount": 47,
+      "bearCount": 0,
+      "scorePct": 82.7,
+      "weightedScore": 0.827,
       "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $176.29 ואז להיכנס",
+      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $298.78 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 1.38 | יעד אנליסטים: $395.11",
+      "institutionalSummary": "39 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 48,
-        "warned": 16,
-        "failed": 1
+        "passed": 47,
+        "warned": 17,
+        "failed": 0
       },
-      "breakoutLevel": 176.29,
-      "supportLevel": 151.51,
-      "entry": 176.29,
-      "entryType": "קנייה רק בפריצת $176.29",
-      "deltaToEntryPct": 7.76,
-      "stopLoss": 159.5,
-      "stopPct": 9.5,
-      "targetPrice": 192.87,
-      "targetPct": 9.4,
-      "recommendedExit": 192.87,
+      "breakoutLevel": 298.78,
+      "supportLevel": 270.03,
+      "entry": 298.78,
+      "entryType": "קנייה רק בפריצת $298.78",
+      "deltaToEntryPct": 8.66,
+      "stopLoss": 268.09,
+      "stopPct": 10.3,
+      "targetPrice": 319.91,
+      "targetPct": 7.1,
+      "recommendedExit": 319.91,
       "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$176.29: יעד $192.87 | סטופ $159.50",
-      "rrRatio": 0.99,
+      "exitReason": "לאחר פריצה ב-$298.78: יעד $319.91 | סטופ $268.09",
+      "rrRatio": 0.69,
       "sentiment": {
         "code": "NEUTRAL",
         "label": "המתנה לפריצה"
@@ -909,6 +1283,12 @@
         "posHits": 2,
         "negHits": 0,
         "items": [
+          {
+            "title": "Can Booking Holdings Stock Hit $210?",
+            "link": "https://www.trefis.com/stock/bkng/articles/629365/can-booking-holdings-stock-hit-210/2026-11-27?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 12:47:35 +0000",
+            "tone": "NEUTRAL"
+          },
           {
             "title": "What Are Wall Street Analysts' Target Price for Booking Holdings Stock?",
             "link": "https://www.barchart.com/story/news/9019923/what-are-wall-street-analysts-target-price-for-booking-holdings-stock?.tsrc=rss",
@@ -926,23 +1306,33 @@
             "link": "https://www.trefis.com/stock/bkng/articles/628858/how-far-did-booking-stock-trail-the-market/2026-11-25?.tsrc=rss",
             "published": "Wed, 25 Nov 2026 11:52:50 +0000",
             "tone": "NEUTRAL"
-          },
-          {
-            "title": "Booking Holdings (BKNG) Says It Plans To Acquire An Australian Restaurant Tech Firm",
-            "link": "https://finance.yahoo.com/technology/ai/articles/booking-holdings-bkng-says-plans-111255689.html?.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 11:12:55 +0000",
-            "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 149.5,
-      "changePct": 1.95,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001075531",
+        "recentFilingsCount": 1000,
+        "recentForm4Count": 27,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "CTC LLC  (CIK 0001445893) (2020-08-06)",
+          "CTC LLC  (CIK 0001445893) (2020-11-04)",
+          "CTC LLC  (CIK 0001445893) (2020-04-09)",
+          "MARSHALL WACE, LLP  (CIK 0001318757) (2022-08-15)"
+        ],
+        "summaryHe": "27 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 150.39,
+      "changePct": 0.6,
       "bullCount": 45,
       "bearCount": 0,
       "scorePct": 82.2,
       "weightedScore": 0.822,
       "gateVerdict": "מאושר לכניסה",
       "waitInstruction": "",
+      "analystSummary": "ממוצע המלצות: 1.56 | יעד אנליסטים: $215.06",
+      "institutionalSummary": "27 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
         "passed": 45,
@@ -950,18 +1340,18 @@
         "failed": 0
       },
       "breakoutLevel": 166.22,
-      "supportLevel": 143.86,
-      "entry": 146.95,
-      "entryType": "שער כניסה מובחן (תמיכה/מבנה $146.95)",
-      "deltaToEntryPct": -1.71,
-      "stopLoss": 142.71,
-      "stopPct": 2.9,
+      "supportLevel": 149.29,
+      "entry": 149.29,
+      "entryType": "שער כניסה מובחן (תמיכה/מבנה $149.29)",
+      "deltaToEntryPct": -0.73,
+      "stopLoss": 143.32,
+      "stopPct": 4.0,
       "targetPrice": 166.22,
-      "targetPct": 13.1,
+      "targetPct": 11.3,
       "recommendedExit": 166.22,
       "exitAction": "יעד רווח / סטופ",
-      "exitReason": "יעד $166.22 | סטופ $142.71",
-      "rrRatio": 4.54,
+      "exitReason": "יעד $166.22 | סטופ $143.32",
+      "rrRatio": 2.84,
       "sentiment": {
         "code": "BULLISH",
         "label": "שורי"
@@ -971,201 +1361,83 @@
       "ticker": "TSLA",
       "news": {
         "count": 6,
-        "tone": "MIXED",
-        "summaryHe": "ידיעות מעורבות (6 כותרות)",
-        "posHits": 1,
-        "negHits": 1,
-        "items": [
-          {
-            "title": "Elon Musk Offers Samsung Long-Term Chip Deals and Factory Funding, Gets Brushed Off: 'Everyone Else Was Offering That'",
-            "link": "https://finance.yahoo.com/technology/articles/elon-musk-offers-samsung-long-064455133.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 06:44:55 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "‘How Can TSLA Compete With Waymo?’ Gary Black Questions Tesla’s Robotaxi Strategy, Predicts Waymo Will Lead in Miles and Trips",
-            "link": "https://finance.yahoo.com/technology/articles/tsla-compete-waymo-gary-black-013007370.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 01:30:07 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "What Could Tesla (TSLA) Merger Talks Mean For Its Stock?",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/could-tesla-tsla-merger-talks-013007632.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 01:30:07 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Should You Buy Tesla Stock Before December?",
-            "link": "https://www.fool.com/investing/2026/11/26/should-you-buy-tesla-stock-before-december/?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 22:35:02 +0000",
-            "tone": "NEUTRAL"
-          }
-        ]
-      },
-      "price": 380.14,
-      "changePct": -1.18,
-      "bullCount": 45,
-      "bearCount": 1,
-      "scorePct": 81.6,
-      "weightedScore": 0.816,
-      "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $406.42 ואז להיכנס",
-      "checksSummary": {
-        "total": 66,
-        "passed": 45,
-        "warned": 16,
-        "failed": 1
-      },
-      "breakoutLevel": 406.42,
-      "supportLevel": 367.21,
-      "entry": 406.42,
-      "entryType": "קנייה רק בפריצת $406.42",
-      "deltaToEntryPct": 6.91,
-      "stopLoss": 370.64,
-      "stopPct": 8.8,
-      "targetPrice": 442.51,
-      "targetPct": 8.9,
-      "recommendedExit": 442.51,
-      "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$406.42: יעד $442.51 | סטופ $370.64",
-      "rrRatio": 1.01,
-      "sentiment": {
-        "code": "NEUTRAL",
-        "label": "המתנה לפריצה"
-      }
-    },
-    {
-      "ticker": "GOOGL",
-      "news": {
-        "count": 6,
-        "tone": "MIXED",
-        "summaryHe": "ידיעות מעורבות (6 כותרות)",
+        "tone": "NEGATIVE",
+        "summaryHe": "ידיעות שליליות (2 מול 0)",
         "posHits": 0,
-        "negHits": 0,
+        "negHits": 2,
         "items": [
           {
-            "title": "5 Best Quantum Computing Stocks To Buy for 2027",
-            "link": "https://finance.yahoo.com/technology/articles/5-best-quantum-computing-stocks-032149616.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 03:21:49 +0000",
+            "title": "SpaceX, Tesla have had a bumpy 2026 thus far: What to know",
+            "link": "https://finance.yahoo.com/video/spacex-tesla-have-had-a-bumpy-2026-thus-far-what-to-know-145849441.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 14:58:49 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "5 Best Tech Stocks to Buy for 2027 According to Hedge Funds",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/5-best-tech-stocks-buy-030856400.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 03:08:56 +0000",
+            "title": "Tesla Takes 1.2M SF at Houston’s Cedar Port Industrial Park",
+            "link": "https://www.credaily.com/briefs/tesla-takes-1-2m-sf-at-houstons-cedar-port-industrial-park/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:11:54 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "‘How Can TSLA Compete With Waymo?’ Gary Black Questions Tesla’s Robotaxi Strategy, Predicts Waymo Will Lead in Miles and Trips",
-            "link": "https://finance.yahoo.com/technology/articles/tsla-compete-waymo-gary-black-013007370.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 01:30:07 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Jim Lebenthal Says This Is “a Correction, Not Something Worse.” Why He’s Buying More Alphabet",
-            "link": "https://247wallst.com/investing/2026/11/26/jim-lebenthal-says-this-is-a-correction-not-something-worse-why-hes-buying-more-alphabet/?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 22:07:55 +0000",
-            "tone": "NEUTRAL"
-          }
-        ]
-      },
-      "price": 273.1,
-      "changePct": -2.13,
-      "bullCount": 46,
-      "bearCount": 1,
-      "scorePct": 81.2,
-      "weightedScore": 0.812,
-      "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $298.82 ואז להיכנס",
-      "checksSummary": {
-        "total": 66,
-        "passed": 46,
-        "warned": 17,
-        "failed": 1
-      },
-      "breakoutLevel": 298.82,
-      "supportLevel": 264.22,
-      "entry": 298.82,
-      "entryType": "קנייה רק בפריצת $298.82",
-      "deltaToEntryPct": 9.42,
-      "stopLoss": 266.27,
-      "stopPct": 10.9,
-      "targetPrice": 319.75,
-      "targetPct": 7.0,
-      "recommendedExit": 319.75,
-      "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$298.82: יעד $319.75 | סטופ $266.27",
-      "rrRatio": 0.64,
-      "sentiment": {
-        "code": "NEUTRAL",
-        "label": "המתנה לפריצה"
-      }
-    },
-    {
-      "ticker": "SHOP",
-      "news": {
-        "count": 6,
-        "tone": "POSITIVE",
-        "summaryHe": "ידיעות חיוביות (3 מול 1)",
-        "posHits": 3,
-        "negHits": 1,
-        "items": [
-          {
-            "title": "ETFs Are Buying Shopify (SHOP) on Tuesday",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/etfs-buying-shopify-shop-tuesday-110151756.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 11:01:51 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Shopify (NasdaqGS:SHOP) Rebound Rekindles The Debate Over Its Fair Value",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/shopify-nasdaqgs-shop-rebound-rekindles-100844802.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 10:08:44 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Shopify Keeps Sliding After Its Q3 Miss: Why Piper Sandler Still Sees 30% Upside",
-            "link": "https://www.tikr.com/blog/shopify-keeps-sliding-after-its-q3-miss-why-piper-sandler-still-sees-30-upside?ref=yahoofinance&tlnk=yf-261125-ch439v4q&.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 10:06:50 +0000",
+            "title": "Sector Update: Consumer Stocks Advance Friday Afternoon",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/sector-consumer-stocks-advance-friday-171212418.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:12:12 +0000",
             "tone": "NEGATIVE"
           },
           {
-            "title": "What a $5,000 Investment in Shopify Stock Today Could Grow Into by 2030",
-            "link": "https://www.fool.com/investing/2026/11/24/what-a-usd5-000-investment-in-shopify-stock-today-could-grow-into-by-2030/?.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 01:03:02 +0000",
-            "tone": "NEUTRAL"
+            "title": "Tesla Rallies 5% Amid SpaceX Merger Speculation; Rivian and SpaceX Rise 3%: Is Tesla’s 439x P/E a Warning Sign?",
+            "link": "https://247wallst.com/investing/2026/11/27/tesla-rallies-5-amid-spacex-merger-speculation-rivian-and-spacex-rise-3-is-teslas-439x-p-e-a-warning-sign/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 17:04:16 +0000",
+            "tone": "NEGATIVE"
           }
         ]
       },
-      "price": 133.4,
-      "changePct": 0.82,
-      "bullCount": 46,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001318605",
+        "recentFilingsCount": 1006,
+        "recentForm4Count": 15,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "JBF Capital, Inc.  (CIK 0001483864) (2018-02-07)",
+          "JBF Capital, Inc.  (CIK 0001483864) (2018-11-13)",
+          "JBF Capital, Inc.  (CIK 0001483864) (2018-05-11)",
+          "JBF Capital, Inc.  (CIK 0001483864) (2026-05-08)"
+        ],
+        "summaryHe": "15 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 400.0,
+      "changePct": 5.22,
+      "bullCount": 44,
       "bearCount": 1,
-      "scorePct": 80.5,
-      "weightedScore": 0.805,
-      "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $151.46 ואז להיכנס",
+      "scorePct": 80.6,
+      "weightedScore": 0.806,
+      "gateVerdict": "לא להיכנס",
+      "waitInstruction": "לא להיכנס — להמתין שירד לשער $388.00 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 2.20 | יעד אנליסטים: $419.05",
+      "institutionalSummary": "15 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 46,
-        "warned": 18,
+        "passed": 44,
+        "warned": 17,
         "failed": 1
       },
-      "breakoutLevel": 151.46,
-      "supportLevel": 123.74,
-      "entry": 151.46,
-      "entryType": "קנייה רק בפריצת $151.46",
-      "deltaToEntryPct": 13.54,
-      "stopLoss": 130.06,
-      "stopPct": 14.1,
-      "targetPrice": 166.16,
-      "targetPct": 9.7,
-      "recommendedExit": 166.16,
-      "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$151.46: יעד $166.16 | סטופ $130.06",
-      "rrRatio": 0.69,
+      "breakoutLevel": 406.42,
+      "supportLevel": 384.66,
+      "entry": 388.0,
+      "entryType": "להמתין שירד לשער $388.00 ואז להיכנס",
+      "deltaToEntryPct": -3.0,
+      "stopLoss": 372.48,
+      "stopPct": 4.0,
+      "targetPrice": 411.28,
+      "targetPct": 6.0,
+      "recommendedExit": 411.28,
+      "exitAction": "המתן לשער כניסה",
+      "exitReason": "בכניסה ב-$388.00: יעד $411.28 | סטופ $372.48",
+      "rrRatio": 1.5,
       "sentiment": {
-        "code": "NEUTRAL",
-        "label": "המתנה לפריצה"
+        "code": "BEARISH",
+        "label": "דובי/המתנה"
       }
     },
     {
@@ -1177,6 +1449,12 @@
         "posHits": 1,
         "negHits": 0,
         "items": [
+          {
+            "title": "MongoDB Set to Report Q3 Earnings: Is the MDB Stock a Smart Buy?",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/mongodb-set-report-q3-earnings-161700688.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 16:17:00 +0000",
+            "tone": "NEUTRAL"
+          },
           {
             "title": "MongoDB Stock (MDB): Wells Fargo Says Buy Ahead of Earnings After Positive Customer Survey",
             "link": "https://finance.yahoo.com/markets/stocks/articles/mongodb-stock-mdb-wells-fargo-222628693.html?.tsrc=rss",
@@ -1194,175 +1472,134 @@
             "link": "https://finance.yahoo.com/markets/stocks/articles/best-growth-stocks-buy-november-095800515.html?.tsrc=rss",
             "published": "Thu, 26 Nov 2026 09:58:00 +0000",
             "tone": "POSITIVE"
-          },
-          {
-            "title": "MongoDB Remains 'Database Provider of Choice' for GenAI Apps, RBC Says",
-            "link": "https://finance.yahoo.com/technology/ai/articles/mongodb-remains-apos-database-provider-154831875.html?.tsrc=rss",
-            "published": "Wed, 25 Nov 2026 15:48:31 +0000",
-            "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 313.53,
-      "changePct": 1.63,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001441816",
+        "recentFilingsCount": 1001,
+        "recentForm4Count": 34,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "TYBOURNE CAPITAL MANAGEMENT (HK) LTD  (CIK 0001553936) (2023-05-15)",
+          "TYBOURNE CAPITAL MANAGEMENT (HK) LTD  (CIK 0001553936) (2023-08-14)",
+          "TYBOURNE CAPITAL MANAGEMENT (HK) LTD  (CIK 0001553936) (2022-08-15)",
+          "TYBOURNE CAPITAL MANAGEMENT (HK) LTD  (CIK 0001553936) (2022-02-25)"
+        ],
+        "summaryHe": "34 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 320.12,
+      "changePct": 2.1,
       "bullCount": 43,
       "bearCount": 1,
       "scorePct": 80.2,
       "weightedScore": 0.802,
       "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $348.17 ואז להיכנס",
+      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $343.51 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 1.54 | יעד אנליסטים: $449.13",
+      "institutionalSummary": "34 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
         "passed": 43,
         "warned": 17,
         "failed": 1
       },
-      "breakoutLevel": 348.17,
-      "supportLevel": 287.79,
-      "entry": 348.17,
-      "entryType": "קנייה רק בפריצת $348.17",
-      "deltaToEntryPct": 11.05,
-      "stopLoss": 305.69,
-      "stopPct": 12.2,
-      "targetPrice": 384.85,
-      "targetPct": 10.5,
-      "recommendedExit": 384.85,
+      "breakoutLevel": 343.51,
+      "supportLevel": 312.06,
+      "entry": 343.51,
+      "entryType": "קנייה רק בפריצת $343.51",
+      "deltaToEntryPct": 7.31,
+      "stopLoss": 312.12,
+      "stopPct": 9.1,
+      "targetPrice": 379.18,
+      "targetPct": 10.4,
+      "recommendedExit": 379.18,
       "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$348.17: יעד $384.85 | סטופ $305.69",
-      "rrRatio": 0.86,
+      "exitReason": "לאחר פריצה ב-$343.51: יעד $379.18 | סטופ $312.12",
+      "rrRatio": 1.14,
       "sentiment": {
         "code": "NEUTRAL",
         "label": "המתנה לפריצה"
       }
     },
     {
-      "ticker": "AMZN",
-      "news": {
-        "count": 6,
-        "tone": "MIXED",
-        "summaryHe": "ידיעות מעורבות (6 כותרות)",
-        "posHits": 1,
-        "negHits": 0,
-        "items": [
-          {
-            "title": "Amazon Lost 40 Satellites on a Boeing-Lockheed Rocket in November. SpaceX Is the Only Company That Can Fix Amazon’s Problem. Is the Stock a Buy Near $130?",
-            "link": "https://www.fool.com/investing/2026/11/26/amazon-lost-40-satellites-on-a-boeing-lockheed-rocket-in-november-spacex-is-the-only-company-that-can-fix-amazon-s-problem-is-the-stock-a-buy-near-usd130/?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 03:53:02 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Can Amazon (AMZN) Turn Its AWS Growth Outlook Into Cash?",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/amazon-amzn-turn-aws-growth-035240906.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 03:52:40 +0000",
-            "tone": "POSITIVE"
-          },
-          {
-            "title": "Amazon tried to kill Musk’s plan for 1 million AI satellites. The FCC chair scolded it and gave SpaceX the green light",
-            "link": "https://finance.yahoo.com/technology/ai/articles/amazon-tried-kill-musk-plan-233000718.html?.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 23:30:00 +0000",
-            "tone": "NEUTRAL"
-          },
-          {
-            "title": "Stanley Druckenmiller, Bill Ackman and 7 Other Famous Investors Own Amazon. Here’s Who Bought and Sold Recently",
-            "link": "https://www.tikr.com/blog/stanley-druckenmiller-bill-ackman-and-7-other-famous-investors-own-amazon-heres-who-bought-and-sold-recently?ref=yahoofinance&tlnk=yf-261126-2mffj2wm&.tsrc=rss",
-            "published": "Thu, 26 Nov 2026 18:11:13 +0000",
-            "tone": "NEUTRAL"
-          }
-        ]
-      },
-      "price": 244.43,
-      "changePct": -3.12,
-      "bullCount": 43,
-      "bearCount": 0,
-      "scorePct": 79.4,
-      "weightedScore": 0.794,
-      "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $276.09 ואז להיכנס",
-      "checksSummary": {
-        "total": 66,
-        "passed": 43,
-        "warned": 20,
-        "failed": 0
-      },
-      "breakoutLevel": 276.09,
-      "supportLevel": 235.96,
-      "entry": 276.09,
-      "entryType": "קנייה רק בפריצת $276.09",
-      "deltaToEntryPct": 12.95,
-      "stopLoss": 238.32,
-      "stopPct": 13.7,
-      "targetPrice": 294.92,
-      "targetPct": 6.8,
-      "recommendedExit": 294.92,
-      "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$276.09: יעד $294.92 | סטופ $238.32",
-      "rrRatio": 0.5,
-      "sentiment": {
-        "code": "NEUTRAL",
-        "label": "המתנה לפריצה"
-      }
-    },
-    {
-      "ticker": "NVDA",
+      "ticker": "SHOP",
       "news": {
         "count": 6,
         "tone": "NEGATIVE",
-        "summaryHe": "ידיעות שליליות (3 מול 0)",
+        "summaryHe": "ידיעות שליליות (2 מול 0)",
         "posHits": 0,
-        "negHits": 3,
+        "negHits": 2,
         "items": [
           {
-            "title": "Michael Burry Shares Stark Warning About AI Boom, as Nvidia, Oracle and Meta Face Surging Debt Insurance Costs",
-            "link": "https://finance.yahoo.com/technology/ai/articles/michael-burry-shares-stark-warning-063128312.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 06:31:28 +0000",
-            "tone": "NEGATIVE"
-          },
-          {
-            "title": "Learn Why The Bull Case For Nvidia Stock Could Change Following CEO Reinstatement",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/learn-why-bull-case-nvidia-051409281.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 05:14:09 +0000",
+            "title": "Shopify vs. Wix.com: Which E-Commerce Stock Has an Edge Right Now?",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/shopify-vs-wix-com-e-162100901.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 16:21:00 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Nvidia (NVDA) Stock Fair Value Falls After Analysts Reassess Leadership And Regulatory Risks",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-stock-fair-value-042301514.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 04:23:01 +0000",
+            "title": "HubSpot, AST SpaceMobile downgraded: Wall Street's top analyst calls",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/hubspot-ast-spacemobile-downgraded-wall-143518350.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 14:35:18 +0000",
             "tone": "NEGATIVE"
           },
           {
-            "title": "Singapore yet to confirm if Nvidia has halted advanced chip shipments- deputy PM",
-            "link": "https://finance.yahoo.com/technology/articles/singapore-yet-confirm-nvidia-halted-041419330.html?.tsrc=rss",
-            "published": "Fri, 27 Nov 2026 04:14:19 +0000",
+            "title": "ETFs Are Buying Shopify (SHOP) on Tuesday",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/etfs-buying-shopify-shop-tuesday-110151756.html?.tsrc=rss",
+            "published": "Thu, 26 Nov 2026 11:01:51 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Shopify (NasdaqGS:SHOP) Rebound Rekindles The Debate Over Its Fair Value",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/shopify-nasdaqgs-shop-rebound-rekindles-100844802.html?.tsrc=rss",
+            "published": "Thu, 26 Nov 2026 10:08:44 +0000",
             "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 149.3,
-      "changePct": -3.91,
-      "bullCount": 44,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001594805",
+        "recentFilingsCount": 546,
+        "recentForm4Count": 4,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "PEABODY AMELIA FOUNDATION  (CIK 0001130042) (2001-01-12)",
+          "Fox Point Capital Management LLC  (CIK 0001385011) (2013-05-14)",
+          "Fox Point Capital Management LLC  (CIK 0001385011) (2013-08-13)",
+          "Fox Point Capital Management LLC  (CIK 0001385011) (2013-11-13)"
+        ],
+        "summaryHe": "4 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 141.78,
+      "changePct": 6.28,
+      "bullCount": 45,
       "bearCount": 1,
-      "scorePct": 78.5,
-      "weightedScore": 0.785,
+      "scorePct": 79.5,
+      "weightedScore": 0.795,
       "gateVerdict": "לא להיכנס",
-      "waitInstruction": "לא להיכנס — להמתין שירד לשער $144.82 ואז להיכנס",
+      "waitInstruction": "לא להיכנס — להמתין שירד לשער $138.60 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 1.67 | יעד אנליסטים: $177.18",
+      "institutionalSummary": "4 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 44,
-        "warned": 20,
+        "passed": 45,
+        "warned": 19,
         "failed": 1
       },
-      "breakoutLevel": 178.43,
-      "supportLevel": 141.17,
-      "entry": 144.82,
-      "entryType": "להמתין שירד לשער $144.82 ואז להיכנס",
-      "deltaToEntryPct": -3.0,
-      "stopLoss": 139.03,
+      "breakoutLevel": 151.46,
+      "supportLevel": 138.6,
+      "entry": 138.6,
+      "entryType": "להמתין שירד לשער $138.60 ואז להיכנס",
+      "deltaToEntryPct": -2.24,
+      "stopLoss": 133.06,
       "stopPct": 4.0,
-      "targetPrice": 153.51,
+      "targetPrice": 146.92,
       "targetPct": 6.0,
-      "recommendedExit": 153.51,
+      "recommendedExit": 146.92,
       "exitAction": "המתן לשער כניסה",
-      "exitReason": "בכניסה ב-$144.82: יעד $153.51 | סטופ $139.03",
+      "exitReason": "בכניסה ב-$138.60: יעד $146.92 | סטופ $133.06",
       "rrRatio": 1.5,
       "sentiment": {
         "code": "BEARISH",
@@ -1370,70 +1607,86 @@
       }
     },
     {
-      "ticker": "DLEKG.TA",
+      "ticker": "NVDA",
       "news": {
         "count": 6,
-        "tone": "POSITIVE",
-        "summaryHe": "ידיעות חיוביות (3 מול 0)",
-        "posHits": 3,
-        "negHits": 0,
+        "tone": "NEGATIVE",
+        "summaryHe": "ידיעות שליליות (2 מול 0)",
+        "posHits": 0,
+        "negHits": 2,
         "items": [
           {
-            "title": "Delek Group (TASE:DLEKG) Stock Looks Stretched Against Its Current Earnings Power",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/delek-group-tase-dlekg-stock-231419642.html?.tsrc=rss",
-            "published": "Sat, 17 Oct 2026 23:14:19 +0000",
-            "tone": "POSITIVE"
-          },
-          {
-            "title": "Polanski urges Miliband to block Rosebank oil field over Israel links",
-            "link": "https://uk.finance.yahoo.com/news/polanski-urges-miliband-block-rosebank-193624819.html?.tsrc=rss",
-            "published": "Wed, 30 Sep 2026 19:36:24 +0000",
+            "title": "Investing.com’s stocks of the week",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/investing-com-stocks-week-182910314.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:29:10 +0000",
             "tone": "NEUTRAL"
           },
           {
-            "title": "Delek Group Ltd (DLKGF) (Q2 2026) Earnings Call Highlights: Record Logistics Performance and ...",
-            "link": "https://finance.yahoo.com/markets/stocks/articles/delek-group-ltd-dlkgf-q2-030210139.html?.tsrc=rss",
-            "published": "Fri, 21 Aug 2026 03:02:10 +0000",
-            "tone": "POSITIVE"
+            "title": "SanDisk Stocks Jump 12.85% After Kioxia and Nvidia Stretch GPU Memory With SSDs",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/sandisk-stocks-jump-12-85-181316890.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:13:16 +0000",
+            "tone": "NEUTRAL"
           },
           {
-            "title": "Israel's NewMed Advances Talks to Enter Venezuela",
-            "link": "https://finance.yahoo.com/energy/articles/israels-newmed-advances-talks-enter-185445096.html?.tsrc=rss",
-            "published": "Mon, 16 Nov 2026 18:54:45 +0000",
+            "title": "Kioxia Stocks Jump 8.86% as Nvidia SSD Test and Index Buying Lift Shares",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/kioxia-stocks-jump-8-86-181157042.html?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:11:57 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Nvidia’s Key Man Problem",
+            "link": "https://www.fool.com/investing/2026/11/27/nvidias-key-man-problem/?.tsrc=rss",
+            "published": "Fri, 27 Nov 2026 18:01:02 +0000",
             "tone": "NEUTRAL"
           }
         ]
       },
-      "price": 7839.0,
-      "changePct": 0.29,
-      "bullCount": 40,
-      "bearCount": 1,
-      "scorePct": 77.8,
-      "weightedScore": 0.778,
-      "gateVerdict": "המתן לפריצה בשער",
-      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $8223.43 ואז להיכנס",
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001045810",
+        "recentFilingsCount": 1005,
+        "recentForm4Count": 35,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "Belvedere Trading LLC  (CIK 0001632341) (2024-11-01)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2024-11-05)",
+          "Live Oak Investment Partners  (CIK 0001822262) (2025-02-06)",
+          "Belvedere Trading LLC  (CIK 0001632341) (2024-08-09)"
+        ],
+        "summaryHe": "35 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 150.49,
+      "changePct": 0.8,
+      "bullCount": 45,
+      "bearCount": 2,
+      "scorePct": 78.9,
+      "weightedScore": 0.789,
+      "gateVerdict": "לא להיכנס",
+      "waitInstruction": "לא להיכנס — להמתין שירד לשער $145.98 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 1.67 | יעד אנליסטים: $242.43",
+      "institutionalSummary": "35 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 40,
-        "warned": 19,
-        "failed": 1
+        "passed": 45,
+        "warned": 18,
+        "failed": 2
       },
-      "breakoutLevel": 8223.43,
-      "supportLevel": 7750.0,
-      "entry": 8223.43,
-      "entryType": "קנייה רק בפריצת $8223.43",
-      "deltaToEntryPct": 4.9,
-      "stopLoss": 7672.5,
-      "stopPct": 6.7,
-      "targetPrice": 8716.84,
+      "breakoutLevel": 172.36,
+      "supportLevel": 145.39,
+      "entry": 145.98,
+      "entryType": "להמתין שירד לשער $145.98 ואז להיכנס",
+      "deltaToEntryPct": -3.0,
+      "stopLoss": 140.14,
+      "stopPct": 4.0,
+      "targetPrice": 154.74,
       "targetPct": 6.0,
-      "recommendedExit": 8716.84,
-      "exitAction": "יעד פריצה / סטופ",
-      "exitReason": "לאחר פריצה ב-$8223.43: יעד $8716.84 | סטופ $7672.50",
-      "rrRatio": 0.9,
+      "recommendedExit": 154.74,
+      "exitAction": "המתן לשער כניסה",
+      "exitReason": "בכניסה ב-$145.98: יעד $154.74 | סטופ $140.14",
+      "rrRatio": 1.5,
       "sentiment": {
-        "code": "NEUTRAL",
-        "label": "המתנה לפריצה"
+        "code": "BEARISH",
+        "label": "דובי/המתנה"
       }
     },
     {
@@ -1471,36 +1724,130 @@
           }
         ]
       },
-      "price": 158.25,
-      "changePct": -4.31,
-      "bullCount": 41,
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "0001561550",
+        "recentFilingsCount": 1001,
+        "recentForm4Count": 28,
+        "has13FFiling": true,
+        "topInstFilers": [
+          "Optimus Prime Fund Management Co., Ltd.  (CIK 0001732539) (2021-02-09)",
+          "TB Alternative Assets Ltd.  (CIK 0001483503) (2023-07-21)",
+          "TB Alternative Assets Ltd.  (CIK 0001483503) (2022-10-14)",
+          "Wellesley Asset Management  (CIK 0001533551) (2026-08-13)"
+        ],
+        "summaryHe": "28 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים"
+      },
+      "price": 165.75,
+      "changePct": 4.74,
+      "bullCount": 42,
       "bearCount": 1,
-      "scorePct": 76.7,
-      "weightedScore": 0.767,
-      "gateVerdict": "לא להיכנס",
-      "waitInstruction": "לא להיכנס — להמתין שירד לשער $156.14 ואז להיכנס",
+      "scorePct": 77.8,
+      "weightedScore": 0.778,
+      "gateVerdict": "המתן לפריצה בשער",
+      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $189.38 ואז להיכנס",
+      "analystSummary": "ממוצע המלצות: 1.39 | יעד אנליסטים: $269.65",
+      "institutionalSummary": "28 דיווחי Form 4 (בעלי עניין) | 5 אזכורי 13F-HR עדכניים",
       "checksSummary": {
         "total": 66,
-        "passed": 41,
-        "warned": 21,
+        "passed": 42,
+        "warned": 20,
         "failed": 1
       },
-      "breakoutLevel": 189.54,
-      "supportLevel": 156.14,
-      "entry": 156.14,
-      "entryType": "להמתין שירד לשער $156.14 ואז להיכנס",
-      "deltaToEntryPct": -1.33,
-      "stopLoss": 149.89,
-      "stopPct": 4.0,
-      "targetPrice": 165.51,
-      "targetPct": 6.0,
-      "recommendedExit": 165.51,
-      "exitAction": "המתן לשער כניסה",
-      "exitReason": "בכניסה ב-$156.14: יעד $165.51 | סטופ $149.89",
-      "rrRatio": 1.5,
+      "breakoutLevel": 189.38,
+      "supportLevel": 161.6,
+      "entry": 189.38,
+      "entryType": "קנייה רק בפריצת $189.38",
+      "deltaToEntryPct": 14.26,
+      "stopLoss": 161.61,
+      "stopPct": 14.7,
+      "targetPrice": 208.69,
+      "targetPct": 10.2,
+      "recommendedExit": 208.69,
+      "exitAction": "יעד פריצה / סטופ",
+      "exitReason": "לאחר פריצה ב-$189.38: יעד $208.69 | סטופ $161.61",
+      "rrRatio": 0.7,
       "sentiment": {
-        "code": "BEARISH",
-        "label": "דובי/המתנה"
+        "code": "NEUTRAL",
+        "label": "המתנה לפריצה"
+      }
+    },
+    {
+      "ticker": "DLEKG.TA",
+      "news": {
+        "count": 6,
+        "tone": "POSITIVE",
+        "summaryHe": "ידיעות חיוביות (3 מול 0)",
+        "posHits": 3,
+        "negHits": 0,
+        "items": [
+          {
+            "title": "Delek Group (TASE:DLEKG) Stock Looks Stretched Against Its Current Earnings Power",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/delek-group-tase-dlekg-stock-231419642.html?.tsrc=rss",
+            "published": "Sat, 17 Oct 2026 23:14:19 +0000",
+            "tone": "POSITIVE"
+          },
+          {
+            "title": "Polanski urges Miliband to block Rosebank oil field over Israel links",
+            "link": "https://uk.finance.yahoo.com/news/polanski-urges-miliband-block-rosebank-193624819.html?.tsrc=rss",
+            "published": "Wed, 30 Sep 2026 19:36:24 +0000",
+            "tone": "NEUTRAL"
+          },
+          {
+            "title": "Delek Group Ltd (DLKGF) (Q2 2026) Earnings Call Highlights: Record Logistics Performance and ...",
+            "link": "https://finance.yahoo.com/markets/stocks/articles/delek-group-ltd-dlkgf-q2-030210139.html?.tsrc=rss",
+            "published": "Fri, 21 Aug 2026 03:02:10 +0000",
+            "tone": "POSITIVE"
+          },
+          {
+            "title": "Israel's NewMed Advances Talks to Enter Venezuela",
+            "link": "https://finance.yahoo.com/energy/articles/israels-newmed-advances-talks-enter-185445096.html?.tsrc=rss",
+            "published": "Mon, 16 Nov 2026 18:54:45 +0000",
+            "tone": "NEUTRAL"
+          }
+        ]
+      },
+      "sec": {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "",
+        "recentFilingsCount": 0,
+        "recentForm4Count": 0,
+        "has13FFiling": false,
+        "topInstFilers": [],
+        "summaryHe": "אין נתוני SEC EDGAR זמינים למניה זו"
+      },
+      "price": 7765.0,
+      "changePct": -0.65,
+      "bullCount": 37,
+      "bearCount": 1,
+      "scorePct": 74.5,
+      "weightedScore": 0.745,
+      "gateVerdict": "המתן לפריצה בשער",
+      "waitInstruction": "להמתין להתבססות ולפריצה מעל שער $8225.55 ואז להיכנס",
+      "analystSummary": "אין פיד אנליסטים חינמי מלא (מומלץ לאמת ידנית)",
+      "institutionalSummary": "אין נתוני SEC EDGAR זמינים למניה זו",
+      "checksSummary": {
+        "total": 66,
+        "passed": 37,
+        "warned": 22,
+        "failed": 1
+      },
+      "breakoutLevel": 8225.55,
+      "supportLevel": 7696.69,
+      "entry": 8225.55,
+      "entryType": "קנייה רק בפריצת $8225.55",
+      "deltaToEntryPct": 5.93,
+      "stopLoss": 7619.72,
+      "stopPct": 7.4,
+      "targetPrice": 8719.08,
+      "targetPct": 6.0,
+      "recommendedExit": 8719.08,
+      "exitAction": "יעד פריצה / סטופ",
+      "exitReason": "לאחר פריצה ב-$8225.55: יעד $8719.08 | סטופ $7619.72",
+      "rrRatio": 0.81,
+      "sentiment": {
+        "code": "NEUTRAL",
+        "label": "המתנה לפריצה"
       }
     }
   ]
