@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>מעקב מניות, ידיעות וניהול תיק אוטומטי</title>
+  <title>מעקב מניות, מגמות וניהול תיק אוטומטי</title>
   <style>
     :root {
       --bg: #f4f6f8;
@@ -94,6 +94,19 @@
       background: #fff;
       color: var(--text);
     }
+    .check-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      padding: 8px 10px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      cursor: pointer;
+    }
     button.btn {
       border: none;
       background: var(--accent);
@@ -149,7 +162,6 @@
     .no-entry-big {
       font-size: 1.15rem;
       font-weight: 900;
-      letter-spacing: 0.2px;
     }
     .no-entry-sub {
       font-size: 0.9rem;
@@ -211,11 +223,7 @@
       padding: 9px 11px;
       font-size: 0.8rem;
     }
-    .news-title {
-      margin-top: 4px;
-      color: var(--text);
-      font-weight: 600;
-    }
+    .news-title { margin-top: 4px; color: var(--text); font-weight: 600; }
     .sub-levels {
       display: flex;
       justify-content: space-between;
@@ -256,14 +264,14 @@
   <div class="wrap">
     <div class="top">
       <div>
-        <h1>מערכת סריקה, ידיעות וניהול תיק אוטומטי</h1>
+        <h1>מערכת סריקה, מגמות וניהול תיק אוטומטי</h1>
         <div class="meta" id="syncStatus">טוען נתוני סנכרון מ-Yahoo Finance...</div>
       </div>
       <button class="btn secondary" onclick="loadSyncedData()">רענן סנכרון</button>
     </div>
 
     <div class="tabs">
-      <button class="tab active" data-tab="scan" onclick="switchTab('scan')">סריקה וידיעות</button>
+      <button class="tab active" data-tab="scan" onclick="switchTab('scan')">סריקה ותוצאות</button>
       <button class="tab" data-tab="bot-demo" onclick="switchTab('bot-demo')">תיק אוטומטי ורווחים</button>
       <button class="tab" data-tab="watchlist" onclick="switchTab('watchlist')">רשימת מעקב</button>
       <button class="tab" data-tab="my-demo" onclick="switchTab('my-demo')">תיק דמו ידני</button>
@@ -276,16 +284,23 @@
           <input id="filterTicker" placeholder="הקלד כל סימול..." oninput="renderScanResults()" />
         </div>
         <div>
-          <label for="filterVerdict">סינון סטטוס כניסה</label>
+          <label for="filterVerdict">סינון מצב כניסה/פריצה</label>
           <select id="filterVerdict" onchange="renderScanResults()">
             <option value="ALL">הכל</option>
             <option value="APPROVED">מאושר לכניסה</option>
+            <option value="BREAKOUT">המתן לפריצה בשער</option>
             <option value="NO_ENTRY">לא להיכנס</option>
           </select>
         </div>
         <div>
-          <label for="customTargetPct">יעד רווח לחישוב (%)</label>
-          <input id="customTargetPct" type="number" step="0.5" min="0.5" max="100" value="6" style="width:110px" oninput="renderScanResults()" />
+          <label for="minProfitPct">רווח מינימלי נדרש (%)</label>
+          <input id="minProfitPct" type="number" step="0.5" min="0" max="100" value="6" style="width:110px" oninput="renderScanResults()" />
+        </div>
+        <div>
+          <label class="check-label">
+            <input id="onlyMinProfit" type="checkbox" checked onchange="renderScanResults()" />
+            הצג רק מניות עם רווח מינימלי של <span id="minProfitBadge">6%</span>
+          </label>
         </div>
       </div>
       <div class="grid" id="scanGrid"></div>
@@ -380,6 +395,7 @@
       const v = String(verdictText || "");
       if (filterVal === "ALL") return true;
       if (filterVal === "APPROVED") return v.includes("מאושר");
+      if (filterVal === "BREAKOUT") return v.includes("פריצה");
       if (filterVal === "NO_ENTRY") return v.includes("לא להיכנס");
       return true;
     }
@@ -387,17 +403,24 @@
     function renderScanResults() {
       const query = (document.getElementById("filterTicker").value || "").trim().toUpperCase();
       const verdictFilter = document.getElementById("filterVerdict").value || "ALL";
-      const targetPct = Math.max(0.5, Number(document.getElementById("customTargetPct").value || 6));
+      const minProfitPct = Math.max(0, Number(document.getElementById("minProfitPct").value || 6));
+      const onlyMinProfit = document.getElementById("onlyMinProfit").checked;
+      document.getElementById("minProfitBadge").textContent = `${minProfitPct}%`;
+
       const grid = document.getElementById("scanGrid");
 
       const items = (scanData.results || []).filter(r => {
         const matchTicker = !query || String(r.ticker || "").includes(query);
         const matchVerdict = matchVerdictFilter(r.gateVerdict, verdictFilter);
-        return matchTicker && matchVerdict;
+        const entry = Number(r.entry || r.price || 0);
+        const target = Number(r.targetPrice || entry * (1 + minProfitPct / 100));
+        const gainPct = entry > 0 ? ((target - entry) / entry) * 100 : Number(r.targetPct || 0);
+        const matchProfit = !onlyMinProfit || gainPct >= minProfitPct;
+        return matchTicker && matchVerdict && matchProfit;
       });
 
       if (!items.length) {
-        grid.innerHTML = `<div class="meta">אין מניות להצגה לפי הסינון הנוכחי.</div>`;
+        grid.innerHTML = `<div class="meta">אין מניות שעומדות בסינון או ביעד הרווח של ${minProfitPct}% כרגע. נסה להוריד את סף הרווח או לבטל את הסינון.</div>`;
         return;
       }
 
@@ -405,13 +428,15 @@
         const currPrice = Number(r.price || 0);
         const entry = Number(r.entry || currPrice);
         const stopLoss = Number(r.stopLoss || 0);
-        const calcTarget = Number((entry * (1 + targetPct / 100)).toFixed(2));
-        const recExit = Number(r.recommendedExit || calcTarget);
+        const targetPrice = Number(r.targetPrice || (entry * 1.06));
+        const gainPct = entry > 0 ? ((targetPrice - entry) / entry) * 100 : Number(r.targetPct || 6);
+        const recExit = Number(r.recommendedExit || targetPrice);
         const chg = Number(r.changePct || 0);
         const chgClass = chg >= 0 ? "pos" : "neg";
         const sentLabel = r.sentiment?.label || "מעורב";
         const scorePct = Math.max(0, Math.min(100, Number(r.scorePct || 0)));
         const isNoEntry = String(r.gateVerdict || "").includes("לא להיכנס");
+        const isBreakoutWait = String(r.gateVerdict || "").includes("פריצה");
 
         const deltaEntryPct = Number(r.deltaToEntryPct ?? (((entry - currPrice) / Math.max(currPrice, 0.01)) * 100));
         const entryPctLabel = `${deltaEntryPct >= 0 ? "+" : ""}${deltaEntryPct.toFixed(1)}% מול מחיר נוכחי`;
@@ -419,20 +444,25 @@
         const exitDiffPct = (((recExit - entry) / Math.max(entry, 0.01)) * 100);
         const exitPctLabel = `${exitDiffPct >= 0 ? "+" : ""}${exitDiffPct.toFixed(1)}% מול שער כניסה`;
 
-        const spanRange = Math.max(calcTarget - stopLoss, 0.01);
+        const spanRange = Math.max(targetPrice - stopLoss, 0.01);
         const posInRangePct = Math.max(0, Math.min(100, ((currPrice - stopLoss) / spanRange) * 100));
-        const fillClass = isNoEntry ? "fill-bad" : (scorePct >= 65 ? "fill-ok" : "fill-warn");
+        const fillClass = isNoEntry ? "fill-bad" : (isBreakoutWait ? "fill-warn" : (scorePct >= 65 ? "fill-ok" : "fill-warn"));
 
         const newsObj = r.news || {};
         const newsSummary = newsObj.summaryHe || "ללא ידיעות";
         const topHeadline = (newsObj.items && newsObj.items[0] && newsObj.items[0].title) ? newsObj.items[0].title : "";
 
-        const noEntryBannerHtml = isNoEntry ? `
+        const bannerHtml = isNoEntry ? `
           <div class="no-entry-banner">
             <div class="no-entry-big">לא להיכנס</div>
             <div class="no-entry-sub">${r.waitInstruction || `להמתין שירד לשער $${entry.toFixed(2)} ואז להיכנס`}</div>
           </div>
-        ` : "";
+        ` : (isBreakoutWait ? `
+          <div class="bar-block" style="border-color:#fde68a;background:#fffbeb;">
+            <div class="warn" style="font-size:0.9rem;">המתן להתבססות ולפריצה מעל $${entry.toFixed(2)}</div>
+            <div class="meta">קנייה מאושרת רק בשער הפריצה • יעד צפוי +${gainPct.toFixed(1)}%</div>
+          </div>
+        ` : "");
 
         return `
           <div class="item">
@@ -447,27 +477,27 @@
               </div>
             </div>
 
-            ${noEntryBannerHtml}
+            ${bannerHtml}
 
             <div class="bar-block">
               <div class="bar-labels">
                 <span>ציון 66 בדיקות: ${scorePct.toFixed(0)}%</span>
-                <span>מיקום ביעד: ${posInRangePct.toFixed(0)}%</span>
+                <span>רווח ליעד: +${gainPct.toFixed(1)}%</span>
               </div>
               <div class="progress-track">
                 <div class="progress-fill ${fillClass}" style="width:${scorePct.toFixed(0)}%"></div>
               </div>
               <div class="sub-levels" style="margin-top:6px;">
                 <span>סטופ: <b>$${stopLoss.toFixed(2)}</b> (-${Number(r.stopPct || 0).toFixed(1)}%)</span>
-                <span>יעד: <b>$${calcTarget.toFixed(2)}</b> (+${targetPct}%)</span>
+                <span>יעד: <b>$${targetPrice.toFixed(2)}</b> (+${gainPct.toFixed(1)}%)</span>
               </div>
             </div>
 
             <div class="io-grid">
               <div class="entry-box">
-                <div class="box-label">${isNoEntry ? "שער כניסה להמתנה" : "שער כניסה"}</div>
+                <div class="box-label">${isBreakoutWait ? "שער פריצה לכניסה" : (isNoEntry ? "שער כניסה להמתנה" : "שער כניסה")}</div>
                 <div class="box-val">$${entry.toFixed(2)}</div>
-                <div class="box-pct ${isNoEntry ? "warn" : "pos"}">${entryPctLabel}</div>
+                <div class="box-pct ${isBreakoutWait || isNoEntry ? "warn" : "pos"}">${entryPctLabel}</div>
                 <div class="meta">${r.entryType || ""}</div>
               </div>
 
@@ -538,7 +568,7 @@
         const actionTxt = found
           ? (String(found.gateVerdict || "").includes("לא להיכנס")
               ? ` | <span class="neg">לא להיכנס</span> — ${found.waitInstruction || ""}`
-              : ` | כניסה: <b>$${Number(found.entry).toFixed(2)}</b> | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b>`)
+              : ` | <b>${found.gateVerdict}</b>: כניסה <b>$${Number(found.entry).toFixed(2)}</b> | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b>`)
           : "";
         return `
           <div class="list-row">
