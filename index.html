@@ -19,6 +19,8 @@
       --exit-line: #fde68a;
       --stop-bg: #fef2f2;
       --stop-line: #fecaca;
+      --closed-bg: #f1f5f9;
+      --closed-line: #cbd5e1;
       --ok: #15803d;
       --warn: #b45309;
       --bad: #b91c1c;
@@ -157,6 +159,10 @@
       font-size: 0.78rem;
       font-weight: 800;
     }
+    .badge.gray {
+      background: #e2e8f0;
+      color: #334155;
+    }
     .no-entry-banner {
       background: var(--stop-bg);
       border: 1.5px solid var(--stop-line);
@@ -244,10 +250,17 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      padding: 10px 0;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--line);
     }
     .list-row:last-child { border-bottom: none; }
+    .closed-row {
+      background: var(--closed-bg);
+      border: 1px solid var(--closed-line);
+      border-radius: 11px;
+      margin-bottom: 8px;
+      color: #334155;
+    }
   </style>
 </head>
 <body>
@@ -335,26 +348,35 @@
         </div>
         <div>
           <label for="buyAmount">סכום השקעה ($)</label>
-          <input id="buyAmount" type="number" min="1" step="10" placeholder="2000" style="width:120px" />
+          <input id="buyAmount" type="number" min="1" step="10" placeholder="2000" style="width:115px" />
         </div>
         <div>
-          <label for="buyPrice">שער קנייה ($)</label>
-          <input id="buyPrice" type="number" min="0.01" step="0.01" placeholder="135.00" style="width:120px" />
+          <label for="buyPrice">שער קנייה מבוקש ($)</label>
+          <input id="buyPrice" type="number" min="0.01" step="0.01" placeholder="135.00" style="width:130px" />
         </div>
-        <button class="btn" onclick="openManualTrade()">קנה לתיק</button>
+        <div>
+          <label for="sellTargetPrice">שער מכירה / יעד ($)</label>
+          <input id="sellTargetPrice" type="number" min="0.01" step="0.01" placeholder="143.10" style="width:130px" />
+        </div>
+        <button class="btn" onclick="placeManualBuyOrder()">הצב פקודת קנייה</button>
       </div>
       <div id="myDemoSummary" class="meta" style="margin-top:14px;"></div>
-      <div id="myDemoTrades" style="margin-top:8px;"></div>
+      <div id="myDemoPending" style="margin-top:10px;"></div>
+      <div id="myDemoOpen" style="margin-top:10px;"></div>
+      <div id="myDemoClosed" style="margin-top:14px;"></div>
     </section>
   </div>
 
   <script>
     let scanData = { updatedAt: "", results: [] };
-    let botPortfolio = { initial_capital: 10000, cash: 10000, open_positions: [], closed_positions: [], summary: {} };
+    let botPortfolio = { initial_capital: 10000, cash: 10000, pending_orders: [], open_positions: [], closed_positions: [], summary: {} };
 
     let watchlist = JSON.parse(localStorage.getItem("user_watchlist") || '["NVDA","PLTR","COIN"]');
     let myCapital = Number(localStorage.getItem("my_demo_capital") || 10000);
-    let myTrades = JSON.parse(localStorage.getItem("my_demo_trades") || "[]");
+    let myDemoState = JSON.parse(localStorage.getItem("my_demo_state_v2") || "null");
+    if (!myDemoState) {
+      myDemoState = { pending: [], open: [], closed: [], nextActionNum: 1 };
+    }
 
     let botRemovedTickers = JSON.parse(localStorage.getItem("bot_removed_tickers") || "[]");
     let botResetCapital = localStorage.getItem("bot_reset_capital") ? Number(localStorage.getItem("bot_reset_capital")) : null;
@@ -400,6 +422,7 @@
       } catch (err) {
         statusEl.textContent = "מצב מקומי / לא מחובר לשרת";
       }
+      processManualDemoTriggers();
       renderScanResults();
       renderWatchlist();
       renderMyDemo();
@@ -625,85 +648,259 @@
       renderMyDemo();
     }
 
-    function openManualTrade() {
+    function saveMyDemoState() {
+      localStorage.setItem("my_demo_state_v2", JSON.stringify(myDemoState));
+    }
+
+    function allocManualActionNum() {
+      const n = Number(myDemoState.nextActionNum || 1);
+      myDemoState.nextActionNum = n + 1;
+      return n;
+    }
+
+    function getLivePriceFor(ticker) {
+      const found = (scanData.results || []).find(r => String(r.ticker || "").toUpperCase() === String(ticker || "").toUpperCase());
+      return found ? Number(found.price) : null;
+    }
+
+    function placeManualBuyOrder() {
       const ticker = (document.getElementById("buyTicker").value || "").trim().toUpperCase();
       const amount = Number(document.getElementById("buyAmount").value || 0);
-      const buyPrice = Number(document.getElementById("buyPrice").value || 0);
-      if (!ticker || amount <= 0 || buyPrice <= 0) return;
+      const entryPrice = Number(document.getElementById("buyPrice").value || 0);
+      const sellTarget = Number(document.getElementById("sellTargetPrice").value || (entryPrice * 1.06));
+      if (!ticker || amount <= 0 || entryPrice <= 0) return;
 
-      myTrades.push({
+      const actNum = allocManualActionNum();
+      myDemoState.pending.push({
         id: Date.now(),
+        actionNum: actNum,
         ticker,
         amount,
-        shares: amount / buyPrice,
-        buyPrice,
-        sellPrice: null
+        entryPrice,
+        sellTarget: sellTarget > 0 ? sellTarget : Number((entryPrice * 1.06).toFixed(2)),
+        createdAt: new Date().toLocaleString("he-IL")
       });
-      localStorage.setItem("my_demo_trades", JSON.stringify(myTrades));
+      saveMyDemoState();
       document.getElementById("buyTicker").value = "";
       document.getElementById("buyAmount").value = "";
       document.getElementById("buyPrice").value = "";
+      document.getElementById("sellTargetPrice").value = "";
+      processManualDemoTriggers();
       renderMyDemo();
     }
 
-    function sellManualTrade(id) {
-      const raw = prompt("באיזה שער מכרת את המניה ($)?");
-      if (!raw) return;
-      const sellPrice = Number(raw);
-      if (!(sellPrice > 0)) return;
-      myTrades = myTrades.map(tr => tr.id === id ? { ...tr, sellPrice } : tr);
-      localStorage.setItem("my_demo_trades", JSON.stringify(myTrades));
+    function fillManualOrderNow(orderId) {
+      const ord = myDemoState.pending.find(o => o.id === orderId);
+      if (!ord) return;
+      myDemoState.pending = myDemoState.pending.filter(o => o.id !== orderId);
+      myDemoState.open.push({
+        id: ord.id,
+        actionNum: ord.actionNum,
+        ticker: ord.ticker,
+        amount: ord.amount,
+        shares: ord.amount / ord.entryPrice,
+        buyPrice: ord.entryPrice,
+        sellTarget: ord.sellTarget,
+        boughtAt: new Date().toLocaleString("he-IL")
+      });
+      saveMyDemoState();
       renderMyDemo();
+    }
+
+    function closeManualPositionAtPrice(posId, exitPriceVal, reasonText) {
+      const pos = myDemoState.open.find(p => p.id === posId);
+      if (!pos) return;
+      const exitPrice = Number(exitPriceVal);
+      if (!(exitPrice > 0)) return;
+      const pnlDollar = (exitPrice - pos.buyPrice) * pos.shares;
+      const pnlPct = ((exitPrice - pos.buyPrice) / pos.buyPrice) * 100;
+      myDemoState.open = myDemoState.open.filter(p => p.id !== posId);
+      myDemoState.closed.push({
+        ...pos,
+        exitPrice,
+        pnlDollar,
+        pnlPct,
+        reason: reasonText || "מכירה ידנית",
+        closedAt: new Date().toLocaleString("he-IL")
+      });
+      saveMyDemoState();
+    }
+
+    function promptManualSell(posId) {
+      const pos = myDemoState.open.find(p => p.id === posId);
+      if (!pos) return;
+      const live = getLivePriceFor(pos.ticker);
+      const defVal = live ? live.toFixed(2) : Number(pos.sellTarget || pos.buyPrice).toFixed(2);
+      const raw = prompt(`באיזה שער מכרת את ${pos.ticker} ($)?`, defVal);
+      if (!raw) return;
+      closeManualPositionAtPrice(posId, Number(raw), "מכירה ידנית");
+      renderMyDemo();
+    }
+
+    function updateManualSellTarget(posId) {
+      const pos = myDemoState.open.find(p => p.id === posId);
+      if (!pos) return;
+      const raw = prompt(`שער מכירה / יעד חדש עבור ${pos.ticker} ($):`, Number(pos.sellTarget || pos.buyPrice * 1.06).toFixed(2));
+      if (!raw) return;
+      const val = Number(raw);
+      if (!(val > 0)) return;
+      pos.sellTarget = val;
+      saveMyDemoState();
+      processManualDemoTriggers();
+      renderMyDemo();
+    }
+
+    function processManualDemoTriggers() {
+      let changed = false;
+      const stillPending = [];
+      for (const ord of myDemoState.pending) {
+        const live = getLivePriceFor(ord.ticker);
+        if (live !== null && live <= ord.entryPrice) {
+          myDemoState.open.push({
+            id: ord.id,
+            actionNum: ord.actionNum,
+            ticker: ord.ticker,
+            amount: ord.amount,
+            shares: ord.amount / ord.entryPrice,
+            buyPrice: ord.entryPrice,
+            sellTarget: ord.sellTarget,
+            boughtAt: new Date().toLocaleString("he-IL")
+          });
+          changed = true;
+        } else {
+          stillPending.push(ord);
+        }
+      }
+      myDemoState.pending = stillPending;
+
+      const stillOpen = [];
+      for (const pos of myDemoState.open) {
+        const live = getLivePriceFor(pos.ticker);
+        if (live !== null && pos.sellTarget > 0 && live >= pos.sellTarget) {
+          const exitP = Math.max(live, pos.sellTarget);
+          const pnlDollar = (exitP - pos.buyPrice) * pos.shares;
+          const pnlPct = ((exitP - pos.buyPrice) / pos.buyPrice) * 100;
+          myDemoState.closed.push({
+            ...pos,
+            exitPrice: exitP,
+            pnlDollar,
+            pnlPct,
+            reason: `הגיעה לשער מכירה $${pos.sellTarget.toFixed(2)}`,
+            closedAt: new Date().toLocaleString("he-IL")
+          });
+          changed = true;
+        } else {
+          stillOpen.push(pos);
+        }
+      }
+      myDemoState.open = stillOpen;
+      if (changed) saveMyDemoState();
     }
 
     function renderMyDemo() {
       const summaryEl = document.getElementById("myDemoSummary");
-      const tradesEl = document.getElementById("myDemoTrades");
+      const pendingEl = document.getElementById("myDemoPending");
+      const openEl = document.getElementById("myDemoOpen");
+      const closedEl = document.getElementById("myDemoClosed");
 
-      let totalPnl = 0;
-      let allocated = 0;
+      const realizedPnl = myDemoState.closed.reduce((acc, c) => acc + Number(c.pnlDollar || 0), 0);
+      let openMarketVal = 0;
+      let openCostBasis = 0;
+      let unrealizedPnl = 0;
 
-      const html = myTrades.map(tr => {
-        allocated += tr.amount;
-        const found = (scanData.results || []).find(r => r.ticker === tr.ticker);
-        const live = found ? Number(found.price) : null;
-        const refPrice = tr.sellPrice !== null ? tr.sellPrice : live;
-        const pnl = refPrice !== null ? (refPrice - tr.buyPrice) * tr.shares : 0;
-        const pnlPct = refPrice !== null ? ((refPrice - tr.buyPrice) / tr.buyPrice) * 100 : 0;
-        totalPnl += pnl;
+      for (const pos of myDemoState.open) {
+        const live = getLivePriceFor(pos.ticker);
+        const curr = live !== null ? live : pos.buyPrice;
+        openCostBasis += pos.amount;
+        openMarketVal += curr * pos.shares;
+        unrealizedPnl += (curr - pos.buyPrice) * pos.shares;
+      }
 
-        const exitHint = found && tr.sellPrice === null
-          ? ` | יציאה: <b>$${Number(found.recommendedExit || found.targetPrice).toFixed(2)}</b>`
-          : "";
+      const pendingReserved = myDemoState.pending.reduce((acc, o) => acc + Number(o.amount || 0), 0);
+      const cash = myCapital - openCostBasis - pendingReserved + realizedPnl;
+      const totalEquity = cash + openMarketVal;
+      const totalPnl = totalEquity - myCapital;
+      const totalReturnPct = (totalPnl / Math.max(myCapital, 1)) * 100;
 
-        const statusText = tr.sellPrice !== null
-          ? `נמכר ב-$${tr.sellPrice.toFixed(2)}`
-          : (live !== null ? `פתוח (עכשיו $${live.toFixed(2)}${exitHint})` : "פתוח (ממתין למחיר)");
+      summaryEl.innerHTML = `
+        הון התחלתי: <b>$${myCapital.toLocaleString()}</b> |
+        שווי תיק: <b>$${totalEquity.toLocaleString(undefined, { maximumFractionDigits: 0 })}</b> |
+        מזומן פנוי: <b>$${cash.toLocaleString(undefined, { maximumFractionDigits: 0 })}</b> |
+        רווח/הפסד כללי: <span class="${totalPnl >= 0 ? "pos" : "neg"}">${totalPnl >= 0 ? "+" : ""}$${totalPnl.toFixed(2)} (${totalReturnPct >= 0 ? "+" : ""}${totalReturnPct.toFixed(2)}%)</span>
+      `;
 
-        return `
-          <div class="list-row">
-            <div>
-              <b>${tr.ticker}</b> | קנייה: $${tr.buyPrice.toFixed(2)} | סכום: $${tr.amount.toFixed(0)}<br/>
-              <span class="meta">${statusText}</span>
-            </div>
-            <div style="text-align:left;">
-              <div class="${pnl >= 0 ? "pos" : "neg"}">${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)} (${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(1)}%)</div>
-              ${tr.sellPrice === null ? `<button class="btn secondary" style="margin-top:4px;" onclick="sellManualTrade(${tr.id})">מכור בשער</button>` : ""}
-            </div>
-          </div>
-        `;
-      }).join("");
+      if (!myDemoState.pending.length) {
+        pendingEl.innerHTML = "";
+      } else {
+        pendingEl.innerHTML = `<h3 style="margin:8px 0 6px;font-size:1rem;">פקודות קנייה ממתינות (ייקנו אוטומטית בהגעה לשער הכניסה)</h3>` +
+          myDemoState.pending.map(o => {
+            const live = getLivePriceFor(o.ticker);
+            return `
+              <div class="list-row">
+                <div>
+                  <span class="badge">פעולה #${o.actionNum}</span> <b>${o.ticker}</b> | ממתין לכניסה ב-<b>$${o.entryPrice.toFixed(2)}</b> | יעד מכירה: <b>$${o.sellTarget.toFixed(2)}</b> | סכום: $${o.amount.toFixed(0)}<br/>
+                  <span class="meta">${live !== null ? `מחיר נוכחי: $${live.toFixed(2)}` : "ממתין לנתון מחיר"}</span>
+                </div>
+                <button class="btn secondary" style="padding:5px 10px;font-size:0.78rem;" onclick="fillManualOrderNow(${o.id})">סמן כנקנה עכשיו</button>
+              </div>
+            `;
+          }).join("");
+      }
 
-      const totalReturnPct = (totalPnl / myCapital) * 100;
-      summaryEl.innerHTML = `הון התחלתי: <b>$${myCapital.toLocaleString()}</b> | בשימוש: <b>$${allocated.toLocaleString()}</b> | רווח/הפסד: <span class="${totalPnl >= 0 ? "pos" : "neg"}">${totalPnl >= 0 ? "+" : ""}$${totalPnl.toFixed(2)} (${totalReturnPct >= 0 ? "+" : ""}${totalReturnPct.toFixed(2)}%)</span>`;
-      tradesEl.innerHTML = html || `<div class="meta">עדיין לא הוזנו עסקאות לתיק הידני.</div>`;
+      if (!myDemoState.open.length) {
+        openEl.innerHTML = `<div class="meta" style="margin-top:8px;">אין פוזיציות פתוחות בתיק הדמו הידני.</div>`;
+      } else {
+        openEl.innerHTML = `<h3 style="margin:8px 0 6px;font-size:1rem;">פוזיציות פתוחות (יימכרו אוטומטית בהגעה לשער המכירה)</h3>` +
+          myDemoState.open.map(pos => {
+            const live = getLivePriceFor(pos.ticker);
+            const curr = live !== null ? live : pos.buyPrice;
+            const pnl = (curr - pos.buyPrice) * pos.shares;
+            const pnlPct = ((curr - pos.buyPrice) / pos.buyPrice) * 100;
+            return `
+              <div class="list-row">
+                <div>
+                  <span class="badge">פעולה #${pos.actionNum}</span> <b>${pos.ticker}</b> | נקנה ב-<b>$${pos.buyPrice.toFixed(2)}</b> | שער מכירה: <b>$${pos.sellTarget.toFixed(2)}</b><br/>
+                  <span class="meta">עכשיו: $${curr.toFixed(2)} | סכום: $${pos.amount.toFixed(0)}</span>
+                </div>
+                <div style="text-align:left;">
+                  <div class="${pnl >= 0 ? "pos" : "neg"}">${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)} (${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(1)}%)</div>
+                  <div style="display:flex;gap:6px;margin-top:4px;justify-content:flex-end;">
+                    <button class="btn secondary" style="padding:4px 9px;font-size:0.76rem;" onclick="updateManualSellTarget(${pos.id})">שנה יעד</button>
+                    <button class="btn secondary" style="padding:4px 9px;font-size:0.76rem;" onclick="promptManualSell(${pos.id})">מכור</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+      }
+
+      if (!myDemoState.closed.length) {
+        closedEl.innerHTML = "";
+      } else {
+        closedEl.innerHTML = `<h3 style="margin:14px 0 6px;font-size:1rem;">עסקאות סגורות (רווח/הפסד ממומש בתיק)</h3>` +
+          myDemoState.closed.slice().reverse().map(c => {
+            const pnlD = Number(c.pnlDollar || 0);
+            const pnlP = Number(c.pnlPct || 0);
+            return `
+              <div class="list-row closed-row">
+                <div>
+                  <span class="badge gray">פעולה #${c.actionNum}</span> <b>${c.ticker}</b> — כניסה $${Number(c.buyPrice).toFixed(2)} ← מכירה $${Number(c.exitPrice).toFixed(2)}<br/>
+                  <span class="meta">${c.reason || "נסגרה"} • ${c.closedAt || ""}</span>
+                </div>
+                <div style="text-align:left;" class="${pnlD >= 0 ? "pos" : "neg"}">${pnlD >= 0 ? "+" : ""}$${pnlD.toFixed(2)} (${pnlP >= 0 ? "+" : ""}${pnlP.toFixed(1)}%)</div>
+              </div>
+            `;
+          }).join("");
+      }
     }
 
     function renderBotDemo() {
       const noteEl = document.getElementById("botOverrideNote");
+      const rawPending = botResetCapital !== null ? [] : (botPortfolio.pending_orders || []);
       const rawOpen = botResetCapital !== null ? [] : (botPortfolio.open_positions || []);
       const rawClosed = botResetCapital !== null ? [] : (botPortfolio.closed_positions || []);
 
+      const pendingList = rawPending.filter(o => !botRemovedTickers.includes(String(o.ticker || "").toUpperCase()));
       const openList = rawOpen.filter(p => !botRemovedTickers.includes(String(p.ticker || "").toUpperCase()));
       const closedList = rawClosed.filter(c => !botRemovedTickers.includes(String(c.ticker || "").toUpperCase()));
 
@@ -718,22 +915,23 @@
       noteEl.textContent = noteParts.join(" • ");
 
       let calcOpenVal = 0;
-      let calcOpenPnl = 0;
       let calcAllocated = 0;
 
-      const enrichedOpen = openList.map(p => {
+      const enrichedOpen = openList.map((p, idx) => {
         const liveItem = (scanData.results || []).find(r => r.ticker === p.ticker);
         const curr = liveItem ? Number(liveItem.price) : Number(p.current_price || p.entry);
         const entry = Number(p.entry || curr);
+        const chosenEntry = Number(p.chosen_entry || entry);
         const shares = Number(p.shares || (Number(p.allocated || 1500) / Math.max(entry, 0.01)));
         const alloc = shares * entry;
         const pnlDollar = (curr - entry) * shares;
         const pnlPct = ((curr - entry) / Math.max(entry, 0.01)) * 100;
         const dynExit = liveItem ? Number(liveItem.recommendedExit || p.exit_price_target || p.target_price) : Number(p.exit_price_target || p.target_price);
+        const chosenExit = Number(p.chosen_exit || dynExit);
+        const actNum = p.action_num || (idx + 1);
         calcOpenVal += curr * shares;
-        calcOpenPnl += pnlDollar;
         calcAllocated += alloc;
-        return { ...p, curr, entry, shares, alloc, pnlDollar, pnlPct, dynExit };
+        return { ...p, actNum, curr, entry, chosenEntry, shares, alloc, pnlDollar, pnlPct, dynExit, chosenExit };
       });
 
       const realizedPnl = closedList.reduce((acc, c) => acc + Number(c.pnl_dollar || 0), 0);
@@ -752,7 +950,7 @@
       let html = `
         <div class="kpi-grid">
           <div class="kpi-box">
-            <div class="box-label">רווח / הפסד כללי לתיק</div>
+            <div class="box-label">רווח / הפסד בטוטאל תיק</div>
             <div class="kpi-val ${totalPnlDollar >= 0 ? "pos" : "neg"}">${totalPnlDollar >= 0 ? "+" : ""}$${totalPnlDollar.toFixed(2)} (${totalPnlPct >= 0 ? "+" : ""}${totalPnlPct.toFixed(2)}%)</div>
           </div>
           <div class="kpi-box">
@@ -760,7 +958,7 @@
             <div class="kpi-val">$${totalEquity.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
           </div>
           <div class="kpi-box">
-            <div class="box-label">מזומן פנוי / ממומש</div>
+            <div class="box-label">מזומן פנוי / רווח ממומש</div>
             <div class="kpi-val">$${cash.toLocaleString(undefined, { maximumFractionDigits: 0 })} <span class="meta">(${realizedPnl >= 0 ? "+" : ""}$${realizedPnl.toFixed(0)}$)</span></div>
           </div>
           <div class="kpi-box">
@@ -770,15 +968,31 @@
         </div>
       `;
 
-      html += `<h3 style="margin:8px 0 6px;font-size:1rem;">פוזיציות פתוחות (רווח לכל מניה ויציאה דינמית)</h3>`;
+      if (pendingList.length) {
+        html += `<h3 style="margin:8px 0 6px;font-size:1rem;">פקודות כניסה אוטומטיות ממתינות לשער שבחרה המערכת</h3>`;
+        html += pendingList.map((o, idx) => {
+          const actNum = o.action_num || (idx + 1);
+          return `
+            <div class="list-row">
+              <div>
+                <span class="badge">פעולה #${actNum}</span> <b>${o.ticker}</b> <span class="badge">${o.source || "אוטומטי"}</span><br/>
+                <span class="meta">כניסה שנבחרה: <b>$${Number(o.chosen_entry || o.entry_target || 0).toFixed(2)}</b> (עכשיו $${Number(o.current_price || 0).toFixed(2)}) | יציאה שנבחרה: <b>$${Number(o.chosen_exit || o.target_price || 0).toFixed(2)}</b></span>
+              </div>
+              <button class="btn danger" style="padding:4px 9px;font-size:0.76rem;" onclick="removeBotPosition('${o.ticker}')">הסר מניה</button>
+            </div>
+          `;
+        }).join("");
+      }
+
+      html += `<h3 style="margin:10px 0 6px;font-size:1rem;">עסקאות פתוחות (שערי כניסה ויציאה שנבחרו ורווח פר עסקה)</h3>`;
       if (!enrichedOpen.length) {
         html += `<div class="meta">אין פוזיציות פתוחות כרגע.</div>`;
       } else {
         html += enrichedOpen.map(p => `
           <div class="list-row">
             <div>
-              <b>${p.ticker}</b> <span class="badge">${p.source || "אוטומטי"}</span><br/>
-              <span class="meta">כניסה: $${p.entry.toFixed(2)} | עכשיו: $${p.curr.toFixed(2)} | יציאה דינמית: <b>$${p.dynExit.toFixed(2)}</b> | סטופ: $${Number(p.stop_loss || 0).toFixed(2)}</span>
+              <span class="badge">פעולה #${p.actNum}</span> <b>${p.ticker}</b> <span class="badge">${p.source || "אוטומטי"}</span><br/>
+              <span class="meta">כניסה שנבחרה: <b>$${p.chosenEntry.toFixed(2)}</b> | עכשיו: $${p.curr.toFixed(2)} | יציאה שנבחרה: <b>$${p.chosenExit.toFixed(2)}</b> (דינמית $${p.dynExit.toFixed(2)})</span>
             </div>
             <div style="text-align:left;">
               <div class="${p.pnlDollar >= 0 ? "pos" : "neg"}">${p.pnlDollar >= 0 ? "+" : ""}$${p.pnlDollar.toFixed(2)} (${p.pnlPct >= 0 ? "+" : ""}${p.pnlPct.toFixed(1)}%)</div>
@@ -789,14 +1003,17 @@
       }
 
       if (closedList.length) {
-        html += `<h3 style="margin:14px 0 6px;font-size:1rem;">עסקאות סגורות (רווח ממומש לכל מניה)</h3>`;
-        html += closedList.slice().reverse().slice(0, 12).map(c => {
+        html += `<h3 style="margin:14px 0 6px;font-size:1rem;">עסקאות סגורות (רווח/הפסד ממומש בתיק)</h3>`;
+        html += closedList.slice().reverse().slice(0, 15).map((c, idx) => {
           const pnlD = Number(c.pnl_dollar || 0);
           const pnlP = Number(c.pnl_pct || 0);
+          const actNum = c.action_num || (closedList.length - idx);
+          const chEntry = Number(c.chosen_entry ?? c.entry ?? 0);
+          const chExit = Number(c.chosen_exit ?? c.exit_price ?? 0);
           return `
-            <div class="list-row">
+            <div class="list-row closed-row">
               <div>
-                <b>${c.ticker}</b> — כניסה $${Number(c.entry).toFixed(2)} ← יציאה $${Number(c.exit_price).toFixed(2)}<br/>
+                <span class="badge gray">פעולה #${actNum}</span> <b>${c.ticker}</b> — כניסה: <b>$${chEntry.toFixed(2)}</b> ← יציאה: <b>$${chExit.toFixed(2)}</b> (מימוש $${Number(c.exit_price).toFixed(2)})<br/>
                 <span class="meta">${c.exit_reason || c.result} • ${c.closed_at || ""}</span>
               </div>
               <div style="text-align:left;" class="${pnlD >= 0 ? "pos" : "neg"}">${pnlD >= 0 ? "+" : ""}$${pnlD.toFixed(2)} (${pnlP >= 0 ? "+" : ""}${pnlP.toFixed(1)}%)</div>
