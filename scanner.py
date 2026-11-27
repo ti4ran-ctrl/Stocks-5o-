@@ -430,7 +430,6 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     def add_check(num: int, section: str, title: str, status: str, weight: float = 1.0):
         checks.append({"id": num, "section": section, "title": title, "status": status, "weight": weight})
 
-    # א. ניתוח טכני (1-19)
     add_check(1, "א. טכני", "מגמה", "PASS" if (last_close > sma_20 and ret_20d > 0) else ("WARN" if ret_20d >= -0.04 else "FAIL"))
     add_check(2, "א. טכני", "תמיכות והתנגדויות", "PASS" if last_close >= low_20 * 1.02 else "WARN")
     add_check(3, "א. טכני", "נרות יפניים", "PASS" if (is_hammer or is_bull_engulf or (last_close > last_open and body / rng > 0.5)) else "WARN")
@@ -455,7 +454,6 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     add_check(18, "א. טכני", "איצ'ימוקו", "PASS" if ichi["above_cloud"] else "WARN")
     add_check(19, "א. טכני", "גל אליוט ודאו", "PASS" if (last_close > sma_50 and ret_60d > 0) else "WARN")
 
-    # ב. דוחות כספיים (20-25)
     add_check(20, "ב. דוחות", "רווח והפסד", "PASS" if (net_margin is not None and net_margin > 0) else ("NA_DATA" if net_margin is None else "WARN"))
     add_check(21, "ב. דוחות", "מאזן", "PASS" if (total_cash is not None and total_debt is not None and total_cash >= total_debt * 0.35) else ("NA_DATA" if total_cash is None else "WARN"))
     add_check(22, "ב. דוחות", "תזרים ו-FCF", "PASS" if (free_cashflow is not None and free_cashflow > 0) else ("NA_DATA" if free_cashflow is None else "WARN"))
@@ -463,7 +461,6 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     add_check(24, "ב. דוחות", "שולי רווח", "PASS" if (op_margin is not None and op_margin > 0.08) else ("NA_DATA" if op_margin is None else "WARN"))
     add_check(25, "ב. דוחות", "EBITDA", "PASS" if (ebitda is not None and ebitda > 0) else ("NA_DATA" if ebitda is None else "WARN"))
 
-    # ג. מכפילים ויחסים (26-37)
     add_check(26, "ג. מכפילים", "P/E", "PASS" if (pe_ratio is not None and 0 < pe_ratio < 65) else ("NA_DATA" if pe_ratio is None else "WARN"))
     add_check(27, "ג. מכפילים", "PEG", "PASS" if (peg_ratio is not None and 0 < peg_ratio <= 2.5) else ("NA_DATA" if peg_ratio is None else "WARN"))
     add_check(28, "ג. מכפילים", "P/S", "PASS" if (ps_ratio is not None and 0 < ps_ratio < 20) else ("NA_DATA" if ps_ratio is None else "WARN"))
@@ -477,7 +474,6 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     add_check(36, "ג. מכפילים", "Buyback", "PASS" if (free_cashflow is not None and free_cashflow > 0 and (payout_ratio is None or payout_ratio < 0.75)) else "NA_DATA")
     add_check(37, "ג. מכפילים", "השוואה לענף", "PASS" if (sector or industry) else "NA_DATA")
 
-    # ד. איכותי (38-44)
     add_check(38, "ד. איכותי", "מודל עסקי", "PASS" if bool(sector) else "NA_DATA")
     add_check(39, "ד. איכותי", "יתרון תחרותי", "PASS" if (op_margin is not None and op_margin >= 0.15) else "NA_DATA")
     add_check(40, "ד. איכותי", "הנהלה", "PASS" if (roe is not None and roe >= 0.12) else "NA_DATA")
@@ -486,7 +482,6 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     add_check(43, "ד. איכותי", "סחירות/לקוחות", "PASS" if (vol_avg20 >= 1_000_000) else "WARN")
     add_check(44, "ד. איכותי", "רגולציה ומשפטי", "WARN" if (abs(gap_pct) > 10 or news_tone == "NEGATIVE") else "PASS")
 
-    # ה. דיווחים וידיעות ברשת (45-51)
     add_check(45, "ה. ידיעות ודיווחים", "ידיעות ברשת", "PASS" if news_tone == "POSITIVE" else ("WARN" if news_tone == "NEGATIVE" else ("NA_DATA" if news_count == 0 else "PASS")))
     add_check(46, "ה. ידיעות ודיווחים", "שיחות ועידה ומצגות", "NA_DATA")
     add_check(47, "ה. ידיעות ודיווחים", "עסקאות בעלי עניין", "PASS" if insider_pct is not None else "NA_DATA")
@@ -495,7 +490,6 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     add_check(50, "ה. ידיעות ודיווחים", "תקשורת וחדשות", "PASS" if (news_count > 0 and news_tone != "NEGATIVE" and vol_ratio < 2.5) else ("WARN" if news_tone == "NEGATIVE" else "PASS"))
     add_check(51, "ה. ידיעות ודיווחים", "אנליסטים", "PASS" if (rec_mean is not None and rec_mean <= 2.5) else ("NA_DATA" if (rec_mean is None and target_mean_price is None) else "WARN"))
 
-    # ו. סנטימנט ושוק (52-57)
     add_check(52, "ו. סנטימנט", "Short Interest", "WARN" if (short_pct is not None and short_pct > 0.15) else ("PASS" if short_pct is not None else "NA_DATA"))
     spy_ret20 = bench.get("spy", {}).get("ret_20d", 0.0)
     add_check(53, "ו. סנטימנט", "חוזק מול מדד", "PASS" if ((ret_20d - spy_ret20) >= 0) else "WARN")
@@ -506,7 +500,6 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     add_check(56, "ו. סנטימנט", "מצב שוק רחב", "PASS" if spy_up else "WARN")
     add_check(57, "ו. סנטימנט", "אופציות", "WARN" if vol_ratio > 2.2 else "PASS")
 
-    # ז. מקרו (58-61)
     env_rates = os.getenv("MACRO_RATES_TREND", "NEUTRAL").strip().upper()
     add_check(58, "ז. מקרו", "ריבית ואינפלציה", "PASS" if env_rates in ("EASING", "STABLE", "NEUTRAL") else "WARN")
     add_check(59, "ז. מקרו", "ענף ועונתיות", "PASS" if ret_20d > -0.05 else "WARN")
@@ -514,7 +507,6 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     add_check(60, "ז. מקרו", "גיאו ומטבע", "WARN" if env_fx_geo in ("RISK_OFF", "HIGH_RISK") else "PASS")
     add_check(61, "ז. מקרו", "כלכלה כללית", "PASS" if spy_up else "WARN")
 
-    # ח. ניהול סיכונים (62-66)
     add_check(62, "ח. סיכונים", "גודל פוזיציה", "PASS")
     add_check(63, "ח. סיכונים", "סטופ ויעד", "PASS")
     add_check(64, "ח. סיכונים", "יחס סיכון/סיכוי", "PASS")
@@ -594,17 +586,14 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
     vol_ratio = r["vol_ratio"]
     news_tone = r.get("news_tone", "NONE")
 
-    # שער פריצה אמיתי מעל התנגדות / שיא קרוב
     res_candidates = [x for x in [high_10 * 1.005, high_20 * 1.005, bb_upper] if x > last_close * 1.004]
     breakout_level = round(min(res_candidates), 2) if res_candidates else round(last_close * (1.0 + max(target_pct * 0.55, 0.025)), 2)
 
-    # רמות תמיכה/מבנה קרובות לחישוב שער כניסה מובחן (לא "העתק-הדבק" של המחיר הנוכחי)
     sup_candidates = [x for x in [vwap_20, ema_20, sma_20, fib_618, low_10, last_low] if 0 < x < last_close * 0.996]
     support_level = round(max(sup_candidates), 2) if sup_candidates else round(max(0.01, last_close * 0.975), 2)
 
     has_bad_structure = (eval_66["failedCount"] >= 2) or (news_tone == "NEGATIVE") or (eval_66["scorePct"] < 55)
 
-    # מקרה 1: מניה שירדה/מתבססת ולכן נכון לחכות לשער פריצה אחרי התבססות
     if not has_bad_structure and eval_66["inBaseAfterDrop"] and rsi >= 38:
         entry_price = round(max(breakout_level, last_close * 1.015), 2)
         gate_verdict = "המתן לפריצה בשער"
@@ -619,7 +608,6 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
         exit_action = "יעד פריצה / סטופ"
         exit_reason = f"לאחר פריצה ב-${entry_price:.2f}: יעד ${target_price:.2f} | סטופ ${stop_loss:.2f}"
 
-    # מקרה 2: מגמה שלילית / חולשה / ידיעות שליליות -> לא להיכנס, להמתין שירד לשער X
     elif has_bad_structure or (last_close < ema_20 and r["ret_1d"] < -0.015):
         wait_candidates = [x for x in [support_level, low_10, fib_618, last_close * 0.97] if 0 < x < last_close * 0.994]
         entry_price = round(max(wait_candidates), 2) if wait_candidates else round(max(0.01, last_close * 0.97), 2)
@@ -635,7 +623,6 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
         exit_action = "המתן לשער כניסה"
         exit_reason = f"בכניסה ב-${entry_price:.2f}: יעד ${target_price:.2f} | סטופ ${stop_loss:.2f}"
 
-    # מקרה 3: מניה במגמה חיובית — שער כניסה מדויק לפי מבנה (פריצה מאושרת או אזור תמיכה/אישור קרוב, לא מחיר השוק העיוור)
     else:
         if vol_ratio >= 1.25 and last_close >= high_10 * 0.995:
             entry_price = round(max(breakout_level, last_close * 1.006), 2)
@@ -719,20 +706,35 @@ def load_demo_portfolio(initial_capital: float) -> dict:
                 if isinstance(data, dict) and "open_positions" in data and "closed_positions" in data:
                     data.setdefault("initial_capital", initial_capital)
                     data.setdefault("cash", initial_capital)
+                    data.setdefault("pending_orders", [])
+                    data.setdefault("next_action_num", 1)
                     return data
         except Exception as exc:
             print(f"Error loading {DEMO_FILE}: {exc}")
     return {
         "initial_capital": initial_capital,
         "cash": initial_capital,
+        "pending_orders": [],
         "open_positions": [],
         "closed_positions": [],
+        "next_action_num": 1,
     }
 
 
 def save_demo_portfolio(data: dict):
     with open(DEMO_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def _next_action_id(portfolio: dict) -> int:
+    existing_nums = [
+        int(x.get("action_num", 0))
+        for x in (portfolio.get("closed_positions", []) + portfolio.get("open_positions", []) + portfolio.get("pending_orders", []))
+        if str(x.get("action_num", "")).isdigit()
+    ]
+    nxt = max([int(portfolio.get("next_action_num", 1) or 1)] + [n + 1 for n in existing_nums])
+    portfolio["next_action_num"] = nxt + 1
+    return nxt
 
 
 def update_demo_portfolio(
@@ -752,18 +754,64 @@ def update_demo_portfolio(
 
     init_cap = float(portfolio.get("initial_capital", initial_capital) or initial_capital)
     cash = float(portfolio.get("cash", init_cap))
+    portfolio.setdefault("pending_orders", [])
 
     if remove_set:
-        kept = []
+        kept_open = []
         for pos in portfolio["open_positions"]:
             if pos["ticker"].upper() in remove_set:
                 refund = round(float(pos.get("allocated", float(pos.get("entry", 0)) * float(pos.get("shares", 0)))), 2)
                 cash = round(cash + refund, 2)
                 status_lines.append(f"🗑️ הוסרה <b>{pos['ticker']}</b> והוחזר ${refund:,.0f} למזומן")
             else:
-                kept.append(pos)
-        portfolio["open_positions"] = kept
+                kept_open.append(pos)
+        portfolio["open_positions"] = kept_open
+        portfolio["pending_orders"] = [o for o in portfolio["pending_orders"] if o["ticker"].upper() not in remove_set]
 
+    # בדיקת פקודות קנייה ממתינות — כניסה רק כשמחיר המניה מגיע לשער הכניסה שנבחר
+    if demo_mode in ("check", "both"):
+        still_pending = []
+        for order in portfolio["pending_orders"]:
+            t = order["ticker"]
+            item = eval_map.get(t)
+            curr = float(item["price"]) if item else float(order.get("current_price", order["entry_target"]))
+            entry_target = float(order["entry_target"])
+            order_side = order.get("side", "BUY_AT_OR_BELOW")
+            reached = (curr <= entry_target) if order_side == "BUY_AT_OR_BELOW" else (curr >= entry_target)
+            if reached and len(portfolio["open_positions"]) < MAX_OPEN_POSITIONS:
+                budget = float(order.get("budget", 1500.0))
+                if cash >= budget and entry_target > 0:
+                    shares = round(budget / entry_target, 4)
+                    actual_cost = round(shares * entry_target, 2)
+                    cash = round(cash - actual_cost, 2)
+                    act_num = order.get("action_num") or _next_action_id(portfolio)
+                    portfolio["open_positions"].append({
+                        "action_num": act_num,
+                        "ticker": t,
+                        "source": order.get("source", "אוטומטי"),
+                        "chosen_entry": round(entry_target, 2),
+                        "chosen_exit": round(float(order.get("target_price", entry_target * 1.06)), 2),
+                        "entry": round(entry_target, 2),
+                        "current_price": round(curr, 2),
+                        "shares": shares,
+                        "allocated": actual_cost,
+                        "stop_loss": round(float(order.get("stop_loss", entry_target * 0.965)), 2),
+                        "target_price": round(float(order.get("target_price", entry_target * 1.06)), 2),
+                        "exit_price_target": round(float(order.get("target_price", entry_target * 1.06)), 2),
+                        "exit_action": "יעד רווח / סטופ",
+                        "unrealized_dollar": round((curr - entry_target) * shares, 2),
+                        "unrealized_pct": round(((curr - entry_target) / max(entry_target, 0.01)) * 100, 2),
+                        "score": order.get("score", 0.7),
+                        "opened_at": now_str,
+                    })
+                    status_lines.append(f"🎯 פעולה #{act_num}: <b>{t}</b> הגיעה לשער כניסה ${entry_target:.2f} ונקנתה (${actual_cost:.0f})")
+                else:
+                    still_pending.append(order)
+            else:
+                still_pending.append(order)
+        portfolio["pending_orders"] = still_pending
+
+    # בדיקת פוזיציות פתוחות — מכירה אוטומטית בהגעה לשער יציאה / יעד / סטופ
     if demo_mode in ("check", "both"):
         still_open = []
         for pos in portfolio["open_positions"]:
@@ -785,7 +833,10 @@ def update_demo_portfolio(
                 pos.setdefault("exit_price_target", round(float(pos.get("target_price", curr)), 2))
                 pos.setdefault("exit_action", "יעד רווח / סטופ")
 
+            act_num = pos.get("action_num") or _next_action_id(portfolio)
+            pos["action_num"] = act_num
             entry_p = float(pos["entry"])
+            pos.setdefault("chosen_entry", round(entry_p, 2))
             shares = float(pos.get("shares") or (float(pos.get("allocated", 1500.0)) / max(entry_p, 0.01)))
             allocated = round(shares * entry_p, 2)
             pos["shares"] = round(shares, 4)
@@ -794,21 +845,25 @@ def update_demo_portfolio(
             target_p = float(pos["target_price"])
             stop_p = float(pos["stop_loss"])
             active_exit_p = float(pos.get("exit_price_target", target_p))
+            pos["chosen_exit"] = round(active_exit_p, 2)
 
             hit_target = curr >= target_p
             hit_dynamic_exit = (active_exit_p != target_p) and (curr >= active_exit_p)
             hit_stop = curr <= stop_p
 
             if hit_target or hit_dynamic_exit or hit_stop:
-                pnl_dollar = round((curr - entry_p) * shares, 2)
-                pnl_pct = round(((curr - entry_p) / max(entry_p, 0.01)) * 100, 2)
-                cash = round(cash + (curr * shares), 2)
+                exit_exec_p = round(max(curr, target_p), 2) if hit_target else round(curr, 2)
+                pnl_dollar = round((exit_exec_p - entry_p) * shares, 2)
+                pnl_pct = round(((exit_exec_p - entry_p) / max(entry_p, 0.01)) * 100, 2)
+                cash = round(cash + (exit_exec_p * shares), 2)
                 reason = "הגיעה ליעד רווח" if hit_target else ("מימוש בשער יציאה דינמי" if hit_dynamic_exit else "פגעה בסטופ לוס")
                 result = "WIN" if pnl_dollar >= 0 else "LOSS"
 
                 portfolio["closed_positions"].append({
                     **pos,
-                    "exit_price": round(curr, 2),
+                    "chosen_entry": round(entry_p, 2),
+                    "chosen_exit": round(active_exit_p, 2),
+                    "exit_price": exit_exec_p,
                     "pnl_dollar": pnl_dollar,
                     "pnl_pct": pnl_pct,
                     "result": result,
@@ -816,7 +871,9 @@ def update_demo_portfolio(
                     "closed_at": now_str,
                 })
                 icon = "✅" if pnl_dollar >= 0 else "🛑"
-                status_lines.append(f"{icon} נמכרה <b>{t}</b> ב-${curr:.2f} ({pnl_pct:+.1f}% | {pnl_dollar:+.2f}$) — {reason}")
+                status_lines.append(
+                    f"{icon} פעולה #{act_num}: נמכרה <b>{t}</b> ב-${exit_exec_p:.2f} (כניסה ${entry_p:.2f}) | <b>{pnl_dollar:+.2f}$ ({pnl_pct:+.1f}%)</b> — {reason}"
+                )
             else:
                 unrealized_dollar = round((curr - entry_p) * shares, 2)
                 unrealized_pct = round(((curr - entry_p) / max(entry_p, 0.01)) * 100, 2)
@@ -825,64 +882,96 @@ def update_demo_portfolio(
                 pos["unrealized_pct"] = unrealized_pct
                 still_open.append(pos)
                 status_lines.append(
-                    f"⏳ <b>{t}</b> ב-${curr:.2f} ({unrealized_pct:+.1f}% | {unrealized_dollar:+.2f}$) | יציאה עדכנית: ${active_exit_p:.2f}"
+                    f"⏳ פעולה #{act_num} <b>{t}</b>: כניסה ${entry_p:.2f} | עכשיו ${curr:.2f} | יציאה ${active_exit_p:.2f} ({unrealized_pct:+.1f}% | {unrealized_dollar:+.2f}$)"
                 )
 
         portfolio["open_positions"] = still_open
 
+    # יצירת פקודות כניסה אוטומטיות חדשות לפי שער הכניסה והיציאה שבחרה המערכת
     if demo_mode in ("open", "both"):
-        open_tickers = {p["ticker"] for p in portfolio["open_positions"]}
+        active_tickers = (
+            {p["ticker"] for p in portfolio["open_positions"]}
+            | {o["ticker"] for o in portfolio["pending_orders"]}
+        )
         watch_picks = [
             eval_map[t] for t in watchlist_tickers
-            if t in eval_map and eval_map[t].get("gateVerdict") == "מאושר לכניסה"
+            if t in eval_map and eval_map[t].get("gateVerdict") in ("מאושר לכניסה", "המתן לפריצה בשער")
         ]
         candidates = list(dict.fromkeys([x["ticker"] for x in (watch_picks + qualified)]))
         per_trade_budget = round(max(250.0, init_cap / max(MAX_OPEN_POSITIONS, 1)), 2)
 
         for t in candidates:
-            if len(portfolio["open_positions"]) >= MAX_OPEN_POSITIONS:
+            if (len(portfolio["open_positions"]) + len(portfolio["pending_orders"])) >= MAX_OPEN_POSITIONS:
                 break
-            if t in open_tickers or t in remove_set:
+            if t in active_tickers or t in remove_set:
                 continue
             pick = eval_map.get(t)
-            if not pick or pick.get("gateVerdict") != "מאושר לכניסה":
+            if not pick or pick.get("gateVerdict") not in ("מאושר לכניסה", "המתן לפריצה בשער"):
                 continue
 
-            entry_p = float(pick["entry"])
+            entry_target = float(pick["entry"])
             curr_p = float(pick["price"])
-            if entry_p <= 0 or cash < min(250.0, per_trade_budget * 0.5):
+            exit_target = float(pick.get("recommendedExit") or pick["targetPrice"])
+            if entry_target <= 0 or cash < min(250.0, per_trade_budget * 0.5):
                 continue
 
             invest_amt = min(cash, per_trade_budget)
-            shares = round(invest_amt / entry_p, 4)
-            actual_cost = round(shares * entry_p, 2)
-            if shares <= 0 or actual_cost > cash:
-                continue
-
-            cash = round(cash - actual_cost, 2)
+            is_breakout = pick.get("gateVerdict") == "המתן לפריצה בשער"
             source_type = "רשימת מעקב" if t in watchlist_tickers else "בחירה אוטומטית"
 
-            pos_obj = {
-                "ticker": t,
-                "source": source_type,
-                "entry": round(entry_p, 2),
-                "current_price": round(curr_p, 2),
-                "shares": shares,
-                "allocated": actual_cost,
-                "stop_loss": round(float(pick["stopLoss"]), 2),
-                "target_price": round(float(pick["targetPrice"]), 2),
-                "exit_price_target": round(float(pick["recommendedExit"]), 2),
-                "exit_action": pick.get("exitAction", "יעד רווח / סטופ"),
-                "unrealized_dollar": round((curr_p - entry_p) * shares, 2),
-                "unrealized_pct": round(((curr_p - entry_p) / max(entry_p, 0.01)) * 100, 2),
-                "score": pick["weightedScore"],
-                "opened_at": now_str,
-            }
-            portfolio["open_positions"].append(pos_obj)
-            open_tickers.add(t)
-            status_lines.append(
-                f"🆕 נקנתה <b>{t}</b> ({source_type}) ב-${entry_p:.2f} (${actual_cost:.0f}) | יעד ${pick['targetPrice']:.2f} | יציאה ${pick['recommendedExit']:.2f}"
-            )
+            # אם המחיר כבר הגיע לשער הכניסה (או כשמדובר בכניסה מאושרת שהשוק כבר בשערה/מתחתיו) — קונים מיד; אחרת ממתינים שהשער יגיע
+            reached_now = (curr_p >= entry_target) if is_breakout else (curr_p <= entry_target)
+            if reached_now:
+                shares = round(invest_amt / entry_target, 4)
+                actual_cost = round(shares * entry_target, 2)
+                if shares <= 0 or actual_cost > cash:
+                    continue
+                cash = round(cash - actual_cost, 2)
+                act_num = _next_action_id(portfolio)
+                portfolio["open_positions"].append({
+                    "action_num": act_num,
+                    "ticker": t,
+                    "source": source_type,
+                    "chosen_entry": round(entry_target, 2),
+                    "chosen_exit": round(exit_target, 2),
+                    "entry": round(entry_target, 2),
+                    "current_price": round(curr_p, 2),
+                    "shares": shares,
+                    "allocated": actual_cost,
+                    "stop_loss": round(float(pick["stopLoss"]), 2),
+                    "target_price": round(float(pick["targetPrice"]), 2),
+                    "exit_price_target": round(exit_target, 2),
+                    "exit_action": pick.get("exitAction", "יעד רווח / סטופ"),
+                    "unrealized_dollar": round((curr_p - entry_target) * shares, 2),
+                    "unrealized_pct": round(((curr_p - entry_target) / max(entry_target, 0.01)) * 100, 2),
+                    "score": pick["weightedScore"],
+                    "opened_at": now_str,
+                })
+                active_tickers.add(t)
+                status_lines.append(
+                    f"🆕 פעולה #{act_num}: נקנתה <b>{t}</b> בכניסה ${entry_target:.2f} | יציאה ${exit_target:.2f} (${actual_cost:.0f})"
+                )
+            else:
+                act_num = _next_action_id(portfolio)
+                portfolio["pending_orders"].append({
+                    "action_num": act_num,
+                    "ticker": t,
+                    "source": source_type,
+                    "side": "BUY_AT_OR_ABOVE" if is_breakout else "BUY_AT_OR_BELOW",
+                    "chosen_entry": round(entry_target, 2),
+                    "chosen_exit": round(exit_target, 2),
+                    "entry_target": round(entry_target, 2),
+                    "current_price": round(curr_p, 2),
+                    "budget": invest_amt,
+                    "stop_loss": round(float(pick["stopLoss"]), 2),
+                    "target_price": round(float(pick["targetPrice"]), 2),
+                    "score": pick["weightedScore"],
+                    "created_at": now_str,
+                })
+                active_tickers.add(t)
+                status_lines.append(
+                    f"📌 פעולה #{act_num}: <b>{t}</b> ממתינה לשער כניסה ${entry_target:.2f} (עכשיו ${curr_p:.2f}) | יציאה ${exit_target:.2f}"
+                )
 
     open_market_value = 0.0
     open_unrealized_pnl = 0.0
