@@ -28,6 +28,14 @@ DEMO_FILE = "demo_portfolio.json"
 LATEST_SCAN_FILE = "latest_scan.json"
 WATCHLIST_FILE = "watchlist.json"
 
+SEC_HEADERS = {
+    "User-Agent": os.getenv("SEC_USER_AGENT", "StockScannerApp contact@example.com").strip(),
+    "Accept-Encoding": "gzip, deflate",
+}
+
+_SEC_TICKER_MAP_CACHE: dict[str, str] | None = None
+_SEC_13F_CACHE: dict[str, dict] = {}
+
 POS_NEWS_WORDS = (
     "beat", "beats", "surge", "surges", "soar", "soars", "upgrade", "upgrades",
     "bullish", "record", "profit", "profits", "growth", "partnership", "deal",
@@ -106,6 +114,114 @@ def get_scan_tickers(watchlist_tickers: list[str]) -> tuple[list[str], bool]:
 
     combined = list(dict.fromkeys(watchlist_tickers + extra_tickers + batch))
     return combined, False
+
+
+def _get_sec_ticker_to_cik() -> dict[str, str]:
+    global _SEC_TICKER_MAP_CACHE
+    if _SEC_TICKER_MAP_CACHE is not None:
+        return _SEC_TICKER_MAP_CACHE
+
+    mapping: dict[str, str] = {}
+    try:
+        resp = requests.get(
+            "https://www.sec.gov/files/company_tickers.json",
+            headers=SEC_HEADERS,
+            timeout=10,
+        )
+        if resp.status_code == 200:
+            raw = resp.json() or {}
+            for _, row in raw.items():
+                tk = str(row.get("ticker", "")).strip().upper()
+                cik_num = str(row.get("cik_str", "")).strip()
+                if tk and cik_num:
+                    mapping[tk] = cik_num.zfill(10)
+    except Exception:
+        pass
+
+    _SEC_TICKER_MAP_CACHE = mapping
+    return mapping
+
+
+def fetch_sec_institutional_and_filings(ticker: str) -> dict:
+    t_up = ticker.strip().upper()
+    if t_up in _SEC_13F_CACHE:
+        return _SEC_13F_CACHE[t_up]
+
+    result = {
+        "source": "SEC EDGAR (Free Public Filings)",
+        "cik": "",
+        "recentFilingsCount": 0,
+        "recentForm4Count": 0,
+        "has13FFiling": False,
+        "topInstFilers": [],
+        "summaryHe": "אין נתוני SEC EDGAR זמינים למניה זו",
+    }
+
+    cik_map = _get_sec_ticker_to_cik()
+    cik = cik_map.get(t_up) or cik_map.get(t_up.replace("-", "."))
+    if not cik:
+        _SEC_13F_CACHE[t_up] = result
+        return result
+
+    result["cik"] = cik
+    try:
+        sub_url = f"https://data.sec.gov/submissions/CIK{cik}.json"
+        resp = requests.get(sub_url, headers=SEC_HEADERS, timeout=10)
+        if resp.status_code == 200:
+            data = resp.json() or {}
+            recent = (data.get("filings") or {}).get("recent") or {}
+            forms = recent.get("form") or []
+            dates = recent.get("filingDate") or []
+            result["recentFilingsCount"] = len(forms)
+
+            form4_recent = 0
+            has_13f = False
+            filers_found = []
+            for idx, fm in enumerate(forms[:60]):
+                f_up = str(fm).upper()
+                f_dt = str(dates[idx]) if idx < len(dates) else ""
+                if f_up == "4":
+                    form4_recent += 1
+                if f_up.startswith("13F"):
+                    has_13f = True
+                    filers_found.append(f"{f_up} ({f_dt})")
+
+            # חיפוש הגשות 13F-HR עדכניות ברבעון האחרון ב-EDGAR EFTS לפי טיקר/שם חברה
+            inst_holders = []
+            try:
+                q_url = (
+                    f"https://efts.sec.gov/LATEST/search-index"
+                    f"?q={quote(t_up)}&forms=13F-HR&from=0&size=5"
+                )
+                q_resp = requests.get(q_url, headers=SEC_HEADERS, timeout=8)
+                if q_resp.status_code == 200:
+                    hits = ((q_resp.json() or {}).get("hits") or {}).get("hits") or []
+                    for h in hits[:5]:
+                        src = h.get("_source") or {}
+                        names = src.get("display_names") or []
+                        fdate = str(src.get("file_date") or "")
+                        if names:
+                            inst_holders.append(f"{names[0]} ({fdate})")
+            except Exception:
+                pass
+
+            result["recentForm4Count"] = form4_recent
+            result["has13FFiling"] = has_13f or bool(inst_holders)
+            result["topInstFilers"] = inst_holders[:4] or filers_found[:3]
+
+            parts = []
+            if form4_recent > 0:
+                parts.append(f"{form4_recent} דיווחי Form 4 (בעלי עניין)")
+            if inst_holders:
+                parts.append(f"{len(inst_holders)} אזכורי 13F-HR עדכניים")
+            elif has_13f:
+                parts.append("קיים דיווח 13F")
+            result["summaryHe"] = " | ".join(parts) if parts else f"{len(forms)} דיווחי SEC אחרונים"
+    except Exception:
+        pass
+
+    _SEC_13F_CACHE[t_up] = result
+    return result
 
 
 def fetch_stock_news(ticker: str) -> dict:
@@ -202,17 +318,18 @@ def send_telegram_message(text: str) -> bool:
         return False
 
 
-def fetch_market_bundle(ticker: str) -> tuple[pd.DataFrame | None, dict, dict, dict]:
+def fetch_market_bundle(ticker: str) -> tuple[pd.DataFrame | None, dict, dict, dict, dict]:
     news_data = fetch_stock_news(ticker)
+    sec_data = fetch_sec_institutional_and_filings(ticker)
     try:
         df = yf.download(ticker, period="1y", interval="1d", progress=False, auto_adjust=True)
         if df is None or df.empty:
-            return None, {}, {}, news_data
+            return None, {}, {}, news_data, sec_data
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.get_level_values(0)
         df = df.dropna(subset=["Open", "High", "Low", "Close", "Volume"]).copy()
         if len(df) < 30:
-            return None, {}, {}, news_data
+            return None, {}, {}, news_data, sec_data
 
         info = {}
         try:
@@ -244,10 +361,10 @@ def fetch_market_bundle(ticker: str) -> tuple[pd.DataFrame | None, dict, dict, d
             except Exception:
                 pass
 
-        return df, info, bench, news_data
+        return df, info, bench, news_data, sec_data
     except Exception as exc:
         print(f"Error fetching {ticker}: {exc}")
-        return None, {}, {}, news_data
+        return None, {}, {}, news_data, sec_data
 
 
 def compute_rsi(series: pd.Series, period: int = 14) -> pd.Series:
@@ -315,7 +432,14 @@ def compute_ichimoku(df: pd.DataFrame) -> dict:
     return {"cloud_top": cloud_top, "above_cloud": float(df["Close"].iloc[-1]) > cloud_top}
 
 
-def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, news_data: dict, target_pct: float) -> dict:
+def run_66_checks_before_entry_exit(
+    df: pd.DataFrame,
+    info: dict,
+    bench: dict,
+    news_data: dict,
+    sec_data: dict,
+    target_pct: float,
+) -> dict:
     close = df["Close"]
     open_p = df["Open"]
     high = df["High"]
@@ -424,6 +548,8 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
 
     news_tone = news_data.get("tone", "NONE")
     news_count = news_data.get("count", 0)
+    sec_13f = bool(sec_data.get("has13FFiling"))
+    sec_form4 = int(sec_data.get("recentForm4Count") or 0)
 
     checks = []
 
@@ -477,15 +603,16 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     add_check(38, "ד. איכותי", "מודל עסקי", "PASS" if bool(sector) else "NA_DATA")
     add_check(39, "ד. איכותי", "יתרון תחרותי", "PASS" if (op_margin is not None and op_margin >= 0.15) else "NA_DATA")
     add_check(40, "ד. איכותי", "הנהלה", "PASS" if (roe is not None and roe >= 0.12) else "NA_DATA")
-    add_check(41, "ד. איכותי", "בעלי עניין", "PASS" if insider_pct is not None else "NA_DATA")
+    add_check(41, "ד. איכותי", "בעלי עניין", "PASS" if (insider_pct is not None or sec_form4 > 0) else "NA_DATA")
     add_check(42, "ד. איכותי", "חדשנות", "PASS" if (rev_growth is not None and rev_growth > 0) else "NA_DATA")
     add_check(43, "ד. איכותי", "סחירות/לקוחות", "PASS" if (vol_avg20 >= 1_000_000) else "WARN")
     add_check(44, "ד. איכותי", "רגולציה ומשפטי", "WARN" if (abs(gap_pct) > 10 or news_tone == "NEGATIVE") else "PASS")
 
     add_check(45, "ה. ידיעות ודיווחים", "ידיעות ברשת", "PASS" if news_tone == "POSITIVE" else ("WARN" if news_tone == "NEGATIVE" else ("NA_DATA" if news_count == 0 else "PASS")))
     add_check(46, "ה. ידיעות ודיווחים", "שיחות ועידה ומצגות", "NA_DATA")
-    add_check(47, "ה. ידיעות ודיווחים", "עסקאות בעלי עניין", "PASS" if insider_pct is not None else "NA_DATA")
-    add_check(48, "ה. ידיעות ודיווחים", "מוסדיים", "PASS" if inst_pct is not None else "NA_DATA")
+    add_check(47, "ה. ידיעות ודיווחים", "עסקאות בעלי עניין (Form 4)", "PASS" if sec_form4 > 0 else ("PASS" if insider_pct is not None else "NA_DATA"))
+    inst_ok = (inst_pct is not None and inst_pct >= 0.25) or sec_13f
+    add_check(48, "ה. ידיעות ודיווחים", "קרנות ומוסדיים (13F / EDGAR)", "PASS" if inst_ok else ("NA_DATA" if inst_pct is None else "WARN"))
     add_check(49, "ה. ידיעות ודיווחים", "הנפקות ודילול", "WARN" if (ret_20d < -0.15 and vol_ratio > 1.5) else "PASS")
     add_check(50, "ה. ידיעות ודיווחים", "תקשורת וחדשות", "PASS" if (news_count > 0 and news_tone != "NEGATIVE" and vol_ratio < 2.5) else ("WARN" if news_tone == "NEGATIVE" else "PASS"))
     add_check(51, "ה. ידיעות ודיווחים", "אנליסטים", "PASS" if (rec_mean is not None and rec_mean <= 2.5) else ("NA_DATA" if (rec_mean is None and target_mean_price is None) else "WARN"))
@@ -528,6 +655,12 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     in_uptrend_structure = (last_close >= ema_20 * 0.995) and (ret_20d >= -0.02) and (macd_hist >= -0.05 or rsi >= 48)
     in_base_after_drop = (last_close < ema_20) or (ret_20d < -0.02)
 
+    analyst_summary = (
+        f"ממוצע המלצות: {rec_mean:.2f} | יעד אנליסטים: ${float(target_mean_price):.2f}"
+        if (rec_mean is not None and target_mean_price is not None)
+        else (f"ממוצע המלצות: {rec_mean:.2f}" if rec_mean is not None else "אין פיד אנליסטים חינמי מלא (מומלץ לאמת ידנית)")
+    )
+
     return {
         "totalChecks": len(checks),
         "passedCount": len(passed),
@@ -537,6 +670,8 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
         "weightedScore": round(score_ratio, 3),
         "inUptrendStructure": in_uptrend_structure,
         "inBaseAfterDrop": in_base_after_drop,
+        "analystSummary": analyst_summary,
+        "institutionalSummary": sec_data.get("summaryHe", ""),
         "levelsRaw": {
             "last_close": last_close,
             "prev_close": prev_close,
@@ -674,6 +809,8 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
         "weightedScore": eval_66["weightedScore"],
         "gateVerdict": gate_verdict,
         "waitInstruction": wait_instruction,
+        "analystSummary": eval_66.get("analystSummary", ""),
+        "institutionalSummary": eval_66.get("institutionalSummary", ""),
         "checksSummary": {
             "total": eval_66["totalChecks"],
             "passed": eval_66["passedCount"],
@@ -768,7 +905,6 @@ def update_demo_portfolio(
         portfolio["open_positions"] = kept_open
         portfolio["pending_orders"] = [o for o in portfolio["pending_orders"] if o["ticker"].upper() not in remove_set]
 
-    # בדיקת פקודות קנייה ממתינות — כניסה רק כשמחיר המניה מגיע לשער הכניסה שנבחר
     if demo_mode in ("check", "both"):
         still_pending = []
         for order in portfolio["pending_orders"]:
@@ -811,7 +947,6 @@ def update_demo_portfolio(
                 still_pending.append(order)
         portfolio["pending_orders"] = still_pending
 
-    # בדיקת פוזיציות פתוחות — מכירה אוטומטית בהגעה לשער יציאה / יעד / סטופ
     if demo_mode in ("check", "both"):
         still_open = []
         for pos in portfolio["open_positions"]:
@@ -828,7 +963,7 @@ def update_demo_portfolio(
                     pos.setdefault("exit_price_target", round(float(pos.get("target_price", curr)), 2))
                     pos.setdefault("exit_action", item.get("exitAction", "יעד רווח / סטופ"))
             else:
-                df, _, _, _ = fetch_market_bundle(t)
+                df, _, _, _, _ = fetch_market_bundle(t)
                 curr = round(float(df["Close"].iloc[-1]), 2) if df is not None else float(pos["entry"])
                 pos.setdefault("exit_price_target", round(float(pos.get("target_price", curr)), 2))
                 pos.setdefault("exit_action", "יעד רווח / סטופ")
@@ -887,7 +1022,6 @@ def update_demo_portfolio(
 
         portfolio["open_positions"] = still_open
 
-    # יצירת פקודות כניסה אוטומטיות חדשות לפי שער הכניסה והיציאה שבחרה המערכת
     if demo_mode in ("open", "both"):
         active_tickers = (
             {p["ticker"] for p in portfolio["open_positions"]}
@@ -919,7 +1053,6 @@ def update_demo_portfolio(
             is_breakout = pick.get("gateVerdict") == "המתן לפריצה בשער"
             source_type = "רשימת מעקב" if t in watchlist_tickers else "בחירה אוטומטית"
 
-            # אם המחיר כבר הגיע לשער הכניסה (או כשמדובר בכניסה מאושרת שהשוק כבר בשערה/מתחתיו) — קונים מיד; אחרת ממתינים שהשער יגיע
             reached_now = (curr_p >= entry_target) if is_breakout else (curr_p <= entry_target)
             if reached_now:
                 shares = round(invest_amt / entry_target, 4)
@@ -1023,7 +1156,7 @@ def update_demo_portfolio(
 def save_latest_scan(evaluated: list[dict], scanned_tickers: list[str], target_pct_label: float, is_manual: bool):
     payload = {
         "updatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-        "source": "Yahoo Finance + News RSS — Trend, Breakout & Profit Filter Engine",
+        "source": "Yahoo Finance + SEC EDGAR (13F / Form 4) + News RSS",
         "mode": "manual" if is_manual else "auto",
         "targetPct": target_pct_label,
         "scannedCount": len(scanned_tickers),
@@ -1041,10 +1174,10 @@ def build_watchlist_telegram_section(watchlist_tickers: list[str], eval_map: dic
     for t in watchlist_tickers[:8]:
         item = eval_map.get(t)
         if not item:
-            df, info, bench, news_d = fetch_market_bundle(t)
+            df, info, bench, news_d, sec_d = fetch_market_bundle(t)
             if df is not None:
-                e66 = run_66_checks_before_entry_exit(df, info, bench, news_d, target_pct)
-                item = {"ticker": t, "news": news_d, **compute_entry_exit_after_66_checks(e66, target_pct)}
+                e66 = run_66_checks_before_entry_exit(df, info, bench, news_d, sec_d, target_pct)
+                item = {"ticker": t, "news": news_d, "sec": sec_d, **compute_entry_exit_after_66_checks(e66, target_pct)}
         if item:
             sign = "+" if item["changePct"] >= 0 else ""
             if item.get("gateVerdict") == "לא להיכנס":
@@ -1071,7 +1204,7 @@ def format_telegram_alert(picks: list[dict], scanned_tickers: list[str], target_
     sample_tickers = ", ".join(scanned_tickers[:10]) + ("..." if len(scanned_tickers) > 10 else "")
 
     lines = [
-        f"<b>66-Checks + Trend/Breakout Engine — {mode_label}</b>",
+        f"<b>66-Checks + SEC EDGAR 13F Engine — {mode_label}</b>",
         f"נסרקו {len(scanned_tickers)} מניות | יעד רווח: <b>+{target_pct_label}%</b> | {now_str}",
         f"מניות: <code>{sample_tickers}</code>",
         "━━━━━━━━━━━━━━━━━━━━",
@@ -1079,18 +1212,20 @@ def format_telegram_alert(picks: list[dict], scanned_tickers: list[str], target_
 
     for idx, item in enumerate(picks, start=1):
         news_sum = item.get("news", {}).get("summaryHe", "")
+        inst_sum = item.get("institutionalSummary", "")
+        meta_line = " | ".join([x for x in [inst_sum, news_sum] if x])
         if item.get("gateVerdict") == "לא להיכנס":
             lines.extend([
                 f"<b>{idx}. {item['ticker']}</b> — ${item['price']:.2f} | ציון <b>{item['scorePct']}%</b>",
                 f"<b>לא להיכנס</b> — {item.get('waitInstruction', '')}",
-                f"יעד: <b>${item['targetPrice']:.2f}</b> (+{item['targetPct']}%) | סטופ: <b>${item['stopLoss']:.2f}</b> | {news_sum}",
+                f"יעד: <b>${item['targetPrice']:.2f}</b> (+{item['targetPct']}%) | סטופ: <b>${item['stopLoss']:.2f}</b> | {meta_line}",
                 "────────────────────",
             ])
         else:
             lines.extend([
                 f"<b>{idx}. {item['ticker']}</b> — ${item['price']:.2f} | <b>{item['gateVerdict']}</b> | ציון <b>{item['scorePct']}%</b>",
                 f"כניסה: <b>${item['entry']:.2f}</b> ({item['entryType']})",
-                f"יעד: <b>${item['targetPrice']:.2f}</b> (+{item['targetPct']}%) | יציאה: <b>${item['recommendedExit']:.2f}</b> | סטופ: <b>${item['stopLoss']:.2f}</b> | {news_sum}",
+                f"יעד: <b>${item['targetPrice']:.2f}</b> (+{item['targetPct']}%) | יציאה: <b>${item['recommendedExit']:.2f}</b> | סטופ: <b>${item['stopLoss']:.2f}</b> | {meta_line}",
                 "────────────────────",
             ])
 
@@ -1114,13 +1249,13 @@ def main():
     scanned_ok = []
 
     for ticker in tickers_to_scan:
-        df, info, bench, news_data = fetch_market_bundle(ticker)
+        df, info, bench, news_data, sec_data = fetch_market_bundle(ticker)
         if df is None:
             continue
         scanned_ok.append(ticker)
-        eval_66 = run_66_checks_before_entry_exit(df, info, bench, news_data, target_pct)
+        eval_66 = run_66_checks_before_entry_exit(df, info, bench, news_data, sec_data, target_pct)
         levels = compute_entry_exit_after_66_checks(eval_66, target_pct)
-        summary = {"ticker": ticker, "news": news_data, **levels}
+        summary = {"ticker": ticker, "news": news_data, "sec": sec_data, **levels}
         evaluated.append(summary)
 
     evaluated.sort(key=lambda x: x["weightedScore"], reverse=True)
