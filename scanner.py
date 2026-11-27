@@ -112,7 +112,6 @@ def fetch_stock_news(ticker: str) -> dict:
     headlines = []
     seen = set()
 
-    # 1. Yahoo Finance RSS Feed
     try:
         rss_url = f"https://feeds.finance.yahoo.com/rss/2.0/headline?s={quote(ticker)}&region=US&lang=en-US"
         resp = requests.get(rss_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
@@ -131,7 +130,6 @@ def fetch_stock_news(ticker: str) -> dict:
     except Exception:
         pass
 
-    # 2. yfinance .news fallback
     if len(headlines) < 3:
         try:
             raw_news = yf.Ticker(ticker).news or []
@@ -188,7 +186,6 @@ def send_telegram_message(text: str) -> bool:
     token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
     chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
     if not token or not chat_id:
-        print("Telegram credentials missing; skipping push.")
         return False
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -200,13 +197,8 @@ def send_telegram_message(text: str) -> bool:
     }
     try:
         resp = requests.post(url, json=payload, timeout=15)
-        if resp.status_code == 200:
-            print("Telegram message sent.")
-            return True
-        print(f"Telegram API error ({resp.status_code}): {resp.text}")
-        return False
-    except Exception as exc:
-        print(f"Telegram error: {exc}")
+        return resp.status_code == 200
+    except Exception:
         return False
 
 
@@ -541,12 +533,9 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
     max_sum = sum(c["weight"] for c in scored) or 1.0
     score_ratio = weighted_sum / max_sum
 
-    if len(failed) >= 2 or score_ratio < 0.48 or news_tone == "NEGATIVE":
-        gate_verdict = "לא להיכנס"
-    elif len(failed) == 1 or score_ratio < 0.65:
-        gate_verdict = "לא להיכנס"
-    else:
-        gate_verdict = "מאושר לכניסה"
+    # סיווג אוטומטי של מבנה השוק למניה (מגמת עלייה/פריצה לעומת בסיס לאחר ירידה)
+    in_uptrend_structure = (last_close >= ema_20 * 0.995) and (ret_20d >= -0.02) and (macd_hist >= -0.05 or rsi >= 48)
+    in_base_after_drop = (last_close < ema_20) or (ret_20d < -0.02)
 
     return {
         "totalChecks": len(checks),
@@ -555,11 +544,14 @@ def run_66_checks_before_entry_exit(df: pd.DataFrame, info: dict, bench: dict, n
         "failedCount": len(failed),
         "scorePct": round(score_ratio * 100, 1),
         "weightedScore": round(score_ratio, 3),
-        "gateVerdict": gate_verdict,
+        "inUptrendStructure": in_uptrend_structure,
+        "inBaseAfterDrop": in_base_after_drop,
         "levelsRaw": {
             "last_close": last_close,
             "prev_close": prev_close,
             "ret_1d": ret_1d,
+            "ret_5d": ret_5d,
+            "ret_20d": ret_20d,
             "sma_20": sma_20,
             "sma_50": sma_50,
             "ema_20": ema_20,
@@ -593,7 +585,6 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
     sma_20 = r["sma_20"]
     ema_20 = r["ema_20"]
     bb_upper = r["bb_upper"]
-    fib_382 = r["fib_382"]
     fib_618 = r["fib_618"]
     vwap_20 = r["vwap_20"]
     atr = r["atr"]
@@ -602,54 +593,55 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
     vol_ratio = r["vol_ratio"]
     news_tone = r.get("news_tone", "NONE")
 
-    # התנגדות/פריצה קרובה
-    res_candidates = [x for x in [high_10 * 1.003, high_20 * 1.003, bb_upper] if x > last_close * 1.002]
-    breakout_level = round(min(res_candidates), 2) if res_candidates else round(last_close * 1.02, 2)
+    # שער פריצה אמיתי מעל התנגדות קרובה
+    res_candidates = [x for x in [high_10 * 1.004, high_20 * 1.004, bb_upper] if x > last_close * 1.003]
+    breakout_level = round(min(res_candidates), 2) if res_candidates else round(last_close * (1.0 + max(target_pct * 0.5, 0.025)), 2)
 
-    # רמות תמיכה / נסיגה שונות מהמחיר הנוכחי
-    sup_candidates = [x for x in [vwap_20, ema_20, sma_20, fib_382, low_10, fib_618, low_20] if 0 < x < last_close * 0.992]
-    support_level = round(max(sup_candidates), 2) if sup_candidates else round(max(0.01, last_close * (1.0 - max(atr / max(last_close, 1e-6), 0.025))), 2)
+    # תמיכה/בסיס קרוב
+    sup_candidates = [x for x in [vwap_20, ema_20, sma_20, low_10, fib_618, low_20] if 0 < x < last_close * 0.992]
+    support_level = round(max(sup_candidates), 2) if sup_candidates else round(max(0.01, last_close * 0.97), 2)
 
-    can_enter_now = (
-        eval_66["gateVerdict"] == "מאושר לכניסה"
-        and news_tone != "NEGATIVE"
-        and rsi < 74
-        and last_close >= ema_20 * 0.99
-    )
+    has_bad_structure = (eval_66["failedCount"] >= 2) or (news_tone == "NEGATIVE") or (eval_66["scorePct"] < 55)
 
-    if not can_enter_now:
-        # חישוב שער כניסה אמיתי שאליו ממתינים שהמניה תרד לפני כניסה
-        wait_candidates = [x for x in [support_level, low_10, fib_618, ema_20 * 0.985, last_close * (1.0 - max(atr / max(last_close, 1e-6) * 1.1, 0.025))] if 0 < x < last_close * 0.995]
-        entry_price = round(max(wait_candidates), 2) if wait_candidates else round(max(0.01, last_close * 0.972), 2)
-        if entry_price >= last_close:
-            entry_price = round(max(0.01, last_close * 0.975), 2)
-
-        gate_verdict = "לא להיכנס"
-        entry_type = f"להמתין שירד לשער ${entry_price:.2f} ואז להיכנס"
-        exit_action = "המתן לירידה ל-${:.2f}".format(entry_price)
-        target_price = round(entry_price * (1.0 + target_pct), 2)
-        max_risk_pct = min(max(target_pct / 1.5, 0.02), target_pct * 0.75)
-        stop_loss = round(max(0.01, min(entry_price * (1.0 - max_risk_pct), support_level * 0.99)), 2)
+    # מקרה 1: מניה שירדה/מתבססת ולכן נכון לחכות לשער פריצה אחרי התבססות (ולא להיכנס לפני פריצה)
+    if not has_bad_structure and eval_66["inBaseAfterDrop"] and (macd_hist > r.get("macd_hist", 0) * 0 or rsi >= 40):
+        entry_price = round(max(breakout_level, last_close * 1.012), 2)
+        gate_verdict = "המתן לפריצה בשער"
+        entry_type = f"קנייה מאושרת רק בפריצת ${entry_price:.2f}"
+        wait_instruction = f"להמתין להתבססות ולפריצה מעל שער ${entry_price:.2f} ואז להיכנס"
+        target_price = round(max(entry_price * (1.0 + target_pct), entry_price + max(atr * 1.8, entry_price * target_pct)), 2)
+        max_risk_pct = min(max(target_pct / 1.5, 0.02), target_pct * 0.7)
+        stop_loss = round(max(0.01, min(entry_price * (1.0 - max_risk_pct), max(last_close * 0.98, support_level * 0.99))), 2)
         if stop_loss >= entry_price:
             stop_loss = round(max(0.01, entry_price * 0.965), 2)
         recommended_exit = target_price
-        exit_reason = f"לאחר כניסה ב-${entry_price:.2f}: יעד ${target_price:.2f} | סטופ ${stop_loss:.2f}"
-    else:
-        # שער כניסה מחושב (נסיגה מבוקרת לתמיכה/ATR או פריצה מעל התנגדות) — לא ברירת מחדל שווה למחיר העכשווי
-        broke_out = last_close > high_20 and (vol_ratio >= 1.0 or macd_hist > 0)
-        if broke_out:
-            entry_price = round(max(last_close * 1.003, min(breakout_level, last_close + atr * 0.15)), 2)
-            entry_type = "כניסה בפריצה מעל התנגדות"
-        else:
-            pullback_target = max(support_level, last_close - min(atr * 0.55, last_close * 0.025))
-            if pullback_target >= last_close * 0.998:
-                pullback_target = last_close * (1.0 - max(atr / max(last_close, 1e-6) * 0.5, 0.012))
-            entry_price = round(max(0.01, pullback_target), 2)
-            entry_type = "כניסה ברמת תמיכה מחושבת"
+        exit_action = "מימוש ביעד / סטופ"
+        exit_reason = f"לאחר פריצה ב-${entry_price:.2f}: יעד ${target_price:.2f} | סטופ ${stop_loss:.2f}"
 
+    # מקרה 2: מגמה שלילית / חולשה / ידיעות שליליות -> לא להיכנס, להמתין שירד לשער X
+    elif has_bad_structure or (last_close < ema_20 and r["ret_1d"] < -0.015):
+        wait_candidates = [x for x in [support_level, low_10, fib_618, last_close * 0.97] if 0 < x < last_close * 0.995]
+        entry_price = round(max(wait_candidates), 2) if wait_candidates else round(max(0.01, last_close * 0.97), 2)
+        if entry_price >= last_close:
+            entry_price = round(max(0.01, last_close * 0.972), 2)
+        gate_verdict = "לא להיכנס"
+        entry_type = f"להמתין שירד לשער ${entry_price:.2f} ואז להיכנס"
+        wait_instruction = f"לא להיכנס — להמתין שירד לשער ${entry_price:.2f} ואז להיכנס"
+        target_price = round(entry_price * (1.0 + target_pct), 2)
+        max_risk_pct = min(max(target_pct / 1.5, 0.02), target_pct * 0.7)
+        stop_loss = round(max(0.01, entry_price * (1.0 - max_risk_pct)), 2)
+        recommended_exit = target_price
+        exit_action = "המתן לשער כניסה"
+        exit_reason = f"בכניסה ב-${entry_price:.2f}: יעד ${target_price:.2f} | סטופ ${stop_loss:.2f}"
+
+    # מקרה 3: מניה במגמה חיובית ואינדיקטורים תומכים -> כניסה מידית כדי לא לפספס מהלך עלייה קרוב
+    else:
+        entry_price = round(last_close, 2)
         gate_verdict = "מאושר לכניסה"
-        target_price = round(max(entry_price * (1.0 + target_pct), breakout_level if breakout_level > entry_price * (1.0 + target_pct * 0.7) else entry_price * (1.0 + target_pct)), 2)
-        max_risk_pct = min(max(target_pct / 1.5, 0.015), target_pct * 0.75)
+        entry_type = "כניסה במהירות/מומנטום (ללא המתנה לנסיגה)"
+        wait_instruction = ""
+        target_price = round(max(entry_price * (1.0 + target_pct), breakout_level if breakout_level > entry_price * (1.0 + target_pct * 0.75) else entry_price * (1.0 + target_pct)), 2)
+        max_risk_pct = min(max(target_pct / 1.5, 0.015), target_pct * 0.7)
         stop_from_risk = entry_price * (1.0 - max_risk_pct)
         stop_from_sup = support_level * 0.992 if support_level < entry_price else stop_from_risk
         stop_loss = round(max(0.01, min(entry_price * 0.988, max(stop_from_risk, stop_from_sup))), 2)
@@ -668,12 +660,13 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
             recommended_exit = target_price
             exit_reason = f"יעד ${target_price:.2f} | סטופ ${stop_loss:.2f}"
 
+    expected_gain_pct = round(((target_price - entry_price) / max(entry_price, 0.01)) * 100, 1)
     stop_pct = round(((entry_price - stop_loss) / max(entry_price, 0.01)) * 100, 1)
     delta_pct = round(((entry_price - last_close) / max(last_close, 0.01)) * 100, 2)
     rr_ratio = round(max(target_price - entry_price, 0.01) / max(entry_price - stop_loss, 0.01), 2)
 
-    sent_code = "BULLISH" if (gate_verdict == "מאושר לכניסה" and eval_66["scorePct"] >= 65) else ("BEARISH" if news_tone == "NEGATIVE" or eval_66["failedCount"] >= 2 else "NEUTRAL")
-    sent_label = "שורי" if sent_code == "BULLISH" else ("דובי/נסיגה" if sent_code == "BEARISH" else "מעורב")
+    sent_code = "BULLISH" if (gate_verdict == "מאושר לכניסה" and eval_66["scorePct"] >= 65) else ("BEARISH" if gate_verdict == "לא להיכנס" else "NEUTRAL")
+    sent_label = "שורי" if sent_code == "BULLISH" else ("המתנה לפריצה" if gate_verdict == "המתן לפריצה בשער" else "דובי/המתנה")
 
     return {
         "price": round(last_close, 2),
@@ -683,7 +676,7 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
         "scorePct": eval_66["scorePct"],
         "weightedScore": eval_66["weightedScore"],
         "gateVerdict": gate_verdict,
-        "waitInstruction": f"להמתין שירד לשער ${entry_price:.2f} ואז להיכנס" if gate_verdict == "לא להיכנס" else "",
+        "waitInstruction": wait_instruction,
         "checksSummary": {
             "total": eval_66["totalChecks"],
             "passed": eval_66["passedCount"],
@@ -698,7 +691,7 @@ def compute_entry_exit_after_66_checks(eval_66: dict, target_pct: float) -> dict
         "stopLoss": stop_loss,
         "stopPct": stop_pct,
         "targetPrice": target_price,
-        "targetPct": round(target_pct * 100, 1),
+        "targetPct": expected_gain_pct,
         "recommendedExit": recommended_exit,
         "exitAction": exit_action,
         "exitReason": exit_reason,
@@ -915,7 +908,7 @@ def update_demo_portfolio(
 def save_latest_scan(evaluated: list[dict], scanned_tickers: list[str], target_pct_label: float, is_manual: bool):
     payload = {
         "updatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-        "source": "Yahoo Finance + News RSS — 66 Checks & Dynamic Entry/Exit Engine",
+        "source": "Yahoo Finance + News RSS — Trend, Breakout & Profit Filter Engine",
         "mode": "manual" if is_manual else "auto",
         "targetPct": target_pct_label,
         "scannedCount": len(scanned_tickers),
@@ -942,12 +935,17 @@ def build_watchlist_telegram_section(watchlist_tickers: list[str], eval_map: dic
             if item.get("gateVerdict") == "לא להיכנס":
                 lines.append(
                     f"• <b>{t}</b>: ${item['price']:.2f} ({sign}{item['changePct']}%) — <b>לא להיכנס</b> | "
-                    f"{item.get('waitInstruction', '')} | יציאה משוערת: ${item['recommendedExit']:.2f}"
+                    f"{item.get('waitInstruction', '')} | יציאה: ${item['recommendedExit']:.2f}"
+                )
+            elif item.get("gateVerdict") == "המתן לפריצה בשער":
+                lines.append(
+                    f"• <b>{t}</b>: ${item['price']:.2f} ({sign}{item['changePct']}%) — <b>{item['gateVerdict']}</b> (${item['entry']:.2f}) | "
+                    f"יעד: ${item['targetPrice']:.2f} (+{item['targetPct']}%) | יציאה: ${item['recommendedExit']:.2f}"
                 )
             else:
                 lines.append(
                     f"• <b>{t}</b>: ${item['price']:.2f} ({sign}{item['changePct']}%) | "
-                    f"כניסה ${item['entry']:.2f} | יעד ${item['targetPrice']:.2f} | יציאה: <b>${item['recommendedExit']:.2f}</b>"
+                    f"כניסה ${item['entry']:.2f} | יעד ${item['targetPrice']:.2f} (+{item['targetPct']}%) | יציאה: <b>${item['recommendedExit']:.2f}</b>"
                 )
     return "\n".join(lines)
 
@@ -958,8 +956,8 @@ def format_telegram_alert(picks: list[dict], scanned_tickers: list[str], target_
     sample_tickers = ", ".join(scanned_tickers[:10]) + ("..." if len(scanned_tickers) > 10 else "")
 
     lines = [
-        f"<b>66-Checks + News Engine — {mode_label}</b>",
-        f"נסרקו {len(scanned_tickers)} מניות | יעד: <b>+{target_pct_label}%</b> | {now_str}",
+        f"<b>66-Checks + Trend/Breakout Engine — {mode_label}</b>",
+        f"נסרקו {len(scanned_tickers)} מניות | יעד רווח: <b>+{target_pct_label}%</b> | {now_str}",
         f"מניות: <code>{sample_tickers}</code>",
         "━━━━━━━━━━━━━━━━━━━━",
     ]
@@ -970,14 +968,14 @@ def format_telegram_alert(picks: list[dict], scanned_tickers: list[str], target_
             lines.extend([
                 f"<b>{idx}. {item['ticker']}</b> — ${item['price']:.2f} | ציון <b>{item['scorePct']}%</b>",
                 f"<b>לא להיכנס</b> — {item.get('waitInstruction', '')}",
-                f"יעד לאחר כניסה: <b>${item['targetPrice']:.2f}</b> | סטופ: <b>${item['stopLoss']:.2f}</b> | {news_sum}",
+                f"יעד: <b>${item['targetPrice']:.2f}</b> (+{item['targetPct']}%) | סטופ: <b>${item['stopLoss']:.2f}</b> | {news_sum}",
                 "────────────────────",
             ])
         else:
             lines.extend([
-                f"<b>{idx}. {item['ticker']}</b> — ${item['price']:.2f} | ציון <b>{item['scorePct']}%</b>",
-                f"כניסה: <b>${item['entry']:.2f}</b> ({item['entryType']}) | יעד: <b>${item['targetPrice']:.2f}</b> | סטופ: <b>${item['stopLoss']:.2f}</b>",
-                f"יציאה: <b>${item['recommendedExit']:.2f}</b> ({item['exitAction']}) | {news_sum}",
+                f"<b>{idx}. {item['ticker']}</b> — ${item['price']:.2f} | <b>{item['gateVerdict']}</b> | ציון <b>{item['scorePct']}%</b>",
+                f"כניסה: <b>${item['entry']:.2f}</b> ({item['entryType']})",
+                f"יעד: <b>${item['targetPrice']:.2f}</b> (+{item['targetPct']}%) | יציאה: <b>${item['recommendedExit']:.2f}</b> | סטופ: <b>${item['stopLoss']:.2f}</b> | {news_sum}",
                 "────────────────────",
             ])
 
@@ -1016,7 +1014,7 @@ def main():
     qualified = (
         evaluated[:5]
         if is_manual_tickers
-        else [x for x in evaluated if x["gateVerdict"] == "מאושר לכניסה" and x["weightedScore"] >= MIN_SCORE_TO_ALERT][:5]
+        else [x for x in evaluated if x["gateVerdict"] in ("מאושר לכניסה", "המתן לפריצה בשער") and x["weightedScore"] >= MIN_SCORE_TO_ALERT][:5]
     )
 
     _, demo_summary = update_demo_portfolio(evaluated, qualified, watchlist_tickers, demo_mode, initial_capital)
