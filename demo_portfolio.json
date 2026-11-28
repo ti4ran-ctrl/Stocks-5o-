@@ -88,9 +88,9 @@
       "exit_action": "יעד רווח / סטופ",
       "shares": 4.2185,
       "allocated": 1500.01,
-      "current_price": 358.54,
-      "unrealized_dollar": 12.49,
-      "unrealized_pct": 0.83,
+      "current_price": 355.58,
+      "unrealized_dollar": 0.0,
+      "unrealized_pct": 0.0,
       "action_num": 5,
       "chosen_entry": 355.58,
       "chosen_exit": 391.14
@@ -140,12 +140,12 @@
   "summary": {
     "initial_capital": 10000.0,
     "cash": 10000.0,
-    "open_market_value": 9082.9,
-    "total_equity": 19082.9,
+    "open_market_value": 9070.41,
+    "total_equity": 19070.41,
     "realized_pnl_dollar": 0.0,
-    "unrealized_pnl_dollar": 82.93,
-    "total_pnl_dollar": 9082.9,
-    "total_pnl_pct": 90.83
+    "unrealized_pnl_dollar": 70.44,
+    "total_pnl_dollar": 9070.41,
+    "total_pnl_pct": 90.7
   },
   "pending_orders": [],
   "next_action_num": 7
